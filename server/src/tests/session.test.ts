@@ -6,6 +6,7 @@ import UserModel, { UserInput } from "../models/user.model";
 import SessionModel from "../models/session.model";
 import app from "../app";
 import getEnvVars from "../config/config";
+import { DecodedItem } from "../utils/jwt.utils";
 
 const { dbUri, dbName, refreshTokenTtl, accessTokenTtl, pubKey } = getEnvVars();
 // test input data
@@ -86,13 +87,6 @@ describe("login / logout tests", () => {
     // checking decoded tokens
     const accessToken = result.body.accessToken.replace(/^Bearer\s/, "");
     const refreshToken = result.body.refreshToken.replace(/^Bearer\s/, "");
-
-    interface DecodedItem {
-      userId: string;
-      sessionId: string;
-      iat: number;
-      exp: number;
-    }
 
     const decodedAccessToken = jwt.verify(
       accessToken,
