@@ -9,7 +9,7 @@ export const createRoleHandler = async (
 ) => {
   try {
     const role = await createRole(req.body);
-    return res.status(201).send(role);
+    return res.status(201).send(role.toJSON());
   } catch (e: any) {
     log.error(e);
     res.status(409).send(e.message);

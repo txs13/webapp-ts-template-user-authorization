@@ -39,7 +39,7 @@ describe("user api tests", () => {
       company: "Roga i Kopyta Ltd.",
       position: "anykey tester",
       description: "very important test case user",
-      userrole_id: dbRole._id,
+      userrole_id: dbRole._id.toString(),
     };
     // to check database - in case user was not deleted in the previous test
     let dbUser = await UserModel.findOne({ email: userInput.email });

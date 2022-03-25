@@ -1,10 +1,21 @@
 import request from "supertest";
 import mongoose from "mongoose";
+import { Request, Response, NextFunction } from "express";
 import RoleModel from "../models/role.model";
 import app from "../app";
 import getEnvVars from "../config/config";
 
-// TODO: to add check create role api is for admin only users
+jest.mock("../middleware/authorizedAccess", () =>
+  jest.fn((req: Request, res: Response, next: NextFunction) => {
+    return next();
+  })
+);
+
+jest.mock("../middleware/adminAccess", () =>
+  jest.fn((req: Request, res: Response, next: NextFunction) => {
+    return next();
+  })
+);
 
 const { dbUri, dbName } = getEnvVars();
 
@@ -28,7 +39,7 @@ describe("role api tests", () => {
       await RoleModel.deleteOne({ role: input.role });
     }
     const result = await request(app).post("/api/v1/role").send(input);
-    const dbRole = await RoleModel.findOne({ _id: result.body._id });
+    const dbRole = await RoleModel.findById(result.body._id);
     expect(dbRole).toBeTruthy();
     if (dbRole) {
       expect(result.statusCode).toBe(201);

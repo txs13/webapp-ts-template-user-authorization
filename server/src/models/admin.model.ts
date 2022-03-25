@@ -1,22 +1,25 @@
-import mongoose from "mongoose";
+import mongoose, {Types} from "mongoose";
 
 export interface AdminInput {
-    userId: string,
-    description?: string
+  userId: Types.ObjectId;
+  description?: string;
 }
 
-const AdminSchema = new mongoose.Schema<AdminDocument>({
-    userId: {type: String, required: true, unique: true},
-    description: {type: String}
-},{
-    timestamps: true
-})
+const AdminSchema = new mongoose.Schema<AdminDocument>(
+  {
+    userId: { type: mongoose.Schema.Types.ObjectId, ref:"User", required: true, unique: true },
+    description: { type: String },
+  },
+  {
+    timestamps: true,
+  }
+);
 
 export interface AdminDocument extends AdminInput, mongoose.Document {
-    createdAt: Date,
-    updatedAt: Date
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-const AdminModel = mongoose.model<AdminDocument>("Admin", AdminSchema)
+const AdminModel = mongoose.model<AdminDocument>("Admin", AdminSchema);
 
-export default AdminModel
+export default AdminModel;

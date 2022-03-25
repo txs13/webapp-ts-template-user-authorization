@@ -1,7 +1,6 @@
-import mongoose from "mongoose";
+import mongoose, {Types} from "mongoose";
 import getEnvVars from "../config/config";
 import bcrypt from "bcrypt";
-import { IndexDefinition } from "mongoose";
 
 const { saltWorkFactor } = getEnvVars();
 
@@ -15,7 +14,7 @@ export interface UserInput {
   company?: string;
   position?: string;
   description?: string;
-  userrole_id: string;
+  userrole_id: Types.ObjectId;
 }
 
 const userSchema = new mongoose.Schema<UserDocument>(
@@ -29,7 +28,11 @@ const userSchema = new mongoose.Schema<UserDocument>(
     company: { type: String },
     position: { type: String },
     description: { type: String },
-    userrole_id: { type: String, required: true },
+    userrole_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Role",
+      required: true,
+    },
   },
   {
     timestamps: true,

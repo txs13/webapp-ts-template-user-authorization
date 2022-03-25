@@ -1,11 +1,18 @@
-import express from 'express'
-import {validateResource} from '../middleware/validateResource'
-import { createRoleHandler } from '../controllers/role.controller'
-import { createRoleSchema } from '../schemas/role.schema'
+import express from "express";
+import { validateResource } from "../middleware/validateResource";
+import { createRoleHandler } from "../controllers/role.controller";
+import { createRoleSchema } from "../schemas/role.schema";
+import authorizedAccess from "../middleware/authorizedAccess";
+import adminAccess from "../middleware/adminAccess";
 
-const roleRouter = express.Router()
-// create role with rolename validation 
-// TODO: create this route for admin only use
-roleRouter.post('/', validateResource(createRoleSchema), createRoleHandler)
+const roleRouter = express.Router();
+// create role with rolename validation
+roleRouter.post(
+  "/",
+  validateResource(createRoleSchema),
+  authorizedAccess,
+  adminAccess,
+  createRoleHandler
+);
 
-export default roleRouter
+export default roleRouter;

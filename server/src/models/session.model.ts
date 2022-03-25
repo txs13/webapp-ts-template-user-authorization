@@ -1,19 +1,20 @@
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 
 // data type and DB schema for the session tokens history input
 export interface SessionAccessTokenInput {
   tokenType: "loginAccessToken" | "refreshAccessToken";
   tokenTTL: number;
 }
-const SessionAccessTokenSchema = new mongoose.Schema<SessionAccessTokenDocument>(
-  {
-    tokenType: { type: String, required: true },
-    tokenTTL: { type: Number, required: true },
-  },
-  {
-    timestamps: true,
-  }
-);
+const SessionAccessTokenSchema =
+  new mongoose.Schema<SessionAccessTokenDocument>(
+    {
+      tokenType: { type: String, required: true },
+      tokenTTL: { type: Number, required: true },
+    },
+    {
+      timestamps: true,
+    }
+  );
 export interface SessionAccessTokenDocument
   extends SessionAccessTokenInput,
     mongoose.Document {
@@ -55,14 +56,14 @@ const SessionActionModel = mongoose.model<SessionActionDocument>(
 
 // data type, DB schema for the session creation / input
 export interface SessionInput {
-  userId: string;
+  userId: Types.ObjectId;
   ipAddress: string;
   userAgent: string;
   sessionTTL: number;
 }
 const SessionSchema = new mongoose.Schema<SessionDocument>(
   {
-    userId: { type: String, required: true },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     ipAddress: { type: String, required: true },
     userAgent: { type: String, required: true },
     sessionTTL: { type: Number, required: true },
