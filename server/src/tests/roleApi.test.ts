@@ -1,30 +1,78 @@
 import request from "supertest";
 import mongoose from "mongoose";
 import { Request, Response, NextFunction } from "express";
-import RoleModel from "../models/role.model";
+import RoleModel, { RoleDocument, RoleInput } from "../models/role.model";
+import UserModel, { UserInput } from "../models/user.model";
+import AdminModel, { AdminInput } from "../models/admin.model";
+import SessionModel from "../models/session.model";
 import app from "../app";
 import getEnvVars from "../config/config";
 
-jest.mock("../middleware/authorizedAccess", () =>
-  jest.fn((req: Request, res: Response, next: NextFunction) => {
-    return next();
-  })
-);
+// jest.mock("../middleware/authorizedAccess", () =>
+//   jest.fn((req: Request, res: Response, next: NextFunction) => {
+//     return next();
+//   })
+// );
 
-jest.mock("../middleware/adminAccess", () =>
-  jest.fn((req: Request, res: Response, next: NextFunction) => {
-    return next();
-  })
-);
+// jest.mock("../middleware/adminAccess", () =>
+//   jest.fn((req: Request, res: Response, next: NextFunction) => {
+//     return next();
+//   })
+// );
 
-const { dbUri, dbName } = getEnvVars();
+const adminRoleName = "test case admin role 00001";
+const adminEmail = "testadmin2@example.com";
+const adminPassword = "qwerty12345";
+const userAgentContent = "user agent content";
+
+const { dbUri, testDbName } = getEnvVars();
 
 describe("role api tests", () => {
+  let mockToken: string;
+
   beforeAll(async () => {
-    await mongoose.connect(dbUri, { dbName: dbName });
+    await mongoose.connect(dbUri, { dbName: testDbName });
+    // create admin user role
+    const adminUserRole: RoleInput = {
+      role: adminRoleName,
+    };
+    const dbAdminRole: RoleDocument = await RoleModel.create(adminUserRole);
+    expect(dbAdminRole).toBeTruthy();
+    // create admin user
+    const adminUser: UserInput = {
+      email: adminEmail,
+      password: adminPassword,
+      userrole_id: dbAdminRole._id,
+      name: "admin name",
+    };
+    const dbAdmin = await UserModel.create(adminUser);
+    expect(dbAdmin).toBeTruthy();
+    //grant admin rights to the admin user
+    const adminInputRecord: AdminInput = {
+      userId: dbAdmin._id,
+    };
+    const dbAdminRecord = AdminModel.create(adminInputRecord);
+    expect(dbAdminRecord).toBeTruthy();
+
+    // login as admin
+    const loginResult = await request(app)
+      .post("/api/v1/user/login")
+      .set("User-agent", userAgentContent)
+      .send({
+        email: adminEmail,
+        password: adminPassword,
+      });
+    expect(loginResult.statusCode).toBe(200);
+    expect(loginResult.body.accessToken).toBeTruthy();
+    mockToken = loginResult.body.accessToken;
   });
 
   afterAll(async () => {
+    // clean up users, roles, admin records
+    await UserModel.deleteMany({});
+    await RoleModel.deleteMany({});
+    await AdminModel.deleteMany({});
+    await SessionModel.deleteMany({});
     await mongoose.disconnect();
     await mongoose.connection.close();
   });
@@ -34,11 +82,11 @@ describe("role api tests", () => {
       role: "test user role 0003",
       description: "test user description",
     };
-    const preTestRoleInDb = await RoleModel.findOne({ role: input.role });
-    if (preTestRoleInDb) {
-      await RoleModel.deleteOne({ role: input.role });
-    }
-    const result = await request(app).post("/api/v1/role").send(input);
+    const result = await request(app)
+      .post("/api/v1/role")
+      .set("User-agent", userAgentContent)
+      .set("Authorization", mockToken)
+      .send(input);
     const dbRole = await RoleModel.findById(result.body._id);
     expect(dbRole).toBeTruthy();
     if (dbRole) {
@@ -55,11 +103,11 @@ describe("role api tests", () => {
     const input = {
       role: "test user role 0003",
     };
-    const preTestRoleInDb = await RoleModel.findOne({ role: input.role });
-    if (preTestRoleInDb) {
-      await RoleModel.deleteOne({ role: input.role });
-    }
-    const result = await request(app).post("/api/v1/role").send(input);
+    const result = await request(app)
+      .post("/api/v1/role")
+      .set("User-agent", userAgentContent)
+      .set("Authorization", mockToken)
+      .send(input);
     const dbRole = await RoleModel.findOne({ _id: result.body._id });
     expect(dbRole).toBeTruthy();
     if (dbRole) {
@@ -77,11 +125,11 @@ describe("role api tests", () => {
       role: "test user role 0003",
       description: "abc",
     };
-    const preTestRoleInDb = await RoleModel.findOne({ role: input.role });
-    if (preTestRoleInDb) {
-      await RoleModel.deleteOne({ role: input.role });
-    }
-    const result = await request(app).post("/api/v1/role").send(input);
+    const result = await request(app)
+      .post("/api/v1/role")
+      .set("User-agent", userAgentContent)
+      .set("Authorization", mockToken)
+      .send(input);
     const dbRole = await RoleModel.findOne({ role: input.role });
     expect(dbRole).toBeFalsy();
     if (dbRole) {
@@ -99,16 +147,13 @@ describe("role api tests", () => {
     const input = {
       role: "",
     };
-    const preTestRoleInDb = await RoleModel.findOne({ role: input.role });
-    if (preTestRoleInDb) {
-      await RoleModel.deleteOne({ role: input.role });
-    }
-    const result = await request(app).post("/api/v1/role").send(input);
+    const result = await request(app)
+      .post("/api/v1/role")
+      .set("User-agent", userAgentContent)
+      .set("Authorization", mockToken)
+      .send(input);
     const dbRole = await RoleModel.findOne({ role: input.role });
     expect(dbRole).toBeFalsy();
-    if (dbRole) {
-      await RoleModel.deleteOne({ role: input.role });
-    }
     expect(result.status).toBe(400);
     expect(result.body[0].code).toBe("too_small");
     expect(result.body[0].message).toBe("role should be 4 chars minimum");
@@ -119,16 +164,13 @@ describe("role api tests", () => {
     const input = {
       role: "abc! a+",
     };
-    const preTestRoleInDb = await RoleModel.findOne({ role: input.role });
-    if (preTestRoleInDb) {
-      await RoleModel.deleteOne({ role: input.role });
-    }
-    const result = await request(app).post("/api/v1/role").send(input);
+    const result = await request(app)
+      .post("/api/v1/role")
+      .set("User-agent", userAgentContent)
+      .set("Authorization", mockToken)
+      .send(input);
     const dbRole = await RoleModel.findOne({ role: input.role });
     expect(dbRole).toBeFalsy();
-    if (dbRole) {
-      await RoleModel.deleteOne({ role: input.role });
-    }
     expect(result.status).toBe(400);
     expect(result.body[0].code).toBe("invalid_string");
     expect(result.body[0].message).toBe("wrong format");
@@ -139,16 +181,13 @@ describe("role api tests", () => {
       role: "test role 00003",
       description: 34567833,
     };
-    const preTestRoleInDb = await RoleModel.findOne({ role: input.role });
-    if (preTestRoleInDb) {
-      await RoleModel.deleteOne({ role: input.role });
-    }
-    const result = await request(app).post("/api/v1/role").send(input);
+    const result = await request(app)
+      .post("/api/v1/role")
+      .set("User-agent", userAgentContent)
+      .set("Authorization", mockToken)
+      .send(input);
     const dbRole = await RoleModel.findOne({ role: input.role });
     expect(dbRole).toBeFalsy();
-    if (dbRole) {
-      await RoleModel.deleteOne({ role: input.role });
-    }
     expect(result.status).toBe(400);
     expect(result.body[0].code).toBe("invalid_type");
   });

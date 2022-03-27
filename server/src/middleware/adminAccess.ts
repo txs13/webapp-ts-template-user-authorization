@@ -11,15 +11,21 @@ const adminAccess = async (req: Request, res: Response, next: NextFunction) => {
         { message: "admin check is not allowed before user authorization" },
       ]);
   }
-  const isAdmin = await checkAdminByUserId(user._id.toString());
+  
+  const isAdmin = await checkAdminByUserId(user._id);
+
   if (!isAdmin) {
+    // add not successful request log
+    const session = res.locals.session;
+    session.addUserAction(req.originalUrl, req.method, false);
+    await session.save();
     return res.status(401).send([
       {
         message: "no admin rights granted",
       },
     ]);
   }
-  next()
+  next();
 };
 
 export default adminAccess;

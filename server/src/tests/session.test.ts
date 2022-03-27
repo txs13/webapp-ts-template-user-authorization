@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import RoleModel, { RoleDocument, RoleInput } from "../models/role.model";
 import UserModel, { UserInput } from "../models/user.model";
 import SessionModel from "../models/session.model";
+import AdminModel from "../models/admin.model";
 import app from "../app";
 import getEnvVars from "../config/config";
 import { DecodedItem } from "../utils/jwt.utils";
@@ -18,17 +19,12 @@ const userAgentContent = "user agent content";
 describe("login / logout tests", () => {
   beforeAll(async () => {
     await mongoose.connect(dbUri, { dbName: dbName });
-    // check and create role - because it is needed for the user registration
+    // create role - because it is needed for the user registration
     const roleInput: RoleInput = {
       role: roleName,
     };
-    let dbRole: null | RoleDocument = await RoleModel.findOne({
-      role: roleInput.role,
-    });
-    if (!dbRole) {
-      dbRole = await RoleModel.create(roleInput);
-    }
-    // user dataset which is supposed to be accepted by api
+    let dbRole = await RoleModel.create(roleInput);
+    // user dataset
     const userInput: UserInput = {
       email: userEmail,
       password: userPassword,
@@ -41,16 +37,15 @@ describe("login / logout tests", () => {
       description: "very important test case user",
       userrole_id: dbRole._id.toString(),
     };
-    // to check database - in case user was not deleted in the previous test
-    let dbUser = await UserModel.findOne({ email: userInput.email });
-    if (!dbUser) {
-      dbUser = await UserModel.create(userInput);
-    }
+    // create user db record
+    await UserModel.create(userInput);
   });
 
   afterAll(async () => {
-    await RoleModel.deleteOne({ role: roleName });
-    await UserModel.deleteOne({ email: userEmail });
+    await UserModel.deleteMany({});
+    await RoleModel.deleteMany({});
+    await AdminModel.deleteMany({});
+    await SessionModel.deleteMany({});
     await mongoose.disconnect();
     await mongoose.connection.close();
   });
@@ -101,12 +96,13 @@ describe("login / logout tests", () => {
     expect(decodedAccessToken.sessionId).toEqual(decodedRefreshToken.sessionId);
     expect(decodedAccessToken.userId).toEqual(sessionDb[0].userId.toString());
     expect(decodedAccessToken.sessionId).toEqual(sessionDb[0]._id.toString());
-    
-    const accessTokenCalcTtl = decodedAccessToken.exp - decodedAccessToken.iat
-    const refreshTokenCalcTtl = decodedRefreshToken.exp - decodedRefreshToken.iat
-    
+
+    const accessTokenCalcTtl = decodedAccessToken.exp - decodedAccessToken.iat;
+    const refreshTokenCalcTtl =
+      decodedRefreshToken.exp - decodedRefreshToken.iat;
+
     expect(accessTokenCalcTtl).toBe(accessTokenTtl);
-    expect(refreshTokenCalcTtl).toBe(refreshTokenTtl);    
+    expect(refreshTokenCalcTtl).toBe(refreshTokenTtl);
 
     // database cleanup for the future tests
     await SessionModel.deleteOne({ _id: sessionDb[0]._id });
@@ -153,5 +149,53 @@ describe("login / logout tests", () => {
     const dbUser = await UserModel.findOne({ email: userEmail });
     const dbSession = await SessionModel.find({ userId: dbUser?._id });
     expect(dbSession.length).toBe(0);
+  });
+
+  test("normal logout", async () => {
+    // check if there is somethig left after prefious not successfull test and cleaning DB
+    let dbSessions = await SessionModel.find({ email: userEmail });
+    if (dbSessions.length > 0) {
+      await SessionModel.deleteMany({ email: userEmail });
+    }
+
+    // implies that login procedure works in teh scope of the preceeding test
+    // performing pure login through the api call
+    const loginResult = await request(app)
+      .post("/api/v1/user/login")
+      .set("User-agent", userAgentContent)
+      .send({
+        email: userEmail,
+        password: userPassword,
+      });
+
+    // checking status and package
+    expect(loginResult.statusCode).toBe(200);
+    expect(loginResult.body.accessToken).toBeTruthy();
+    expect(loginResult.body.refreshToken).toBeTruthy();
+    // extracting accessToken for the logout call
+    const accessToken = loginResult.body.accessToken;
+
+    // performing logout - pure api call
+    const logoutResult = await request(app)
+      .post("/api/v1/user/logout")
+      .set("Authorization", accessToken)
+      .set("User-agent", userAgentContent);
+
+    // check response content
+    expect(logoutResult.statusCode).toBe(200);
+    expect(logoutResult.body.length).toBe(1);
+    expect(logoutResult.body[0].message).toBe("successfully logged out");
+
+    // check correctness of the DB record
+    dbSessions = await SessionModel.find({ email: userEmail });
+    expect(dbSessions.length).toBe(1);
+    expect(dbSessions[0].closedAt).toBeTruthy();
+    expect(dbSessions[0].userActions.length).toBe(1);
+    expect(dbSessions[0].userActions[0].apiRoute).toBe("/api/v1/user/logout");
+    expect(dbSessions[0].userActions[0].apiMethod).toBe("POST");
+    expect(dbSessions[0].userActions[0].successful).toBeTruthy();
+
+    // clean up DB after successfull test
+    await SessionModel.deleteOne({ _id: dbSessions[0].id });
   });
 });

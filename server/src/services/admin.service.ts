@@ -1,4 +1,5 @@
-import { FilterQuery } from 'mongoose'
+import { FilterQuery, Types } from 'mongoose'
+
 import AdminModel, { AdminDocument, AdminInput } from "../models/admin.model";
 
 export const createAdmin = async (input: AdminInput) => {
@@ -10,13 +11,14 @@ export const createAdmin = async (input: AdminInput) => {
   }
 };
 
-export const checkAdminByUserId = async (userId: string): Promise<Boolean> => {
+export const checkAdminByUserId = async (userId: Types.ObjectId): Promise<Boolean> => {
   try {
-    const admin = await AdminModel.findById(userId)
-    if (userId) {
-        return true
+    const admin = await AdminModel.findOne({userId: userId});
+
+    if (admin) {
+      return true;
     } else {
-        return false
+      return false;
     }
   } catch (e: any) {
     throw new Error(e);

@@ -3,9 +3,11 @@ import { LoginDataInput } from "../schemas/login.schema";
 import { validatePasswordAndGetUser } from "../services/user.service";
 import log from "../utils/logger";
 import { signJwt } from "../utils/jwt.utils";
-import SessionModel from "../models/session.model";
+import SessionModel, { SessionDocument } from "../models/session.model";
 import getEnvVars from "../config/config";
 import { omit } from "lodash";
+import { checkAdminByUserId } from "../services/admin.service";
+import { UserDocument } from "../models/user.model";
 
 const { accessTokenTtl, refreshTokenTtl } = getEnvVars();
 
@@ -47,16 +49,36 @@ export const loginUserHandler = async (
     session.addToken("loginAccessToken", accessTokenTtl);
     await session.save();
 
-    // sending successful login confirmation data
+    // create user JSON, exclude password record
     const userData = omit(user.toJSON(), "password");
-    return res.status(200).send({
+    // checking is user has admin rights
+    const isAdmin = await checkAdminByUserId(userData._id)
+    let confirmationJson: Object = {
       user: userData,
       sessionTtl: refreshTokenTtl,
       accessToken: `Bearer ${accessToken}`,
       refreshToken: `Bearer ${refreshToken}`,
-    });
+    };
+    // add isAdmin status frontend to show admin resourses
+    if (isAdmin) {
+      confirmationJson = {...confirmationJson, isAdmin: true}
+    }
+
+    return res.status(200).send(confirmationJson);
   } catch (e: any) {
     log.error(e);
     return res.status(409).send(e.message);
   }
 };
+
+export const logoutUserHandler = async (req: Request, res: Response) => {
+  // get actual session
+  const session: SessionDocument = res.locals.session
+  // update session closed field
+  session.closedAt = new Date();
+  // add user action
+  session.addUserAction(req.originalUrl, req.method, true);
+  await session.save()
+  
+  res.status(200).send([{message: "successfully logged out"}])
+}

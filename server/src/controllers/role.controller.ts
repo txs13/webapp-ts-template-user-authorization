@@ -9,6 +9,9 @@ export const createRoleHandler = async (
 ) => {
   try {
     const role = await createRole(req.body);
+    const session = res.locals.session
+    session.addUserAction(req.originalUrl, req.method, true);
+    await session.save();
     return res.status(201).send(role.toJSON());
   } catch (e: any) {
     log.error(e);

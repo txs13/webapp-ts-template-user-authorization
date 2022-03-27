@@ -2,6 +2,8 @@ import request from "supertest";
 import mongoose from "mongoose";
 import RoleModel, { RoleDocument } from "../models/role.model";
 import UserModel, { UserInput } from "../models/user.model";
+import AdminModel from "../models/admin.model";
+import SessionModel from "../models/session.model";
 import app from "../app";
 import getEnvVars from "../config/config";
 
@@ -13,6 +15,10 @@ describe("user api tests", () => {
   });
 
   afterAll(async () => {
+    await UserModel.deleteMany({});
+    await RoleModel.deleteMany({});
+    await AdminModel.deleteMany({});
+    await SessionModel.deleteMany({});
     await mongoose.disconnect();
     await mongoose.connection.close();
   });
@@ -22,12 +28,8 @@ describe("user api tests", () => {
     const roleInput = {
       role: "test case role 00001",
     };
-    let dbRole: null | RoleDocument = await RoleModel.findOne({
-      role: roleInput.role,
-    });
-    if (!dbRole) {
-      dbRole = await RoleModel.create(roleInput);
-    }
+    let  dbRole = await RoleModel.create(roleInput);
+    
     // user dataset which is supposed to be accepted by api
     const userInput = {
       email: "test@example.com",
@@ -41,18 +43,14 @@ describe("user api tests", () => {
       description: "very important test case user",
       userrole_id: dbRole._id.toString(),
     };
-    // to check database - in case user was not deleted in the previous test
-    let dbUser = await UserModel.findOne({ email: userInput.email });
-    if (dbUser) {
-      await dbUser.deleteOne({ email: userInput.email });
-    }
+    
     // pure api call
     const result = await request(app)
       .post("/api/v1/user/register")
       .send(userInput);
     // check api call status
     expect(result.status).toBe(201);
-    dbUser = await UserModel.findById(result.body._id);
+    let dbUser = await UserModel.findById(result.body._id);
     expect(dbUser).toBeTruthy();
     // check that corresponding fields in DB, returned object and initial request are matching
     expect(dbUser?.email).toBe(userInput.email);
@@ -101,12 +99,8 @@ describe("user api tests", () => {
     const roleInput = {
       role: "test case role 00001",
     };
-    let dbRole: null | RoleDocument = await RoleModel.findOne({
-      role: roleInput.role,
-    });
-    if (!dbRole) {
-      dbRole = await RoleModel.create(roleInput);
-    }
+    let dbRole = await RoleModel.create(roleInput);
+    
     // user dataset which is supposed to be accepted by api
     const userInput = {
       email: "test@example.com",
@@ -114,18 +108,14 @@ describe("user api tests", () => {
       name: "Vasyliy",
       userrole_id: dbRole._id,
     };
-    // to check database - in case user was not deleted in the previous test
-    let dbUser = await UserModel.findOne({ email: userInput.email });
-    if (dbUser) {
-      await dbUser.deleteOne({ email: userInput.email });
-    }
+
     // pure api call
     const result = await request(app)
       .post("/api/v1/user/register")
       .send(userInput);
     // check api call status
     expect(result.status).toBe(201);
-    dbUser = await UserModel.findById(result.body._id);
+    let dbUser = await UserModel.findById(result.body._id);
     expect(dbUser).toBeTruthy();
     // check that corresponding fields in DB, returned object and initial request are matching
     expect(dbUser?.email).toBe(userInput.email);
@@ -168,12 +158,8 @@ describe("user api tests", () => {
     const roleInput = {
       role: "test case role 00001",
     };
-    let dbRole: null | RoleDocument = await RoleModel.findOne({
-      role: roleInput.role,
-    });
-    if (!dbRole) {
-      dbRole = await RoleModel.create(roleInput);
-    }
+    let dbRole = await RoleModel.create(roleInput);
+    
     // user dataset which is supposed to be accepted by api
     const userInput = {
       email: "test@example.com",
@@ -187,11 +173,7 @@ describe("user api tests", () => {
       description: "very important test case user",
       userrole_id: "hjsdhfad43fsewesfwfd",
     };
-    // to check database - in case user was not deleted in the previous test
-    let dbUser = await UserModel.findOne({ email: userInput.email });
-    if (dbUser) {
-      await dbUser.deleteOne({ email: userInput.email });
-    }
+
     // pure api call
     const result = await request(app)
       .post("/api/v1/user/register")
@@ -201,7 +183,7 @@ describe("user api tests", () => {
     expect(result.status).toBe(400);
     expect(result.body[0].message).toBe("wrong role id");
 
-    dbUser = await UserModel.findById(result.body._id);
+    let dbUser = await UserModel.findById(result.body._id);
     expect(dbUser).toBeFalsy();
 
     // clean up the database - delete both test role and user
@@ -213,12 +195,8 @@ describe("user api tests", () => {
     const roleInput = {
       role: "test case role 00001",
     };
-    let dbRole: null | RoleDocument = await RoleModel.findOne({
-      role: roleInput.role,
-    });
-    if (!dbRole) {
-      dbRole = await RoleModel.create(roleInput);
-    }
+    let dbRole = await RoleModel.create(roleInput);
+    
     // user dataset which is supposed to be accepted by api
     const userInput = {
       email: "testexample.com",
@@ -232,11 +210,7 @@ describe("user api tests", () => {
       description: "very*important test case user",
       userrole_id: "6238f2d5b9686c6607323abf",
     };
-    // to check database - in case user was not deleted in the previous test
-    let dbUser = await UserModel.findOne({ email: userInput.email });
-    if (dbUser) {
-      await dbUser.deleteOne({ email: userInput.email });
-    }
+    
     // pure api call
     const result = await request(app)
       .post("/api/v1/user/register")
@@ -290,7 +264,7 @@ describe("user api tests", () => {
     expect(arrayItem.length).toBe(1);
     expect(arrayItem[0].message).toBe("wrong role id");
 
-    dbUser = await UserModel.findById(result.body._id);
+    let dbUser = await UserModel.findById(result.body._id);
     expect(dbUser).toBeFalsy();
 
     // clean up the database - delete both test role and user
@@ -302,12 +276,8 @@ describe("user api tests", () => {
     const roleInput = {
       role: "test case role 00001",
     };
-    let dbRole: null | RoleDocument = await RoleModel.findOne({
-      role: roleInput.role,
-    });
-    if (!dbRole) {
-      dbRole = await RoleModel.create(roleInput);
-    }
+    let dbRole = await RoleModel.create(roleInput);
+    
     // user dataset which is supposed to be accepted by api
     const userInput: UserInput = {
       email: "test@example.com",
@@ -321,11 +291,9 @@ describe("user api tests", () => {
       description: "very important test case user",
       userrole_id: dbRole._id.toString(),
     };
-    // to check database - in case user was not deleted in the previous test
-    let dbUser = await UserModel.findOne({ email: userInput.email });
-    if (!dbUser) {
-      dbUser = await UserModel.create(userInput);
-    }
+    // create "existing" user record in the database
+    let dbUser = await UserModel.create(userInput);
+    
     // pure api call
     const result = await request(app)
       .post("/api/v1/user/register")

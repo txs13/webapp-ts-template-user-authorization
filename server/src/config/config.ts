@@ -8,6 +8,7 @@ const getEnvVars = (): {
   port: number;
   dbUri: string;
   dbName: string;
+  testDbName: string;
   saltWorkFactor: number;
   accessTokenTtl: number;
   refreshTokenTtl: number;
@@ -21,6 +22,7 @@ const getEnvVars = (): {
   const devPort = Number(process.env.PORT);
   const dbUri = process.env.DB_URI_DEV as string;
   const dbName = process.env.DB_NAME_DEV as string;
+  const testDbName = process.env.DB_NAME_TESTS as string;
   const saltWorkFactor = Number(process.env.SALT_WORK_FACTOR);
   const accessTokenTtl = Number(process.env.ACCESS_TOKEN_TTL);
   const refreshTokenTtl = Number(process.env.REFRESH_TOKEN_TTL);
@@ -39,6 +41,7 @@ const getEnvVars = (): {
     port: devPort,
     dbUri: dbUri,
     dbName: dbName,
+    testDbName: testDbName,
     saltWorkFactor: saltWorkFactor,
     accessTokenTtl: accessTokenTtl,
     refreshTokenTtl: refreshTokenTtl,
