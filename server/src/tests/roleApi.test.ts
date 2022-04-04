@@ -191,4 +191,40 @@ describe("role api tests", () => {
     expect(result.status).toBe(400);
     expect(result.body[0].code).toBe("invalid_type");
   });
+
+  test("get empty roles list with one admin role in list", async () => {
+    const dbRoles = await RoleModel.find({});
+    expect(dbRoles.length).toBe(1);
+    expect(dbRoles[0].role.toLowerCase()).toContain("admin");
+
+    const result = await request(app)
+      .get("/api/v1/role")
+      .set("User-agent", userAgentContent);
+
+    expect(result.statusCode).toBe(200);
+    expect(result.body.length).toBe(0);
+  });
+
+  test("get public roles array with one admin role in list, one public role", async () => {
+    // create public role
+    const publicRole: RoleInput = {
+      role: "pretty standard user",
+    };
+    const dbRole = await RoleModel.create(publicRole);
+    // check that there are 2 roles now in the DB
+    const dbRoles = await RoleModel.find({});
+    expect(dbRoles.length).toBe(2);
+    // api call
+    const result = await request(app)
+      .get("/api/v1/role")
+      .set("User-agent", userAgentContent);
+    // result check
+    expect(result.statusCode).toBe(200);
+    expect(result.body.length).toBe(1);
+    expect(result.body[0].role).toBe(publicRole.role)
+    expect(result.body[0]._id).toBe(dbRole._id.toString());
+
+    // clean up DB
+    await RoleModel.deleteOne({_id: dbRole._id})
+  });
 });

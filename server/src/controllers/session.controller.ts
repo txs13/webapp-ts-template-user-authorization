@@ -1,13 +1,13 @@
+import { get } from "lodash";
 import { Request, Response } from "express";
 import { LoginDataInput } from "../schemas/login.schema";
 import { validatePasswordAndGetUser } from "../services/user.service";
 import log from "../utils/logger";
-import { signJwt } from "../utils/jwt.utils";
+import { decodeJwt, signJwt } from "../utils/jwt.utils";
 import SessionModel, { SessionDocument } from "../models/session.model";
 import getEnvVars from "../config/config";
 import { omit } from "lodash";
 import { checkAdminByUserId } from "../services/admin.service";
-import { UserDocument } from "../models/user.model";
 
 const { accessTokenTtl, refreshTokenTtl } = getEnvVars();
 
@@ -19,9 +19,9 @@ export const loginUserHandler = async (
     // checking that such a user and password are valid
     const user = await validatePasswordAndGetUser(req.body);
     // handle wrong credentials
-    
+
     if (!user) {
-      return res.status(401).send([{message: "Invalid email or password"}]);
+      return res.status(401).send([{ message: "Invalid email or password" }]);
     }
     // getting user IP and browser info for further checking
     const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
@@ -30,7 +30,7 @@ export const loginUserHandler = async (
     if (!ip || !userAgent) {
       return res
         .status(401)
-        .send([{message: "Wrong network settings. Please contact admin"}]);
+        .send([{ message: "Wrong network settings. Please contact admin" }]);
     }
 
     // TODO?: to check that user has opened sessions
@@ -52,7 +52,7 @@ export const loginUserHandler = async (
     // create user JSON, exclude password record
     const userData = omit(user.toJSON(), "password");
     // checking is user has admin rights
-    const isAdmin = await checkAdminByUserId(userData._id)
+    const isAdmin = await checkAdminByUserId(userData._id);
     let confirmationJson: Object = {
       user: userData,
       sessionTtl: refreshTokenTtl,
@@ -61,7 +61,7 @@ export const loginUserHandler = async (
     };
     // add isAdmin status frontend to show admin resourses
     if (isAdmin) {
-      confirmationJson = {...confirmationJson, isAdmin: true}
+      confirmationJson = { ...confirmationJson, isAdmin: true };
     }
 
     return res.status(200).send(confirmationJson);
@@ -73,12 +73,41 @@ export const loginUserHandler = async (
 
 export const logoutUserHandler = async (req: Request, res: Response) => {
   // get actual session
-  const session: SessionDocument = res.locals.session
+  const session: SessionDocument = res.locals.session;
   // update session closed field
   session.closedAt = new Date();
   // add user action
   session.addUserAction(req.originalUrl, req.method, true);
-  await session.save()
-  
-  res.status(200).send([{message: "successfully logged out"}])
-}
+  await session.save();
+
+  res.status(200).send([{ message: "successfully logged out" }]);
+};
+
+export const refreshTokenHandler = async (req: Request, res: Response) => {
+  // create new access token
+  const newAccessToken = signJwt(
+    res.locals.user._id,
+    res.locals.session._id,
+    "accessKey"
+  );
+  // add token record to the session
+  const session: SessionDocument = res.locals.session;
+  session.addUserAction(req.originalUrl, req.method, true);
+  session.addToken("refreshAccessToken", accessTokenTtl);
+  await session.save();
+
+  // create user JSON, exclude password record
+  const userData = omit(res.locals.user.toJSON(), "password");
+  // checking is user has admin rights
+  const isAdmin = await checkAdminByUserId(userData._id);
+  let refreshJson: Object = {
+    user: userData,
+    accessToken: `Bearer ${newAccessToken}`,
+  };
+  // add isAdmin status frontend to show admin resourses
+  if (isAdmin) {
+    refreshJson = { ...refreshJson, isAdmin: true };
+  }
+
+  return res.status(200).send(refreshJson);
+};

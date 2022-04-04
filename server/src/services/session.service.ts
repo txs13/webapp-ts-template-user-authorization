@@ -4,6 +4,7 @@ import SessionModel, {
   SessionInput,
 } from "../models/session.model";
 
+// create session record within the login procedure 
 export const createSession = async (
   input: SessionInput
 ): Promise<SessionDocument> => {

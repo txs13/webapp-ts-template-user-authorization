@@ -6,6 +6,7 @@ const {pubKey, privKey, accessTokenTtl, refreshTokenTtl} = getEnvVars()
 export interface DecodedItem {
   userId: string;
   sessionId: string;
+  tokenType: "accessKey" | "refreshKey";
   iat: number;
   exp: number;
 }
@@ -20,7 +21,8 @@ export const signJwt = (
     
   const payloadObject = {
       userId: userId,
-      sessionId: sessionId
+      sessionId: sessionId,
+      tokenType: tokenType
   }
 
   return jwt.sign(payloadObject, privKey, {...options&&options, expiresIn: ttl, algorithm: "RS256"})

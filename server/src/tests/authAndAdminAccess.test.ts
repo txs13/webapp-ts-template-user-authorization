@@ -242,4 +242,76 @@ describe("authorization and admin access tests", () => {
 
     await SessionModel.deleteOne({ _id: dbSession._id });
   });
+
+  test("resource request with empty string", async () => {
+
+    const result = await request(app)
+      .post("/api/v1/role")
+      .set("User-agent", userAgentContent)
+      .set("Authorization", "")
+      .send(newUserRoleInput1);
+
+    expect(result.statusCode).toBe(401);
+    expect(result.body.length).toBe(1);
+    expect(result.body[0].message).toBe("token is required");
+
+    const dbRole = await RoleModel.findOne({ role: newUserRoleInput1.role });
+    expect(dbRole).toBeFalsy();
+  });
+
+  test("resource request without auth token", async () => {
+    
+    const result = await request(app)
+      .post("/api/v1/role")
+      .set("User-agent", userAgentContent)
+      .send(newUserRoleInput1);
+
+    expect(result.statusCode).toBe(401);
+    expect(result.body.length).toBe(1);
+    expect(result.body[0].message).toBe("token is required");
+
+    const dbRole = await RoleModel.findOne({ role: newUserRoleInput1.role });
+    expect(dbRole).toBeFalsy();
+  });
+
+  test("access resourses with refresh token", async () => {
+    // login as admin
+    const loginResult = await request(app)
+      .post("/api/v1/user/login")
+      .set("User-agent", userAgentContent)
+      .send({
+        email: adminEmail,
+        password: adminPassword,
+      });
+
+    expect(loginResult.statusCode).toBe(200);
+    expect(loginResult.body.accessToken).toBeTruthy();
+    const refreshToken = loginResult.body.refreshToken;
+
+    // create new role under admin user
+    const result = await request(app)
+      .post("/api/v1/role")
+      .set("User-agent", userAgentContent)
+      .set("Authorization", refreshToken)
+      .send(newUserRoleInput1);
+    // api call should be successful
+    expect(result.statusCode).toBe(409);
+    expect(result.body.length).toBe(1);
+    expect(result.body[0].message).toBe("wrong session");
+
+    const dbRole = await RoleModel.findOne({ role: newUserRoleInput1.role });
+    expect(dbRole).toBeFalsy();
+    // check correct action record in the DB
+    const dbSession = await SessionModel.findOne({
+      userId: loginResult.body.user._id,
+    });
+    expect(dbSession).toBeTruthy();
+    expect(dbSession?.userActions.length).toBe(1);
+    expect(dbSession?.userActions[0].apiRoute).toBe("/api/v1/role");
+    expect(dbSession?.userActions[0].apiMethod).toBe("POST");
+    expect(dbSession?.userActions[0].successful).toBeFalsy();
+    expect(dbSession?.closedAt).toBeTruthy();
+    // clean up database
+    await SessionModel.deleteOne({ _id: dbSession?._id });
+  })
 });

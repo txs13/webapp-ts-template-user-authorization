@@ -7,11 +7,11 @@ import SessionModel from "../models/session.model";
 import app from "../app";
 import getEnvVars from "../config/config";
 
-const { dbUri, dbName } = getEnvVars();
+const { dbUri, testDbName } = getEnvVars();
 
 describe("user api tests", () => {
   beforeAll(async () => {
-    await mongoose.connect(dbUri, { dbName: dbName });
+    await mongoose.connect(dbUri, { dbName: testDbName });
   });
 
   afterAll(async () => {

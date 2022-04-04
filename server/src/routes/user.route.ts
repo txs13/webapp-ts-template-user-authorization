@@ -2,6 +2,7 @@ import express from "express";
 import {
   loginUserHandler,
   logoutUserHandler,
+  refreshTokenHandler,
 } from "../controllers/session.controller";
 import { createUserHandler } from "../controllers/user.controller";
 import authorizedAccess from "../middleware/authorizedAccess";
@@ -24,5 +25,7 @@ userRouter.post(
 );
 
 userRouter.post("/logout", authorizedAccess, logoutUserHandler);
+
+userRouter.post("/refresh", authorizedAccess, refreshTokenHandler);
 
 export default userRouter;

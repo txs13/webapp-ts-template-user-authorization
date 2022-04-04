@@ -9,7 +9,8 @@ import app from "../app";
 import getEnvVars from "../config/config";
 import { DecodedItem } from "../utils/jwt.utils";
 
-const { dbUri, dbName, refreshTokenTtl, accessTokenTtl, pubKey } = getEnvVars();
+const { dbUri, testDbName, refreshTokenTtl, accessTokenTtl, pubKey } =
+  getEnvVars();
 // test input data
 const roleName = "test case role 00002";
 const userEmail = "test2@example.com";
@@ -18,7 +19,7 @@ const userAgentContent = "user agent content";
 
 describe("login / logout tests", () => {
   beforeAll(async () => {
-    await mongoose.connect(dbUri, { dbName: dbName });
+    await mongoose.connect(dbUri, { dbName: testDbName });
     // create role - because it is needed for the user registration
     const roleInput: RoleInput = {
       role: roleName,
@@ -197,5 +198,121 @@ describe("login / logout tests", () => {
 
     // clean up DB after successfull test
     await SessionModel.deleteOne({ _id: dbSessions[0].id });
+  });
+
+  test("get fresh access token using refresh token", async () => {
+    // check if there is somethig left after prefious not successfull test and cleaning DB
+    let dbSessions = await SessionModel.find({ email: userEmail });
+    if (dbSessions.length > 0) {
+      await SessionModel.deleteMany({ email: userEmail });
+    }
+
+    // implies that login procedure works in teh scope of the preceeding test
+    // performing pure login through the api call
+    const loginResult = await request(app)
+      .post("/api/v1/user/login")
+      .set("User-agent", userAgentContent)
+      .send({
+        email: userEmail,
+        password: userPassword,
+      });
+
+    // checking status and package
+    expect(loginResult.statusCode).toBe(200);
+    expect(loginResult.body.accessToken).toBeTruthy();
+    expect(loginResult.body.refreshToken).toBeTruthy();
+
+    // extracting accessToken for the logout call
+    const refreshToken = loginResult.body.refreshToken;
+
+    // getting fresh access token
+    const refreshResult = await request(app)
+      .post("/api/v1/user/refresh")
+      .set("User-agent", userAgentContent)
+      .set("Authorization", refreshToken);
+    expect(refreshResult.statusCode).toBe(200);
+    expect(refreshResult.body.accessToken).toBeTruthy();
+    expect(refreshResult.body.user.email).toBe(userEmail);
+    expect(refreshResult.body.isAdmin).toBeFalsy();
+    const newAccessToken = refreshResult.body.accessToken;
+
+    // check new token through passing it to logout api call
+    const logoutResult = await request(app)
+      .post("/api/v1/user/logout")
+      .set("User-agent", userAgentContent)
+      .set("Authorization", newAccessToken);
+    expect(logoutResult.statusCode).toBe(200);
+    expect(logoutResult.body.length).toBe(1);
+    expect(logoutResult.body[0].message).toBe("successfully logged out");
+
+    // check new AccessToken Record
+    const dbUser = await UserModel.findOne({ email: userEmail });
+    const dbSession = await SessionModel.findOne({ userId: dbUser?._id });
+    const accessTokens: any = [...(dbSession?.accessTokens as any)];
+    const userActions: any = [...(dbSession?.userActions as any)];
+
+    expect(accessTokens[0].tokenType).toBe("loginAccessToken");
+    expect(accessTokens[0].tokenTTL).toBe(accessTokenTtl);
+    expect(accessTokens[1].tokenType).toBe("refreshAccessToken");
+    expect(accessTokens[1].tokenTTL).toBe(accessTokenTtl);
+
+    expect(userActions[0].apiRoute).toBe("/api/v1/user/refresh");
+    expect(userActions[0].apiMethod).toBe("POST");
+    expect(userActions[0].successful).toBeTruthy();
+    expect(userActions[1].apiRoute).toBe("/api/v1/user/logout");
+    expect(userActions[1].apiMethod).toBe("POST");
+    expect(userActions[1].successful).toBeTruthy();
+
+    // clean up database
+    await SessionModel.deleteOne({ _id: dbSession?._id });
+  });
+
+  test("refresh access token using valid access token", async () => {
+    // check if there is somethig left after prefious not successfull test and cleaning DB
+    let dbSessions = await SessionModel.find({ email: userEmail });
+    if (dbSessions.length > 0) {
+      await SessionModel.deleteMany({ email: userEmail });
+    }
+
+    // implies that login procedure works in teh scope of the preceeding test
+    // performing pure login through the api call
+    const loginResult = await request(app)
+      .post("/api/v1/user/login")
+      .set("User-agent", userAgentContent)
+      .send({
+        email: userEmail,
+        password: userPassword,
+      });
+
+    // checking status and package
+    expect(loginResult.statusCode).toBe(200);
+    expect(loginResult.body.accessToken).toBeTruthy();
+    expect(loginResult.body.refreshToken).toBeTruthy();
+
+    // extracting accessToken for the logout call
+    const accessToken = loginResult.body.accessToken;
+
+    // getting fresh access token
+    const refreshResult = await request(app)
+      .post("/api/v1/user/refresh")
+      .set("User-agent", userAgentContent)
+      .set("Authorization", accessToken);
+    expect(refreshResult.statusCode).toBe(409);
+    expect(refreshResult.body.length).toBe(1);
+    expect(refreshResult.body[0].message).toBe("wrong session");
+
+    // check correctness DB
+    const dbUser = await UserModel.findOne({ email: userEmail });
+    const dbSession = await SessionModel.findOne({ userId: dbUser?._id });
+    expect(dbSession?.accessTokens.length).toBe(1);
+
+    const userActions: any = [...(dbSession?.userActions as any)];
+    expect(userActions.length).toBe(1);
+    expect(userActions[0].apiRoute).toBe("/api/v1/user/refresh");
+    expect(userActions[0].apiMethod).toBe("POST");
+    expect(userActions[0].successful).toBeFalsy();
+
+    // clean up DB
+    await SessionModel.deleteOne({ _id: dbSession?._id });
   });
 });

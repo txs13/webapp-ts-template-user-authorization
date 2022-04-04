@@ -1,5 +1,5 @@
 import RoleModel, { RoleDocument, RoleInput } from "../models/role.model";
-import {FilterQuery} from 'mongoose'
+import { FilterQuery } from "mongoose";
 
 // create role service
 export const createRole = async (input: RoleInput) => {
@@ -40,10 +40,19 @@ export const getRoleById = async (roleId: string): Promise<RoleDocument> => {
 };
 
 // get role by filter
-export const findRole = async(query: FilterQuery<RoleDocument>) => {
+export const findRole = async (query: FilterQuery<RoleDocument>) => {
   try {
-    return await RoleModel.findOne(query)
+    return await RoleModel.findOne(query);
   } catch (e: any) {
     throw new Error(e);
   }
-}
+};
+
+// get all roles and filter ones with "admin" word in name
+export const getAllRolesWithoutAdmin = async () => {
+  const allRoles = await RoleModel.find();
+  const allPublicRoles = allRoles.filter(
+    (it) => !it.role.toLowerCase().includes("admin")
+  );
+  return allPublicRoles.map(it => it.toJSON())
+};

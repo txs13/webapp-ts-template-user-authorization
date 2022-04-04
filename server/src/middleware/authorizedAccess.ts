@@ -13,6 +13,11 @@ const authorizedAccess = async (
     /^Bearer\s/,
     ""
   );
+
+  if (!accessToken || accessToken === "") {
+    return res.status(401).send([{ message: "token is required" }]);
+  }
+
   // decode token
   const decoded = decodeJwt(accessToken);
   if (!decoded) {
@@ -45,6 +50,19 @@ const authorizedAccess = async (
       session.addUserAction(req.originalUrl, req.method, false);
       await session.save();
       return res.status(409).send([{ message: "session is closed" }]);
+    }
+
+    // if user attempts to use refresh token intead of access token
+    if (
+      (decoded.tokenType === "refreshKey" &&
+        req.originalUrl !== "/api/v1/user/refresh") ||
+      (decoded.tokenType === "accessKey" &&
+        req.originalUrl === "/api/v1/user/refresh")
+    ) {
+      session.addUserAction(req.originalUrl, req.method, false);
+      session.closedAt = new Date();
+      await session.save();
+      return res.status(409).send([{ message: "wrong session" }]);
     }
 
     // attach proper user and session documents

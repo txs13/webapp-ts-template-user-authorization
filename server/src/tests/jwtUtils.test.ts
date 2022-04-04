@@ -35,6 +35,8 @@ describe("JWT coding and decoding utils tests", () => {
     expect(decodedRefreshToken?.userId).toBe(testPayload.userId);
     expect(decodedAccessToken?.sessionId).toBe(testPayload.sessionId);
     expect(decodedRefreshToken?.sessionId).toBe(testPayload.sessionId);
+    expect(decodedRefreshToken?.tokenType).toBe("refreshKey");
+    expect(decodedAccessToken?.tokenType).toBe("accessKey");
 
     let accessTokenCalcTtl;
     let refreshTokenCalcTtl;
