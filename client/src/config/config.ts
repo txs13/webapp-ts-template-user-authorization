@@ -17,10 +17,11 @@ const OPTIONS_WITH_TOKEN = (token: string) => {
 
 const getConfig = () => {
   return {
-    userApiBaseUrl: `${SERVER_URL}:${SERVER_PORT}${USER_API}`,
-    roleApiBaseUrl: `${SERVER_URL}:${SERVER_PORT}${ROLE_API}`,
+    baseApiUrl: `${SERVER_URL}:${SERVER_PORT}`,
+    userApi: `${USER_API}`,
+    roleApi: `${ROLE_API}`,
     reqOptions: OPTIONS,
-    reqOptionsToken: OPTIONS_WITH_TOKEN
+    reqOptionsToken: OPTIONS_WITH_TOKEN,
   };
 };
 
