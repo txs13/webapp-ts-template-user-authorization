@@ -14,19 +14,19 @@ import { AppBar } from "@mui/material";
 
 import { RootState } from "../app/store";
 import navbarStyles from "./styles/navbarStyles";
-import getTextResourses from "../res/textResources";
-import { LocalizedTextResourses } from "../res/textResources";
+import getTextResources from "../res/textResourcesFunction";
+import { LocalizedTextResources } from "../res/textResourcesFunction";
 
 const Navbar: React.FunctionComponent = () => {
   // get data from app settings store and get text resouses in proper language
   const appSettings = useSelector(
     (state: RootState) => state.appSettings.value
   );
-  const [textResourses, setTextResourses] = useState<LocalizedTextResourses>(
+  const [textResourses, setTextResourses] = useState<LocalizedTextResources>(
     {}
   );
   useEffect(() => {
-    setTextResourses(getTextResourses(appSettings.language));
+    setTextResourses(getTextResources(appSettings.language));
   }, [appSettings]);
 
   // get user from app user store and form proper menu items

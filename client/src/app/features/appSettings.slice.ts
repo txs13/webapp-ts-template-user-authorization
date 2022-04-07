@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-import { AppLanguageOptions } from '../../res/textResources'
+import { AppLanguageOptions } from '../../res/textResourcesFunction'
 
 
 export interface AppSettingsInterface {

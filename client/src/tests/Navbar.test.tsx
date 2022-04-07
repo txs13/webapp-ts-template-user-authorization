@@ -6,9 +6,9 @@ import thunk from "redux-thunk";
 import userEvent from "@testing-library/user-event";
 
 import { RootState } from "../app/store";
-import { AppLanguageOptions } from "../res/textResources";
+import { AppLanguageOptions } from "../res/textResourcesFunction";
 import Navbar from "../components/Navbar";
-import getTextResourses from "../res/textResources";
+import getTextResourses from "../res/textResourcesFunction";
 
 const textResourses = getTextResourses(AppLanguageOptions.EN);
 

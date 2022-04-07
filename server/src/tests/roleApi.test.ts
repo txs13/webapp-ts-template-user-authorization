@@ -8,18 +8,6 @@ import SessionModel from "../models/session.model";
 import app from "../app";
 import getEnvVars from "../config/config";
 
-// jest.mock("../middleware/authorizedAccess", () =>
-//   jest.fn((req: Request, res: Response, next: NextFunction) => {
-//     return next();
-//   })
-// );
-
-// jest.mock("../middleware/adminAccess", () =>
-//   jest.fn((req: Request, res: Response, next: NextFunction) => {
-//     return next();
-//   })
-// );
-
 const adminRoleName = "test case admin role 00001";
 const adminEmail = "testadmin2@example.com";
 const adminPassword = "qwerty12345";
