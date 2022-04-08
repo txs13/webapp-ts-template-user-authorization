@@ -9,7 +9,7 @@ const appStyles: ComponentStylesDatatype = {
   },
   appframe: {
     flex: "1 1 auto",
-    backgroundColor: "yellow",
+    backgroundColor: "primary.light"
   },
 };
 

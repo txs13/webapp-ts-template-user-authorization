@@ -7,10 +7,10 @@ import {
   IconButton,
   Menu,
   MenuItem,
+  AppBar,
 } from "@mui/material";
 import CoPresentTwoToneIcon from "@mui/icons-material/CoPresentTwoTone";
 import AccountCircle from "@mui/icons-material/AccountCircle";
-import { AppBar } from "@mui/material";
 
 import { RootState } from "../app/store";
 import navbarStyles from "./styles/navbarStyles";

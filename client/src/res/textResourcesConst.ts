@@ -33,6 +33,25 @@ export const textResourcesMultilang: TextResources = {
   startingAdminMenuItemText: {
     EN: "admin control panel",
   },
-};
+  // login fragment text resources
+  emailInputLabel: {
+    EN: "email"
+  },
+  passwordInputLabel: {
+    EN: "password"
+  },
+  rememberEmailChkBoxLabel: {
+    EN: "remember my email"
+  },
+  loginBtnLabel: {
+    EN: "log in"
+  },
+  registerBtnLabel: {
+    EN: "register"
+  }
 
-//export default textResourcesMultilang;
+
+  // register fragment text resources
+
+  
+};
