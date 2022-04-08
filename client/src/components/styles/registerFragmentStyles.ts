@@ -31,7 +31,8 @@ const registerFragmentStyles: ComponentStylesDatatype = {
     padding: "4px",
     borderRadius: "4px",
     userSelect: "none",
-    marginTop: "10px",
+    marginTop: "20px",
+    marginBottom: "10px",
   },
   logoSectionPictureBox: {
     height: "auto",
