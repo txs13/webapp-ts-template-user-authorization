@@ -1,6 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { Box, Typography } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import {
+  Box,
+  Typography,
+  Alert,
+  TextField,
+  Button,
+  ButtonGroup,
+} from "@mui/material";
 import CoPresentTwoToneIcon from "@mui/icons-material/CoPresentTwoTone";
 
 import { RootState } from "../../app/store";
@@ -19,6 +27,8 @@ const RegisterFragment: React.FunctionComponent = () => {
   useEffect(() => {
     setTextResourses(getTextResources(appSettings.language));
   }, [appSettings]);
+  // app navigation: getting navigate function
+  const navigate = useNavigate();
 
   return (
     <>
@@ -32,18 +42,85 @@ const RegisterFragment: React.FunctionComponent = () => {
                 sx={registerFragmentStyles.logoPicture}
               />
             </Box>
-            <Typography sx={registerFragmentStyles.logoSectionText}>
+            <Typography
+              sx={registerFragmentStyles.logoSectionText}
+              data-testid="appName"
+            >
               {textResourses.appName}
             </Typography>
           </Box>
 
-          <Box sx={registerFragmentStyles.alertSection}>Alert Block</Box>
-
-          <Box sx={registerFragmentStyles.userInputSection}>
-            User Input Block
+          <Box sx={registerFragmentStyles.alertSection}>
+            <Alert
+              sx={registerFragmentStyles.alert}
+              data-testid="registerAlert"
+            ></Alert>
           </Box>
 
-          <Box sx={registerFragmentStyles.buttonsSection}>Buttons Block</Box>
+          <Box sx={registerFragmentStyles.userInputSection}>
+            <TextField
+              sx={registerFragmentStyles.emailInput}
+              variant="outlined"
+              margin="dense"
+              label={textResourses.emailInputLabel}
+              data-testid="emailInputRegister"
+            />
+            <TextField
+              sx={registerFragmentStyles.passwordInput}
+              variant="outlined"
+              margin="dense"
+              label={textResourses.passwordInputLabel}
+              data-testid="passwordInputRegister"
+            />
+            <TextField
+              sx={registerFragmentStyles.confirmPasswordInput}
+              variant="outlined"
+              margin="dense"
+              label={textResourses.confirmPasswordInputLabel}
+              data-testid="confirmPasswordInputRegister"
+            />
+            <TextField
+              sx={registerFragmentStyles.nameInput}
+              variant="outlined"
+              margin="dense"
+              label={textResourses.nameInputLabel}
+              data-testid="nameInput"
+            />
+            <TextField
+              sx={registerFragmentStyles.familynameInput}
+              variant="outlined"
+              margin="dense"
+              label={textResourses.familynameInputLabel}
+              data-testid="familynameInput"
+            />
+            <TextField
+              sx={registerFragmentStyles.roleInput}
+              variant="outlined"
+              margin="dense"
+              label={textResourses.roleInputLabel}
+              data-testid="roleInput"
+            />
+          </Box>
+
+          <Box sx={registerFragmentStyles.buttonsSection}>
+            <ButtonGroup sx={registerFragmentStyles.buttonGroup} variant="text">
+              <Button
+                sx={registerFragmentStyles.backToLoginButton}
+                fullWidth
+                data-testid="backToLoginBtn"
+                onClick={() => navigate("/login")}
+              >
+                {textResourses.backToLoginBtnLabel}
+              </Button>
+              <Button
+                sx={registerFragmentStyles.registerButton}
+                fullWidth
+                data-testid="registerBtn"
+              >
+                {textResourses.registerBtnLabel}
+              </Button>
+            </ButtonGroup>
+          </Box>
         </Box>
       </Box>
     </>

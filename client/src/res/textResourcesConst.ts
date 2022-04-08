@@ -35,23 +35,38 @@ export const textResourcesMultilang: TextResources = {
   },
   // login fragment text resources
   emailInputLabel: {
-    EN: "email"
+    EN: "email",
   },
   passwordInputLabel: {
-    EN: "password"
+    EN: "password",
   },
   rememberEmailChkBoxLabel: {
-    EN: "remember my email"
+    EN: "remember my email",
   },
   loginBtnLabel: {
-    EN: "log in"
+    EN: "log in",
   },
-  registerBtnLabel: {
-    EN: "register"
-  }
-
+  toRegisterBtnLabel: {
+    EN: "register",
+  },
 
   // register fragment text resources
-
-  
+  backToLoginBtnLabel: {
+    EN: "to login",
+  },
+  registerBtnLabel: {
+    EN: "register",
+  },
+  confirmPasswordInputLabel: {
+    EN: "confirm password",
+  },
+  nameInputLabel: {
+    EN: "name",
+  },
+  familynameInputLabel: {
+    EN: "family name",
+  },
+  roleInputLabel: {
+    EN: "role"
+  },
 };

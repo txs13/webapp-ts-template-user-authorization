@@ -8,12 +8,12 @@ import { BrowserRouter } from "react-router-dom";
 
 import { RootState } from "../app/store";
 import { AppLanguageOptions } from "../res/textResourcesFunction";
-import LoginFragment from "../components/fragments/LoginFragment";
+import RegisterFragment from "../components/fragments/RegisterFragment";
 import getTextResourses from "../res/textResourcesFunction";
 
 const textResourses = getTextResourses(AppLanguageOptions.EN);
 
-describe("login form tests", () => {
+describe("register form tests", () => {
   const middleware = [thunk];
   const mockStore = configureMockStore(middleware);
   const initialStoreStateNoUser: RootState = {
@@ -37,18 +37,23 @@ describe("login form tests", () => {
     render(
       <Provider store={store}>
         <BrowserRouter>
-          <LoginFragment />
+          <RegisterFragment />
         </BrowserRouter>
       </Provider>
     );
 
     const logo = await screen.findByTestId("applogo");
     const appName = await screen.findByTestId("appName");
-    const alarm = await screen.findByTestId("loginAlert");
-    const emailInput = await screen.findByTestId("emailInput");
-    const passwordInput = await screen.findByTestId("passwordInput");
-    const rememberEmailChkBox = await screen.findByTestId("rememberEmailChckBox");
-    const loginBtn = await screen.findByTestId("loginBtn");
+    const alarm = await screen.findByTestId("registerAlert");
+    const emailInput = await screen.findByTestId("emailInputRegister");
+    const passwordInput = await screen.findByTestId("passwordInputRegister");
+    const confirmPasswordInput = await screen.findByTestId(
+      "confirmPasswordInputRegister"
+    );
+    const nameInput = await screen.findByTestId("nameInput");
+    const familynameInput = await screen.findByTestId("familynameInput");
+    const roleInput = await screen.findByTestId("roleInput");
+    const backToLoginBtn = await screen.findByTestId("backToLoginBtn");
     const registerBtn = await screen.findByTestId("registerBtn");
 
     expect(logo).toBeInTheDocument();
@@ -64,26 +69,40 @@ describe("login form tests", () => {
     expect(emailInput).toBeVisible();
     expect(emailInput.textContent).toContain(textResourses.emailInputLabel);
 
-
     expect(passwordInput).toBeInTheDocument();
     expect(passwordInput).toBeVisible();
     expect(passwordInput.textContent).toContain(
       textResourses.passwordInputLabel
     );
 
-    expect(rememberEmailChkBox).toBeInTheDocument();
-    expect(rememberEmailChkBox).toBeVisible();
-    expect(rememberEmailChkBox.textContent).toContain(
-      textResourses.rememberEmailChkBoxLabel
+    expect(confirmPasswordInput).toBeInTheDocument();
+    expect(confirmPasswordInput).toBeVisible();
+    expect(confirmPasswordInput.textContent).toContain(
+      textResourses.confirmPasswordInputLabel
     );
 
-    expect(loginBtn).toBeInTheDocument();
-    expect(loginBtn).toBeVisible();
-    expect(loginBtn.textContent).toContain(textResourses.loginBtnLabel);
+    expect(nameInput).toBeInTheDocument();
+    expect(nameInput).toBeVisible();
+    expect(nameInput.textContent).toContain(textResourses.nameInputLabel);
+
+    expect(familynameInput).toBeInTheDocument();
+    expect(familynameInput).toBeVisible();
+    expect(familynameInput.textContent).toContain(
+      textResourses.familynameInputLabel
+    );
+
+    expect(roleInput).toBeInTheDocument();
+    expect(roleInput).toBeVisible();
+    expect(roleInput.textContent).toContain(textResourses.roleInputLabel);
+
+    expect(backToLoginBtn).toBeInTheDocument();
+    expect(backToLoginBtn).toBeVisible();
+    expect(backToLoginBtn.textContent).toContain(
+      textResourses.backToLoginBtnLabel
+    );
 
     expect(registerBtn).toBeInTheDocument();
     expect(registerBtn).toBeVisible();
-    expect(registerBtn.textContent).toContain(textResourses.toRegisterBtnLabel);
-
+    expect(registerBtn.textContent).toContain(textResourses.registerBtnLabel);
   });
 });

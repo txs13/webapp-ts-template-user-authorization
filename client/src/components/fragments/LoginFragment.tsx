@@ -97,7 +97,7 @@ const LoginFragment: React.FunctionComponent = () => {
                 data-testid="registerBtn"
                 onClick={() => navigate("/register")}
               >
-                {textResourses.registerBtnLabel}
+                {textResourses.toRegisterBtnLabel}
               </Button>
             </ButtonGroup>
           </Box>

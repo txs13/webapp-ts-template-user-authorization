@@ -59,6 +59,13 @@ const registerFragmentStyles: ComponentStylesDatatype = {
   alert: {},
   // user input block
   userInputSection: { width: "80%", marginLeft: "auto", marginRight: "auto" },
+  emailInput: { width: "100%" },
+  passwordInput: { width: "100%" },
+  confirmPasswordInput: { width: "100%" },
+  nameInput: { width: "100%" },
+  familynameInput: { width: "100%" },
+  roleInput: { width: "100%" },
+
   // button block
   buttonsSection: {
     width: "80%",
@@ -66,6 +73,11 @@ const registerFragmentStyles: ComponentStylesDatatype = {
     marginRight: "auto",
     marginBottom: "10px",
   },
+  buttonGroup: {
+    width: "100%",
+  },
+  backToLoginButton: {},
+  registerButton: {},
 };
 
 export default registerFragmentStyles;
