@@ -33,7 +33,7 @@ const Navbar: React.FunctionComponent = () => {
   const user = useSelector((state: RootState) => state.user.value);
   const [menuItems, setMenuItems] = useState<string[]>();
   useEffect(() => {
-    if (user) {
+    if (user.user) {
       setMenuItems([
         textResourses.startingAppMenuItemText,
         textResourses.profileMenuItemText,

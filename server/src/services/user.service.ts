@@ -1,6 +1,7 @@
 import { FilterQuery } from 'mongoose'
 import { omit } from "lodash";
 import UserModel, { UserDocument, UserInput } from "../models/user.model";
+import { LoginInput } from '../models/login.model';
 
 // create user service
 export const createUser = async (input: UserInput) => {
@@ -30,10 +31,7 @@ export const checkUserByEmail = async (email: string) => {
 export const validatePasswordAndGetUser = async ({
   email,
   password,
-}: {
-  email: string;
-  password: string;
-}) => {
+}: LoginInput) => {
   try {
     const dbUser = await UserModel.findOne({ email: email });
 

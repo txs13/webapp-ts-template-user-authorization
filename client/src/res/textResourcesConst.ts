@@ -49,7 +49,22 @@ export const textResourcesMultilang: TextResources = {
   toRegisterBtnLabel: {
     EN: "register",
   },
-
+  successfulLoginSubmissionMessage: {
+    EN: "please wait, user credentials were successfully submitted...",
+  },
+  wrongLoginCredentialsMessage: {
+    EN: "please enter your credentials",
+  },
+  wrongUserNamePasswordMessage: {
+    EN: "Email or password are not correct"
+  },
+  // login input validation messages
+  minOneCharEmailMessage: {
+    EN: "please enter your email",
+  },
+  minOneCharPasswordMessage: {
+    EN: "please enter your password",
+  },
   // register fragment text resources
   backToLoginBtnLabel: {
     EN: "to login",
@@ -67,6 +82,6 @@ export const textResourcesMultilang: TextResources = {
     EN: "family name",
   },
   roleInputLabel: {
-    EN: "role"
+    EN: "role",
   },
 };

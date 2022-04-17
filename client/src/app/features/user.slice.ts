@@ -1,39 +1,56 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-export interface UserInterface {
-  _id: String;
-  email: String;
-  name: String;
-  familyname?: String;
-  phone?: String;
-  address?: String;
-  company?: String;
-  position?: String;
-  description?: String;
-  userrole_id: String;
-  createdAt: Date;
-  updatedAt: Date;
-  __v: Number;
+import {
+  UserDocument,
+  LoginError,
+  TokensInterface,
+} from "../../interfaces/inputInterfaces";
+
+export interface UserValue {
+  user: UserDocument | null;
+  tokens: TokensInterface | null;
+  loginError: LoginError | null;
 }
 
-const initialUserValue: UserInterface | null = null;
+const initialUserValue: UserValue = {
+  user: null,
+  tokens: null,
+  loginError: null,
+};
 
 export const userSlice = createSlice({
   name: "user",
   initialState: { value: initialUserValue },
   reducers: {
-    
-    loginUser: (state, action) => {
-      
+    notSuccessfulLoginUser: (state, action) => {
+      state.value = {
+        user: null,
+        tokens: null,
+        loginError: { errorMessage: action.payload as string },
+      } as UserValue;
     },
-
-    logoutUser: (state, action) => {
-      
+    successfulLoginUser: (state, action) => {
+      state.value = {
+        user: action.payload.user,
+        tokens: {
+          accessToken: action.payload.accessToken,
+          refreshToken: action.payload.refreshToken,
+          sessionTtl: action.payload.sessionTtl,
+          isAdmin: action.payload.isAdmin ? true : false,
+        },
+        loginError: null,
+      } as UserValue;
     },
-
+    backToInitialState: (state) => {
+      state.value = initialUserValue;
+    },
   },
 });
 
-export const { loginUser, logoutUser } = userSlice.actions;
+export const {
+  successfulLoginUser,
+  notSuccessfulLoginUser,
+  backToInitialState,
+} = userSlice.actions;
 
 export default userSlice.reducer;

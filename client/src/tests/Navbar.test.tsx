@@ -18,8 +18,7 @@ describe("navbar tests", () => {
   const middleware = [thunk];
   const mockStore = configureMockStore(middleware);
   const initialStoreStateNoUser: RootState = {
-    user: { value: null },
-    token: { value: null },
+    user: { value: { user: null, tokens: null, loginError: null } },
     role: { value: null },
     appSettings: {
       value: {
@@ -31,13 +30,19 @@ describe("navbar tests", () => {
   const initialStoreStateLoggedUser = {
     user: {
       value: {
-        _id: "fdgfdsa",
-        email: "a@b.com",
-        name: "noname",
-        userrole_id: "gfdsafv",
-        createdAt: 1,
-        updatedAt: 1,
-        __v: 1,
+        user: {
+          _id: "fdgfdsa",
+          email: "a@b.com",
+          name: "noname",
+          userrole_id: "gfdsafv",
+          createdAt: 1,
+          updatedAt: 1,
+          __v: 1,
+        },
+        tokens: {
+          
+        },
+        loginError: null
       },
     },
     token: { value: null },

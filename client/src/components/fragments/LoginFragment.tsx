@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, generatePath } from "react-router-dom";
 import {
   Box,
   Typography,
@@ -9,7 +9,7 @@ import {
   Button,
   FormControlLabel,
   Checkbox,
-  Alert
+  Alert,
 } from "@mui/material";
 import CoPresentTwoToneIcon from "@mui/icons-material/CoPresentTwoTone";
 
@@ -17,8 +17,40 @@ import { RootState } from "../../app/store";
 import loginFragmentStyles from "../styles/loginFragmentStyles";
 import getTextResources from "../../res/textResourcesFunction";
 import { LocalizedTextResources } from "../../res/textResourcesFunction";
+import { LoginInput } from "../../interfaces/inputInterfaces";
+import { loginDataSchema } from "../../schemas/InputValidationSchemas";
+import { validateResourceAsync } from "../../utils/validateResource";
+import { loginService } from "../../app/services/loginServices";
+import { backToInitialState } from "../../app/features/user.slice";
+import emailToPath from "../../utils/emailToPath";
+
+const initialFormState: {
+  email: string;
+  emailError: string;
+  password: string;
+  passwordError: string;
+  alertMessage: string;
+  alertType: "error" | "info";
+  rememberMe: boolean;
+} = {
+  email: "",
+  emailError: "",
+  password: "",
+  passwordError: "",
+  alertMessage: "",
+  alertType: "info",
+  rememberMe: true,
+};
 
 const LoginFragment: React.FunctionComponent = () => {
+  // set email and password input references
+  const emailInputRef = useRef<HTMLInputElement>(null)
+  const passwordInputRef = useRef<HTMLInputElement>(null);
+
+  // get dispatch function and user store
+  const dispatch = useDispatch();
+  const user = useSelector((state: RootState) => state.user.value);
+
   // get data from app settings store and get text resouses in proper language
   const appSettings = useSelector(
     (state: RootState) => state.appSettings.value
@@ -30,7 +62,142 @@ const LoginFragment: React.FunctionComponent = () => {
     setTextResourses(getTextResources(appSettings.language));
   }, [appSettings]);
   // app navigation: getting navigate function
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+
+  // form state variables definition
+  const [formState, setFormState] = useState(initialFormState);
+
+  // startup check to set remember me and right focus item
+  useEffect(() => {
+    const rememberEmail = localStorage.getItem("rememberEmail");
+    if (rememberEmail) {
+      setFormState({
+        ...formState,
+        email: rememberEmail,
+      });
+      passwordInputRef.current?.focus()
+    } else {
+      emailInputRef.current?.focus()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // form state change handler
+  const onInputChange: React.FormEventHandler = (
+    e: React.FormEvent<HTMLInputElement>
+  ) => {
+    switch (e.currentTarget.name) {
+      case "email":
+        setFormState({
+          ...formState,
+          email: e.currentTarget.value,
+          alertMessage: "",
+        });
+        break;
+      case "password":
+        setFormState({
+          ...formState,
+          password: e.currentTarget.value,
+          alertMessage: "",
+        });
+        break;
+      case "rememberme":
+        setFormState({
+          ...formState,
+          rememberMe: !formState.rememberMe,
+          alertMessage: "",
+        });
+        break;
+      default:
+        // TODO navigate to error page
+        throw new Error("wrong input element(s) name prperty");
+    }
+  };
+
+  // login click handler
+  const onLoginClick = async () => {
+    const loginInput: LoginInput = {
+      email: formState.email,
+      password: formState.password,
+    };
+    // validate form input fields
+    const errors: any[] = await validateResourceAsync(
+      loginDataSchema,
+      loginInput
+    );
+    if (errors) {
+      // set error messages
+      const errorMessages: {
+        emailError: string;
+        passwordError: string;
+      } = {
+        emailError: "",
+        passwordError: "",
+      };
+      errors.forEach((error: any) => {
+        if (error.path[1] === "email") {
+          errorMessages.emailError = error.message;
+        }
+        if (error.path[1] === "password") {
+          errorMessages.passwordError = error.message;
+        }
+      });
+      setFormState({
+        ...formState,
+        ...errorMessages,
+        alertType: "error",
+        alertMessage: textResourses.wrongLoginCredentialsMessage,
+      });
+    } else {
+      // clear error messages
+      setFormState({
+        ...formState,
+        emailError: "",
+        passwordError: "",
+        alertType: "info",
+        alertMessage: textResourses.successfulLoginSubmissionMessage,
+      });
+      // call login procedure
+      await loginService(loginInput);
+    }
+  };
+
+  // processing login call result
+  // using useMemo here causes simaltneous rerendering of BrowserRouter and LoginFragment
+  // current solution is to link this processing to rerendreing rather that pure var change
+  useEffect(() => {
+    if (user.loginError) {
+      setFormState({
+        ...formState,
+        alertType: "error",
+        alertMessage: user.loginError.errorMessage,
+      });
+      setTimeout(() => {
+        dispatch(backToInitialState());
+        setFormState({
+          ...formState,
+          alertType: "info",
+          alertMessage: "",
+        });
+      }, 5000);
+    }
+    if (user.user) {
+      // save "remember me" settings if selected
+      if (formState.rememberMe) {
+        localStorage.setItem("rememberEmail", user.user.email);
+      } else {
+        const oldSettings = localStorage.getItem("rememberEmail");
+        if (oldSettings) {
+          localStorage.removeItem("rememberEmail");
+        }
+      }
+      // save refresh token to the local storage
+      localStorage.setItem("refreshToken", user.tokens?.refreshToken as string);
+      // navigate to the app starting page
+      navigate(generatePath("/:id", { id: emailToPath(user.user) }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   return (
     <>
@@ -54,9 +221,15 @@ const LoginFragment: React.FunctionComponent = () => {
 
           <Box sx={loginFragmentStyles.alertSection}>
             <Alert
-              sx={loginFragmentStyles.alert}
+              sx={{
+                ...loginFragmentStyles.alert,
+                display: formState.alertMessage === "" ? "none" : "",
+              }}
+              severity={formState.alertType}
               data-testid="loginAlert"
-            ></Alert>
+            >
+              {formState.alertMessage}
+            </Alert>
           </Box>
 
           <Box sx={loginFragmentStyles.userInputSection}>
@@ -66,6 +239,14 @@ const LoginFragment: React.FunctionComponent = () => {
               margin="dense"
               label={textResourses.emailInputLabel}
               data-testid="emailInput"
+              name="email"
+              type="email"
+              inputRef={emailInputRef}
+              value={formState.email}
+              onChange={onInputChange}
+              helperText={formState.emailError}
+              FormHelperTextProps={{ error: true }}
+              error={formState.emailError === "" ? false : true}
             />
             <TextField
               sx={loginFragmentStyles.passwordInput}
@@ -73,12 +254,27 @@ const LoginFragment: React.FunctionComponent = () => {
               margin="dense"
               label={textResourses.passwordInputLabel}
               data-testid="passwordInput"
+              name="password"
+              type="password"
+              inputRef={passwordInputRef}
+              value={formState.password}
+              onChange={onInputChange}
+              helperText={formState.passwordError}
+              FormHelperTextProps={{ error: true }}
+              error={formState.passwordError === "" ? false : true}
             />
             <FormControlLabel
               sx={loginFragmentStyles.rememberUserEmailChkBox}
               label={textResourses.rememberEmailChkBoxLabel}
               data-testid="rememberEmailChckBox"
-              control={<Checkbox />}
+              control={
+                <Checkbox
+                  defaultChecked
+                  value={formState.rememberMe}
+                  onChange={onInputChange}
+                  name="rememberme"
+                />
+              }
             />
           </Box>
 
@@ -88,6 +284,8 @@ const LoginFragment: React.FunctionComponent = () => {
                 sx={loginFragmentStyles.loginButton}
                 fullWidth
                 data-testid="loginBtn"
+                disabled={formState.alertMessage ? true : false}
+                onClick={onLoginClick}
               >
                 {textResourses.loginBtnLabel}
               </Button>
@@ -95,6 +293,7 @@ const LoginFragment: React.FunctionComponent = () => {
                 sx={loginFragmentStyles.registerButton}
                 fullWidth
                 data-testid="registerBtn"
+                disabled={formState.alertMessage ? true : false}
                 onClick={() => navigate("/register")}
               >
                 {textResourses.toRegisterBtnLabel}

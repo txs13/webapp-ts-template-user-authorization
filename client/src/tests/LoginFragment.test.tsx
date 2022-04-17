@@ -10,6 +10,7 @@ import { RootState } from "../app/store";
 import { AppLanguageOptions } from "../res/textResourcesFunction";
 import LoginFragment from "../components/fragments/LoginFragment";
 import getTextResourses from "../res/textResourcesFunction";
+import { UserValue } from "../app/features/user.slice";
 
 const textResourses = getTextResourses(AppLanguageOptions.EN);
 
@@ -17,8 +18,9 @@ describe("login form tests", () => {
   const middleware = [thunk];
   const mockStore = configureMockStore(middleware);
   const initialStoreStateNoUser: RootState = {
-    user: { value: null },
-    token: { value: null },
+    user: {
+      value: { user: null, tokens: null, loginError: null } as UserValue,
+    },
     role: { value: null },
     appSettings: {
       value: {
@@ -58,7 +60,7 @@ describe("login form tests", () => {
     expect(appName.textContent).toContain(textResourses.appName);
 
     expect(alarm).toBeInTheDocument();
-    //expect(alarm).not.toBeVisible();
+    expect(alarm).not.toBeVisible();
 
     expect(emailInput).toBeInTheDocument();
     expect(emailInput).toBeVisible();
