@@ -5,7 +5,7 @@ import getConfig from "../config/config";
 const { baseApiUrl, userApi, roleApi, reqOptions, reqOptionsToken } =
   getConfig();
 
-const client = axios.create({
+export const client = axios.create({
   baseURL: baseApiUrl,
   timeout: 1000,
 });

@@ -91,6 +91,7 @@ const LoginFragment: React.FunctionComponent = () => {
         setFormState({
           ...formState,
           email: e.currentTarget.value,
+          emailError: "",
           alertMessage: "",
         });
         break;
@@ -98,6 +99,7 @@ const LoginFragment: React.FunctionComponent = () => {
         setFormState({
           ...formState,
           password: e.currentTarget.value,
+          passwordError: "",
           alertMessage: "",
         });
         break;
@@ -199,6 +201,13 @@ const LoginFragment: React.FunctionComponent = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
+  // enter key detection and processing
+  const onDownEnter:React.FormEventHandler = (e:React.KeyboardEvent<HTMLInputElement>) => {
+    if(e.key === "Enter") {
+      onLoginClick()
+    } 
+  }
+
   return (
     <>
       <Box sx={loginFragmentStyles.fragmentFrame}>
@@ -247,6 +256,7 @@ const LoginFragment: React.FunctionComponent = () => {
               helperText={formState.emailError}
               FormHelperTextProps={{ error: true }}
               error={formState.emailError === "" ? false : true}
+              onKeyDown={onDownEnter}
             />
             <TextField
               sx={loginFragmentStyles.passwordInput}
@@ -262,6 +272,7 @@ const LoginFragment: React.FunctionComponent = () => {
               helperText={formState.passwordError}
               FormHelperTextProps={{ error: true }}
               error={formState.passwordError === "" ? false : true}
+              onKeyDown={onDownEnter}
             />
             <FormControlLabel
               sx={loginFragmentStyles.rememberUserEmailChkBox}
@@ -293,7 +304,6 @@ const LoginFragment: React.FunctionComponent = () => {
                 sx={loginFragmentStyles.registerButton}
                 fullWidth
                 data-testid="registerBtn"
-                disabled={formState.alertMessage ? true : false}
                 onClick={() => navigate("/register")}
               >
                 {textResourses.toRegisterBtnLabel}

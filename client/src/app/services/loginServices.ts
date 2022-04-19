@@ -15,12 +15,12 @@ export const loginService = async (loginInput: LoginInput) => {
 
   if (response.success) {
     // dispatching successful login
-    store.dispatch(successfulLoginUser(response.payload));
+    return store.dispatch(successfulLoginUser(response.payload));
   } else {
     // dispatching not successfule login
     if (response.errorMessage === "Invalid email or password") {
       // normal server response with wrong password
-      store.dispatch(notSuccessfulLoginUser(wrongUserNamePasswordMessage));
+      return store.dispatch(notSuccessfulLoginUser(wrongUserNamePasswordMessage));
     } else {
       // TODO - some unknown error - redirect to Error fragment
     }
