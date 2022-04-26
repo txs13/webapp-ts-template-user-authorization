@@ -19,7 +19,7 @@ describe("navbar tests", () => {
   const mockStore = configureMockStore(middleware);
   const initialStoreStateNoUser: RootState = {
     user: { value: { user: null, tokens: null, loginError: null } },
-    role: { value: null },
+    role: { value: [] },
     appSettings: {
       value: {
         language: AppLanguageOptions.EN,
@@ -46,7 +46,7 @@ describe("navbar tests", () => {
       },
     },
     token: { value: null },
-    role: { value: null },
+    role: { value: [] },
     appSettings: {
       value: {
         language: AppLanguageOptions.EN,

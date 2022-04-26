@@ -58,6 +58,9 @@ export const textResourcesMultilang: TextResources = {
   wrongUserNamePasswordMessage: {
     EN: "Email or password are not correct"
   },
+  wrongStoredTokenMessage: {
+    EN: "Wrong stored token, please log in"
+  },
   // login input validation messages
   minOneCharEmailMessage: {
     EN: "please enter your email",

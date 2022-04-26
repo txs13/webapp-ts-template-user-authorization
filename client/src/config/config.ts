@@ -3,14 +3,14 @@ const SERVER_PORT = 1337;
 const USER_API = "/api/v1/user";
 const ROLE_API = "/api/v1/role";
 const OPTIONS = {
-  headers: { "content-type": "application/json" },
+  headers: { "Content-Type": "application/json" },
 };
 
 const OPTIONS_WITH_TOKEN = (token: string) => {
   return {
     headers: {
       "Content-Type": "application/json",
-      Authorization: token,
+      "Authorization": token,
     },
   };
 };

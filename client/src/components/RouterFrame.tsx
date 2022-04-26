@@ -15,7 +15,11 @@ import StartingAppFragment from "./fragments/StartingAppFragment";
 import ProtectedRoute, { ProtectedRouteProps } from "./ProtectedRoute";
 import emailToPath from "../utils/emailToPath";
 
-const RouterFrame = () => {
+interface RouterFramePropTypes {
+  startUpActionsAreDone: boolean;
+}
+
+const RouterFrame: React.FunctionComponent<RouterFramePropTypes>  = ({ startUpActionsAreDone }) => {
   const user = useSelector((state: RootState) => state.user.value);
 
   const defaultProtectedRouteProps: Omit<ProtectedRouteProps, "outlet"> = {
@@ -23,9 +27,16 @@ const RouterFrame = () => {
     authenticationPath: "/login",
   };
 
-  return (
+  return !startUpActionsAreDone ? (
+    <StartUpFragment startUpActionsAreDone={startUpActionsAreDone} />
+  ) : (
     <Routes>
-      <Route path="/" element={<StartUpFragment />} />
+      <Route
+        path="/"
+        element={
+          <StartUpFragment startUpActionsAreDone={startUpActionsAreDone} />
+        }
+      />
       <Route path="/error" element={<ErrorFragment />} />
       <Route path="/about" element={<AboutFragment />} />
       <Route path="/login" element={<LoginFragment />} />

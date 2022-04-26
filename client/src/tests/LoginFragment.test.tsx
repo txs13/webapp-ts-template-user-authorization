@@ -69,7 +69,7 @@ describe("login form tests", () => {
     user: {
       value: { user: null, tokens: null, loginError: null } as UserValue,
     },
-    role: { value: null },
+    role: { value: [] },
     appSettings: {
       value: {
         language: AppLanguageOptions.EN,

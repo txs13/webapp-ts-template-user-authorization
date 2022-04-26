@@ -2,18 +2,18 @@ import { createSlice } from "@reduxjs/toolkit";
 
 import { RoleDocument } from '../../interfaces/inputInterfaces'
 
-const initialRoleValue: RoleDocument[] | null = null
+const initialRoleValue: RoleDocument[] = []
 
 export const roleSlice = createSlice({
     name: "role",
     initialState: {value: initialRoleValue},
     reducers: {
-        getPublicRoles: (state, action) => {
-
+        updatePublicRoles: (state, action) => {
+            state.value = [...action.payload as RoleDocument[]]
         }
     }
 })
 
-export const { getPublicRoles } = roleSlice.actions
+export const { updatePublicRoles } = roleSlice.actions
 
 export default roleSlice.reducer

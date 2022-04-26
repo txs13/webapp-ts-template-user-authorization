@@ -44,7 +44,7 @@ const initialFormState: {
 
 const LoginFragment: React.FunctionComponent = () => {
   // set email and password input references
-  const emailInputRef = useRef<HTMLInputElement>(null)
+  const emailInputRef = useRef<HTMLInputElement>(null);
   const passwordInputRef = useRef<HTMLInputElement>(null);
 
   // get dispatch function and user store
@@ -75,22 +75,20 @@ const LoginFragment: React.FunctionComponent = () => {
         ...formState,
         email: rememberEmail,
       });
-      passwordInputRef.current?.focus()
+      passwordInputRef.current?.focus();
     } else {
-      emailInputRef.current?.focus()
+      emailInputRef.current?.focus();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // form state change handler
-  const onInputChange: React.FormEventHandler = (
-    e: React.FormEvent<HTMLInputElement>
-  ) => {
-    switch (e.currentTarget.name) {
+  const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    switch (e.target.name) {
       case "email":
         setFormState({
           ...formState,
-          email: e.currentTarget.value,
+          email: e.target.value,
           emailError: "",
           alertMessage: "",
         });
@@ -98,7 +96,7 @@ const LoginFragment: React.FunctionComponent = () => {
       case "password":
         setFormState({
           ...formState,
-          password: e.currentTarget.value,
+          password: e.target.value,
           passwordError: "",
           alertMessage: "",
         });
@@ -181,6 +179,7 @@ const LoginFragment: React.FunctionComponent = () => {
           alertType: "info",
           alertMessage: "",
         });
+        localStorage.removeItem("refreshinfo");
       }, 5000);
     }
     if (user.user) {
@@ -194,7 +193,21 @@ const LoginFragment: React.FunctionComponent = () => {
         }
       }
       // save refresh token to the local storage
-      localStorage.setItem("refreshToken", user.tokens?.refreshToken as string);
+      const now = new Date();
+      let expires: number = 0;
+      if (user.tokens?.sessionTtl) {
+        expires = (user.tokens?.sessionTtl as number) * 1000 + now.getTime();
+      }
+      const itemToStore: {
+        refreshToken: string;
+        sessionTtl: number;
+        expires: number;
+      } = {
+        refreshToken: user.tokens?.refreshToken as string,
+        sessionTtl: user.tokens?.sessionTtl as number,
+        expires: expires,
+      };
+      localStorage.setItem("refreshinfo", JSON.stringify(itemToStore));
       // navigate to the app starting page
       navigate(generatePath("/:id", { id: emailToPath(user.user) }));
     }
@@ -202,11 +215,13 @@ const LoginFragment: React.FunctionComponent = () => {
   }, [user]);
 
   // enter key detection and processing
-  const onDownEnter:React.FormEventHandler = (e:React.KeyboardEvent<HTMLInputElement>) => {
-    if(e.key === "Enter") {
-      onLoginClick()
-    } 
-  }
+  const onDownEnter: React.FormEventHandler = (
+    e: React.KeyboardEvent<HTMLInputElement>
+  ) => {
+    if (e.key === "Enter") {
+      onLoginClick();
+    }
+  };
 
   return (
     <>
