@@ -87,4 +87,16 @@ export const textResourcesMultilang: TextResources = {
   roleInputLabel: {
     EN: "role",
   },
+  emailIsNeededMessage: {
+    EN: "please enter your email"
+  },
+  emailNotValidMessage: {
+    EN: "entered email is not valid"
+  },
+  passwordIsRequiredMessage: {
+    EN: "please enter password"
+  },
+  min6CharsPasswordMessage: {
+    EN: "plassword should be at least 6 chars"
+  }
 };

@@ -128,6 +128,10 @@ const RegisterFragment: React.FunctionComponent = () => {
     }
   };
 
+  const validateUserInput = async (mode: "input" | "submit") => {
+    
+  }
+
   return (
     <>
       <Box sx={registerFragmentStyles.fragmentFrame}>

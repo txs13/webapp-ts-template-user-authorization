@@ -3,7 +3,7 @@ import { ComponentStylesDatatype } from "./componentStylesDatatype";
 const appStyles: ComponentStylesDatatype = {
   app: {
     height: "100vh",
-    width: "100vw",
+    width: "100%",
     display: "flex",
     flexFlow: "column"
   },
