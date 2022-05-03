@@ -16,6 +16,12 @@ import { RootState } from "../../app/store";
 import registerFragmentStyles from "../styles/registerFragmentStyles";
 import getTextResources from "../../res/textResourcesFunction";
 import { LocalizedTextResources } from "../../res/textResourcesFunction";
+import { validateResourceAsync } from "../../utils/validateResource";
+import {
+  createUserSchema,
+  CreateUserInput,
+} from "../../schemas/InputValidationSchemas";
+import { UserInput } from "../../interfaces/inputInterfaces";
 
 const initialFormState: {
   email: string;
@@ -46,7 +52,7 @@ const initialFormState: {
   role: "",
   roleError: "",
   alertMessage: "",
-  alertType: "info"
+  alertType: "info",
 };
 
 const RegisterFragment: React.FunctionComponent = () => {
@@ -70,9 +76,8 @@ const RegisterFragment: React.FunctionComponent = () => {
   const [formState, setFormState] = useState(initialFormState);
 
   // form state change handler
-  const onInputChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  // TODO: refactor switch section later on
+  const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     switch (e.target.name) {
       case "email":
         setFormState({
@@ -127,10 +132,199 @@ const RegisterFragment: React.FunctionComponent = () => {
         throw new Error("wrong input element(s) name prperty");
     }
   };
-
-  const validateUserInput = async (mode: "input" | "submit") => {
+  // this function makes all the user input validation on this form
+  // including during either submission or completion of the field
+  // function takes "submit" while submitting the whole form
+  // and other input for single field validation as user goes from field to field
+  // main difference - during single firld validation single field error is ignored
+  // both options rely on the same validation schema
+  // function returns overall result, but this is used only for the whole form submission
+  const validateUserInput = async (
+    mode:
+      | "submit"
+      | "email"
+      | "password"
+      | "confirmPassword"
+      | "name"
+      | "familyname"
+  ): Promise<boolean> => {
+    // preparation of the object to be taken to the validation schema
+    // the reason for exactly this way to create the object is the following
+    // MUI text fields give empty string in case there is no input at all
+    // and then ZOD validation does not recignize the absence of a particular firld
+    // whith this object to be tested includes only filled by user fields
+    const userInput: any = {};
+    if (!(mode === "submit" && formState.email === "")) {
+      userInput.email = formState.email;
+    }
+    if (!(mode === "submit" && formState.password === "")) {
+      userInput.password = formState.password;
+    }
+    if (!(mode === "submit" && formState.confirmPassword === "")) {
+      userInput.confirmPassword = formState.confirmPassword;
+    }
+    if (!(mode === "submit" && formState.name === "")) {
+      userInput.name = formState.name;
+    }
+    if (!(mode === "submit" && formState.familyname === "")) {
+      userInput.familyname = formState.familyname;
+    }
+    if (!(mode === "submit" && formState.role === "")) {
+      userInput.userrole_id = formState.role;
+    }
+    // user input validation
+    const errors: any[] = await validateResourceAsync(
+      createUserSchema,
+      userInput as CreateUserInput
+    );
+    // in case there are some errors, we procees with error messages generation
+    if (errors) {
+      // theis is the whole form submission scenario
+      if (mode === "submit") {
+        // prepare empty errors object
+        const errorMessages: {
+          emailError: string;
+          passwordError: string;
+          confirmPasswordError: string;
+          nameError: string;
+          familynameError: string;
+          roleError: string;
+        } = {
+          emailError: "",
+          passwordError: "",
+          confirmPasswordError: "",
+          nameError: "",
+          familynameError: "",
+          roleError: "",
+        };
+        // add only existing errors to teh errors object
+        errors.forEach((error: any) => {
+          if (error.path[0] === "email") {
+            errorMessages.emailError = error.message;
+          }
+          if (error.path[0] === "password") {
+            errorMessages.passwordError = error.message;
+          }
+          if (error.path[0] === "confirmPassword") {
+            errorMessages.confirmPasswordError = error.message;
+          }
+          // passwords matching is checked ontop of the whole schema and does not have own path therefore
+          // passwords mismatch is supposed to be shown only if password field has more that 6 chars
+          if ( error.path.length === 0 && errors.filter((it) => it.path[0] === "confirmPassword").length === 0) {
+            errorMessages.confirmPasswordError = error.message;
+          }
+          if (error.path[0] === "name") {
+            errorMessages.nameError = error.message;
+          }
+          if (error.path[0] === "familyname") {
+            errorMessages.familynameError = error.message;
+          }
+          if (error.path[0] === "userrole_id") {
+            errorMessages.roleError = error.message;
+          }
+        });
+        // update the form and alert banner 
+        setFormState({
+          ...formState,
+          ...errorMessages,
+          alertType: "error",
+          alertMessage: textResourses.notSuccessfulRegisterSubmissionMessage,
+        });
+      }
+      // filter errors just to understand whether there is something regarding enered value
+      const filteredErrors = errors.filter((error) => error.path[0] === mode);
+      // detect whether there is password mismatch error
+      const notMatchingPasswords = errors.filter(
+        (error) => error.path.length === 0
+      );
+      // update related error field
+      // this code could be written more elegant, but for the moment I decided to leave it "as is"
+      // TODO: refactor switch section if it is possible later on
+      if (
+        filteredErrors.length !== 0 ||
+        (notMatchingPasswords && mode === "confirmPassword")
+      ) {
+        switch (mode) {
+          case "email":
+            if (formState.email !== "") {
+              setFormState({
+                ...formState,
+                emailError: filteredErrors[0].message,
+              });
+            }
+            break;
+          case "password":
+            if (formState.password !== "") {
+              setFormState({
+                ...formState,
+                passwordError: filteredErrors[0].message,
+              });
+            }
+            break;
+          case "confirmPassword":
+            if (formState.confirmPassword !== "") {
+              // if there is confirm password error show it does not matter whether passwords match
+              if (filteredErrors.length !== 0) {
+                setFormState({
+                  ...formState,
+                  confirmPasswordError: filteredErrors[0].message,
+                });
+              } else {
+                // in case passwords are entered according to the rule but do not match
+                if (notMatchingPasswords.length !== 0) {
+                  setFormState({
+                    ...formState,
+                    confirmPasswordError: notMatchingPasswords[0].message,
+                  });
+                }
+              }
+            }
+            break;
+          case "name":
+            if (formState.name !== "") {
+              setFormState({
+                ...formState,
+                nameError: filteredErrors[0].message,
+              });
+            }
+            break;
+          case "familyname":
+            if (formState.familyname !== "") {
+              setFormState({
+                ...formState,
+                familynameError: filteredErrors[0].message,
+              });
+            }
+            break;
+          default:
+        }
+      }
+      // return false because there is (are) validation error(s)
+      return false;
+    }
+    // no errors - try to submit the form
+    return true;
+  };
+  
+  // register button click handler 
+  const onRegisterClick = async () => {
+    // input validation
+    const validationResult = await validateUserInput("submit");
+    // assemble object for register api if there are no errors 
+    if (validationResult) {
+      const userInput: UserInput = {
+        email: formState.email,
+        password: formState.password,
+        name: formState.name,
+        userrole_id: formState.role
+      }
+      if (formState.familyname !== "") {
+        userInput.familyname = formState.familyname
+      }
+      console.log(userInput);
+    }
     
-  }
+  };
 
   return (
     <>
@@ -168,12 +362,14 @@ const RegisterFragment: React.FunctionComponent = () => {
               data-testid="emailInputRegister"
               name="email"
               type="email"
+              required
               autoFocus
               value={formState.email}
               onChange={onInputChange}
               helperText={formState.emailError}
-              FormHelperTextProps={{error:true}}
+              FormHelperTextProps={{ error: true }}
               error={formState.emailError === "" ? false : true}
+              onBlur={() => validateUserInput("email")}
             />
             <TextField
               sx={registerFragmentStyles.passwordInput}
@@ -183,11 +379,13 @@ const RegisterFragment: React.FunctionComponent = () => {
               data-testid="passwordInputRegister"
               name="password"
               type="password"
+              required
               value={formState.password}
               onChange={onInputChange}
               helperText={formState.passwordError}
-              FormHelperTextProps={{error:true}}
+              FormHelperTextProps={{ error: true }}
               error={formState.passwordError === "" ? false : true}
+              onBlur={() => validateUserInput("password")}
             />
             <TextField
               sx={registerFragmentStyles.confirmPasswordInput}
@@ -197,11 +395,13 @@ const RegisterFragment: React.FunctionComponent = () => {
               data-testid="confirmPasswordInputRegister"
               name="confirmpassword"
               type="password"
+              required
               value={formState.confirmPassword}
               onChange={onInputChange}
               helperText={formState.confirmPasswordError}
-              FormHelperTextProps={{error:true}}
+              FormHelperTextProps={{ error: true }}
               error={formState.confirmPasswordError === "" ? false : true}
+              onBlur={() => validateUserInput("confirmPassword")}
             />
             <TextField
               sx={registerFragmentStyles.nameInput}
@@ -210,11 +410,13 @@ const RegisterFragment: React.FunctionComponent = () => {
               label={textResourses.nameInputLabel}
               data-testid="nameInput"
               name="name"
+              required
               value={formState.name}
               onChange={onInputChange}
               helperText={formState.nameError}
-              FormHelperTextProps={{error:true}}
+              FormHelperTextProps={{ error: true }}
               error={formState.nameError === "" ? false : true}
+              onBlur={() => validateUserInput("name")}
             />
             <TextField
               sx={registerFragmentStyles.familynameInput}
@@ -226,8 +428,9 @@ const RegisterFragment: React.FunctionComponent = () => {
               value={formState.familyname}
               onChange={onInputChange}
               helperText={formState.familynameError}
-              FormHelperTextProps={{error:true}}
+              FormHelperTextProps={{ error: true }}
               error={formState.familynameError === "" ? false : true}
+              onBlur={() => validateUserInput("familyname")}
             />
             <TextField
               select
@@ -237,10 +440,11 @@ const RegisterFragment: React.FunctionComponent = () => {
               label={textResourses.roleInputLabel}
               data-testid="roleInput"
               name="role"
+              required
               value={formState.role}
               onChange={onInputChange}
               helperText={formState.roleError}
-              FormHelperTextProps={{error:true}}
+              FormHelperTextProps={{ error: true }}
               error={formState.roleError === "" ? false : true}
             >
               {appRoles?.map((role) => (
@@ -265,6 +469,7 @@ const RegisterFragment: React.FunctionComponent = () => {
                 sx={registerFragmentStyles.registerButton}
                 fullWidth
                 data-testid="registerBtn"
+                onClick={() => onRegisterClick()}
               >
                 {textResourses.registerBtnLabel}
               </Button>

@@ -19,15 +19,32 @@ const storeState = store.getState();
 const {
   minOneCharEmailMessage,
   minOneCharPasswordMessage,
-  emailIsNeededMessage,
+  emailIsRequiredMessage,
   emailNotValidMessage,
   passwordIsRequiredMessage,
-  min6CharsPasswordMessage,
+  passwordMin6CharsMessage,
+  nameIsRequiredMessage,
+  nameMin2CharsMessage,
+  nameWrongFormatMessage,
+  familynameMin2CharsMessage,
+  familynameWrongFormatMessage,
+  phoneMin6CharsMessage,
+  phoneWrongFormatMessage,
+  addressMin6CharsMessage,
+  addressWrongFormatMessage,
+  companyMin2CharsMessage,
+  companyWrongFormatMessage,
+  positionMin2CharsMessage,
+  positionWrongFormatMessage,
+  descriptionMin6CharsMessage,
+  descriptionWrongFormatMessage,
+  roleIsRequiredMessage,
+  roleIsWrongMessage,
+  passwordsDoNotMatchMessage,
 } = getTextResources(storeState.appSettings.value.language);
 
 // schema for checking login data
 export const loginDataSchema = object({
-  objectToCheck: object({
     email: string({ required_error: "email is required" }).min(
       1,
       `${minOneCharEmailMessage}`
@@ -36,78 +53,75 @@ export const loginDataSchema = object({
       1,
       `${minOneCharPasswordMessage}`
     ),
-  }),
 });
 export type LoginDataInput = TypeOf<typeof loginDataSchema>;
 
 export const createUserSchema = object({
-  objectToCheck: object({
-    email: string({ required_error: `${emailIsNeededMessage}` }).email(
-      `${emailNotValidMessage}`
-    ),
-    password: string({ required_error: `${passwordIsRequiredMessage}` }).min(
-      6,
-      `${min6CharsPasswordMessage}`
-    ),
-    confirmPassword: string({
-      required_error: `${passwordIsRequiredMessage}`,
-    }).min(6, `${min6CharsPasswordMessage}`),
-    name: string({ required_error: "name is required" })
-      .min(2, "name should be 2 chars minimum")
-      .regex(nameRegex, "wrong format"),
-    familyname: optional(
-      string()
-        .min(2, "familyname should be 2 chars minimum")
-        .regex(nameRegex, "wrong format")
-    ),
-    phone: optional(
-      string()
-        .min(6, "phone number should be 6 chars minimum")
-        .regex(phoneNumberTextRegex, "wrong format")
-    ),
-    address: optional(
-      string()
-        .min(6, "address should be 6 chars minimum")
-        .regex(addressTextRegex, "wrong format")
-    ),
-    company: optional(
-      string()
-        .min(2, "company name should be 2 chars minimum")
-        .regex(nameRegex, "wrong format")
-    ),
-    position: optional(
-      string()
-        .min(2, "position should be 2 chars minimum")
-        .regex(nameRegex, "wrong format")
-    ),
-    description: optional(
-      string()
-        .min(6, "user description should be 6 chars minimum")
-        .regex(longTextRegex, "wrong format")
-    ),
-    userrole_id: string({ required_error: "role id is required" }).refine(
-      (id) => {
-        if (
-          storeState.role.value.filter((role) => role._id === id).length === 0
-        ) {
-          return false;
-        } else {
-          return true;
-        }
-      },
-      { message: "wrong role id" }
-    ),
-  }).refine(
-    (it) => {
-      if (it.password !== it.confirmPassword) {
+  email: string({ required_error: `${emailIsRequiredMessage}` }).email(
+    `${emailNotValidMessage}`
+  ),
+  password: string({ required_error: `${passwordIsRequiredMessage}` }).min(
+    6,
+    `${passwordMin6CharsMessage}`
+  ),
+  confirmPassword: string({
+    required_error: `${passwordIsRequiredMessage}`,
+  }).min(6, `${passwordMin6CharsMessage}`),
+  name: string({ required_error: `${nameIsRequiredMessage}` })
+    .min(2, `${nameMin2CharsMessage}`)
+    .regex(nameRegex, `${nameWrongFormatMessage}`),
+  familyname: optional(
+    string()
+      .min(2, `${familynameMin2CharsMessage}`)
+      .regex(nameRegex, `${familynameWrongFormatMessage}`)
+  ),
+  phone: optional(
+    string()
+      .min(6, `${phoneMin6CharsMessage}`)
+      .regex(phoneNumberTextRegex, `${phoneWrongFormatMessage}`)
+  ),
+  address: optional(
+    string()
+      .min(6, `${addressMin6CharsMessage}`)
+      .regex(addressTextRegex, `${addressWrongFormatMessage}`)
+  ),
+  company: optional(
+    string()
+      .min(2, `${companyMin2CharsMessage}`)
+      .regex(nameRegex, `${companyWrongFormatMessage}`)
+  ),
+  position: optional(
+    string()
+      .min(2, `${positionMin2CharsMessage}`)
+      .regex(nameRegex, `${positionWrongFormatMessage}`)
+  ),
+  description: optional(
+    string()
+      .min(6, `${descriptionMin6CharsMessage}`)
+      .regex(longTextRegex, `${descriptionWrongFormatMessage}`)
+  ),
+  userrole_id: string({ required_error: `${roleIsRequiredMessage}` }).refine(
+    (id) => {
+      if (
+        storeState.role.value.filter((role) => role._id === id.toString()).length === 0
+      ) {
         return false;
       } else {
         return true;
       }
     },
-    { message: "entered passwords do not match" }
+    { message: `${roleIsWrongMessage}` }
   ),
-});
+}).refine(
+  (it) => {
+    if (it.password !== it.confirmPassword) {
+      return false;
+    } else {
+      return true;
+    }
+  },
+  { message: `${passwordsDoNotMatchMessage}` }
+);
 
 export type CreateUserInput = TypeOf<typeof createUserSchema>;
 

@@ -135,10 +135,10 @@ const LoginFragment: React.FunctionComponent = () => {
         passwordError: "",
       };
       errors.forEach((error: any) => {
-        if (error.path[1] === "email") {
+        if (error.path[0] === "email") {
           errorMessages.emailError = error.message;
         }
-        if (error.path[1] === "password") {
+        if (error.path[0] === "password") {
           errorMessages.passwordError = error.message;
         }
       });

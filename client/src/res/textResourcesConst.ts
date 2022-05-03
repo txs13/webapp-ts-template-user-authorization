@@ -49,6 +49,7 @@ export const textResourcesMultilang: TextResources = {
   toRegisterBtnLabel: {
     EN: "register",
   },
+  // login form alert messages
   successfulLoginSubmissionMessage: {
     EN: "please wait, user credentials were successfully submitted...",
   },
@@ -56,10 +57,10 @@ export const textResourcesMultilang: TextResources = {
     EN: "please enter your credentials",
   },
   wrongUserNamePasswordMessage: {
-    EN: "Email or password are not correct"
+    EN: "Email or password are not correct",
   },
   wrongStoredTokenMessage: {
-    EN: "Wrong stored token, please log in"
+    EN: "Wrong stored token, please log in",
   },
   // login input validation messages
   minOneCharEmailMessage: {
@@ -87,16 +88,87 @@ export const textResourcesMultilang: TextResources = {
   roleInputLabel: {
     EN: "role",
   },
-  emailIsNeededMessage: {
-    EN: "please enter your email"
+  // register form validation messages
+  emailIsRequiredMessage: {
+    EN: "please enter your email",
   },
   emailNotValidMessage: {
-    EN: "entered email is not valid"
+    EN: "entered email is not valid",
   },
   passwordIsRequiredMessage: {
-    EN: "please enter password"
+    EN: "please enter password",
   },
-  min6CharsPasswordMessage: {
-    EN: "plassword should be at least 6 chars"
-  }
+  passwordMin6CharsMessage: {
+    EN: "plassword should be at least 6 chars",
+  },
+  nameIsRequiredMessage: {
+    EN: "please enter your name",
+  },
+  nameMin2CharsMessage: {
+    EN: "entered name should be at least 2 chars",
+  },
+  nameWrongFormatMessage: {
+    EN: "name contains wrong symbol(s)",
+  },
+  familynameMin2CharsMessage: {
+    EN: "entered familyname should be at least 2 chars",
+  },
+  familynameWrongFormatMessage: {
+    EN: "familyname contains wrong symbol(s)",
+  },
+  phoneMin6CharsMessage: {
+    EN: "entered phone number should be at least 6 chars",
+  },
+  phoneWrongFormatMessage: {
+    EN: "phone number contains wrong symbol(s)",
+  },
+  addressMin6CharsMessage: {
+    EN: "entered address should be at least 6 chars",
+  },
+  addressWrongFormatMessage: {
+    EN: "address contains wrong symbol(s)",
+  },
+  companyMin2CharsMessage: {
+    EN: "entered company name should be at least 6 chars",
+  },
+  companyWrongFormatMessage: {
+    EN: "company name contains wrong symbol(s)",
+  },
+  positionMin2CharsMessage: {
+    EN: "entered position should be at least 6 chars",
+  },
+  positionWrongFormatMessage: {
+    EN: "position contains wrong symbol(s)",
+  },
+  descriptionMin6CharsMessage: {
+    EN: "entered description should be at least 6 chars",
+  },
+  descriptionWrongFormatMessage: {
+    EN: "description contains wrong symbol(s)",
+  },
+  roleIsRequiredMessage: {
+    EN: "please enter your role",
+  },
+  roleIsWrongMessage: {
+    EN: "selected role is wrong. please contact admin",
+  },
+  passwordsDoNotMatchMessage: {
+    EN: "entered passwords do not match",
+  },
+  // register form alert messages
+  successfulRegisterSubmissionMessage: {
+    EN: "please wait, user credentials were successfully submitted...",
+  },
+  userExistsRegisterMessage: {
+    EN: "user with this email is already registered",
+  },
+  notSuccessfulRegisterSubmissionMessage: {
+    EN: "please neter all the requested data",
+  },
+  wrongUserDataRegisterMessage: {
+    EN: "submitted data is not sufficient - please contact admin",
+  },
+  successfulRegistationMessage: {
+    EN: "You are successfully registered and will be forwarded to login soon",
+  },
 };
