@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -22,6 +23,7 @@ import {
   CreateUserInput,
 } from "../../schemas/InputValidationSchemas";
 import { UserInput } from "../../interfaces/inputInterfaces";
+import { registerUser } from "../../app/services/userServices";
 
 const initialFormState: {
   email: string;
@@ -74,6 +76,14 @@ const RegisterFragment: React.FunctionComponent = () => {
 
   // form state variables definition
   const [formState, setFormState] = useState(initialFormState);
+
+  // set password recommendations once at the system startup
+  useEffect(() => {
+    setFormState({
+      ...formState,
+      alertMessage: textResourses.passwordRecommendationsRegistrationMessage,
+    });
+  }, [textResourses]);
 
   // form state change handler
   // TODO: refactor switch section later on
@@ -210,7 +220,10 @@ const RegisterFragment: React.FunctionComponent = () => {
           }
           // passwords matching is checked ontop of the whole schema and does not have own path therefore
           // passwords mismatch is supposed to be shown only if password field has more that 6 chars
-          if ( error.path.length === 0 && errors.filter((it) => it.path[0] === "confirmPassword").length === 0) {
+          if (
+            error.path.length === 0 &&
+            errors.filter((it) => it.path[0] === "confirmPassword").length === 0
+          ) {
             errorMessages.confirmPasswordError = error.message;
           }
           if (error.path[0] === "name") {
@@ -223,7 +236,7 @@ const RegisterFragment: React.FunctionComponent = () => {
             errorMessages.roleError = error.message;
           }
         });
-        // update the form and alert banner 
+        // update the form and alert banner
         setFormState({
           ...formState,
           ...errorMessages,
@@ -305,25 +318,43 @@ const RegisterFragment: React.FunctionComponent = () => {
     // no errors - try to submit the form
     return true;
   };
-  
-  // register button click handler 
+
+  // register button click handler
   const onRegisterClick = async () => {
     // input validation
     const validationResult = await validateUserInput("submit");
-    // assemble object for register api if there are no errors 
+    // assemble object for register api if there are no errors
     if (validationResult) {
       const userInput: UserInput = {
         email: formState.email,
         password: formState.password,
         name: formState.name,
-        userrole_id: formState.role
-      }
+        userrole_id: formState.role,
+      };
       if (formState.familyname !== "") {
-        userInput.familyname = formState.familyname
+        userInput.familyname = formState.familyname;
       }
-      console.log(userInput);
+      // sending api request
+      const registrationResult = await registerUser(userInput);
+      // processing either positive result or negative
+      if (!registrationResult) {
+        setFormState({
+          ...formState,
+          alertType: "info",
+          alertMessage: textResourses.successfulRegistationMessage,
+        });
+        setTimeout(() => {
+          navigate("/login");
+        }, 2000);
+      } else {
+        // processing negative response
+        setFormState({
+          ...formState,
+          alertType: "error",
+          alertMessage: registrationResult,
+        });
+      }
     }
-    
   };
 
   return (
@@ -348,9 +379,15 @@ const RegisterFragment: React.FunctionComponent = () => {
 
           <Box sx={registerFragmentStyles.alertSection}>
             <Alert
-              sx={registerFragmentStyles.alert}
+              sx={{
+                ...registerFragmentStyles.alert,
+                display: formState.alertMessage === "" ? "none" : "",
+              }}
+              severity={formState.alertType}
               data-testid="registerAlert"
-            ></Alert>
+            >
+              {formState.alertMessage}
+            </Alert>
           </Box>
 
           <Box sx={registerFragmentStyles.userInputSection}>

@@ -163,12 +163,15 @@ export const textResourcesMultilang: TextResources = {
     EN: "user with this email is already registered",
   },
   notSuccessfulRegisterSubmissionMessage: {
-    EN: "please neter all the requested data",
+    EN: "please enter all the requested data",
   },
   wrongUserDataRegisterMessage: {
-    EN: "submitted data is not sufficient - please contact admin",
+    EN: "submitted data is not correct - please contact admin",
   },
   successfulRegistationMessage: {
     EN: "You are successfully registered and will be forwarded to login soon",
   },
+  passwordRecommendationsRegistrationMessage: {
+    EN: "please consider password not less than 6 chars including numbers, letters upper and lower case, special symbols"
+  }
 };

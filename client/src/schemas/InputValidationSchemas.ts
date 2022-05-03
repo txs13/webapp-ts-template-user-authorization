@@ -102,8 +102,10 @@ export const createUserSchema = object({
   ),
   userrole_id: string({ required_error: `${roleIsRequiredMessage}` }).refine(
     (id) => {
+      const latestStore = store.getState()
       if (
-        storeState.role.value.filter((role) => role._id === id.toString()).length === 0
+        latestStore.role.value.filter((role) => role._id === id.toString())
+          .length === 0
       ) {
         return false;
       } else {

@@ -1,5 +1,5 @@
 import axios from "axios";
-import { LoginInput } from "../interfaces/inputInterfaces";
+import { LoginInput, UserInput } from "../interfaces/inputInterfaces";
 import getConfig from "../config/config";
 
 const { baseApiUrl, userApi, roleApi, reqOptions, reqOptionsToken } =
@@ -58,7 +58,24 @@ export const loginWithRefreshTokenApiCall = async (refreshToken:string) => {
 
 }
 
-export const register = () => {};
+export const registerApi = async (userInput: UserInput) => {
+  let response
+  try {
+    response = await client.post(`${userApi}/register`, userInput)
+  } catch (e:any) {
+    response = e.response
+  }
+
+  if (response.status === 201) {
+    // process successful registration response
+    return { success: true, payload: response.data };
+  }  
+
+  if (response.status === 400) {
+    // process error registration
+    return { success: false, errorMessage: response.data[0].message };
+  }  
+};
 
 export const fetchPublicRolesApiCall = async (
 ) => {
