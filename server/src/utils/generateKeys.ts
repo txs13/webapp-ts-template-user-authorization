@@ -19,7 +19,7 @@ const genKeyPair = () => {
       format: "pem", // Most common formatting choice
     },
   });
-
+  
   // Create the public key file
   const keysFolder = path.join(__dirname, "..","..","keys")
   fs.writeFileSync(path.join(keysFolder, "id_rsa_pub.pem"), keyPair.publicKey);
