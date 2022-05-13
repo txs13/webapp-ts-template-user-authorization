@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
+import { useNavigate, generatePath } from "react-router-dom";
 import {
   Toolbar,
   Box,
@@ -16,6 +17,7 @@ import { RootState } from "../app/store";
 import navbarStyles from "./styles/navbarStyles";
 import getTextResources from "../res/textResourcesFunction";
 import { LocalizedTextResources } from "../res/textResourcesFunction";
+import emailToPath from "../utils/emailToPath";
 
 const Navbar: React.FunctionComponent = () => {
   // get data from app settings store and get text resouses in proper language
@@ -28,6 +30,9 @@ const Navbar: React.FunctionComponent = () => {
   useEffect(() => {
     setTextResourses(getTextResources(appSettings.language));
   }, [appSettings]);
+
+  // get navigate function
+  const navigate = useNavigate();
 
   // get user from app user store and form proper menu items
   const user = useSelector((state: RootState) => state.user.value);
@@ -59,13 +64,41 @@ const Navbar: React.FunctionComponent = () => {
   const handleCloseUserMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElUser(null);
     const item = event.currentTarget;
-    console.log(item.getAttribute("value"));
+    //console.log(item.getAttribute("value"));
+    switch (item.getAttribute("value")) {
+      case textResourses.startingAppMenuItemText:
+        navigate(generatePath("/:id", { id: emailToPath(user.user) }));
+        break;
+      case textResourses.profileMenuItemText:
+        navigate(generatePath("/:id/profile", { id: emailToPath(user.user) }));
+        break;
+      case textResourses.logoutMenuItemText:
+        console.log("Logout menu item");
+        break;
+      case textResourses.loginMenuItemText:
+        navigate("/login");
+        break;
+      case textResourses.registerMenuItemText:
+        navigate("/register");
+        break;
+      default:
+        console.log("something went wrong with menu items selection");
+    }
   };
 
   return (
     <AppBar position="static" sx={navbarStyles.appbar}>
       <Toolbar variant="dense" sx={navbarStyles.toolbar}>
-        <Box sx={navbarStyles.logoSection}>
+        <Box
+          sx={navbarStyles.logoSection}
+          onClick={() => {
+            if (user.user) {
+              navigate(generatePath("/:id", { id: emailToPath(user.user) }));
+            } else {
+              navigate("/login");
+            }
+          }}
+        >
           <Box sx={navbarStyles.logoSectionPictureBox}>
             <CoPresentTwoToneIcon
               fontSize="large"
@@ -78,7 +111,12 @@ const Navbar: React.FunctionComponent = () => {
           </Typography>
         </Box>
         <Box sx={navbarStyles.siteLinksSection}>
-          <Typography sx={navbarStyles.aboutAppLink}>
+          <Typography
+            sx={navbarStyles.aboutAppLink}
+            onClick={() => {
+              navigate("/about");
+            }}
+          >
             {textResourses.aboutAppLink}
           </Typography>
         </Box>
@@ -108,8 +146,7 @@ const Navbar: React.FunctionComponent = () => {
           >
             {menuItems?.map((menuItem, index) => (
               <MenuItem
-                data-testid={`navbar-menu-item-${
-                  (menuItem || "temporary-id")
+                data-testid={`navbar-menu-item-${(menuItem || "temporary-id")
                   .toLowerCase()
                   .replace(" ", "")}`}
                 key={index}

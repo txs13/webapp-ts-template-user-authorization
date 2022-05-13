@@ -1,6 +1,7 @@
 import "@testing-library/jest-dom";
 import { Provider } from "react-redux";
 import { render, screen, cleanup } from "@testing-library/react";
+import { BrowserRouter } from "react-router-dom";
 import configureMockStore from "redux-mock-store";
 import thunk from "redux-thunk";
 import userEvent from "@testing-library/user-event";
@@ -39,10 +40,8 @@ describe("navbar tests", () => {
           updatedAt: 1,
           __v: 1,
         },
-        tokens: {
-          
-        },
-        loginError: null
+        tokens: {},
+        loginError: null,
       },
     },
     token: { value: null },
@@ -63,7 +62,9 @@ describe("navbar tests", () => {
 
     render(
       <Provider store={store}>
-        <Navbar />
+        <BrowserRouter>
+          <Navbar />
+        </BrowserRouter>
       </Provider>
     );
 
@@ -113,7 +114,9 @@ describe("navbar tests", () => {
     const store = mockStore(() => initialStoreStateLoggedUser);
     render(
       <Provider store={store}>
-        <Navbar />
+        <BrowserRouter>
+          <Navbar />
+        </BrowserRouter>
       </Provider>
     );
 

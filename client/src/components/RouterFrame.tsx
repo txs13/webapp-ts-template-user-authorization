@@ -19,7 +19,9 @@ interface RouterFramePropTypes {
   startUpActionsAreDone: boolean;
 }
 
-const RouterFrame: React.FunctionComponent<RouterFramePropTypes>  = ({ startUpActionsAreDone }) => {
+const RouterFrame: React.FunctionComponent<RouterFramePropTypes> = ({
+  startUpActionsAreDone,
+}) => {
   const user = useSelector((state: RootState) => state.user.value);
 
   const defaultProtectedRouteProps: Omit<ProtectedRouteProps, "outlet"> = {
@@ -50,7 +52,15 @@ const RouterFrame: React.FunctionComponent<RouterFramePropTypes>  = ({ startUpAc
           />
         }
       />
-      <Route path="/profile" element={<ProfileFragment />} />
+      <Route
+        path={generatePath("/:id/profile", { id: emailToPath(user.user) })}
+        element={
+          <ProtectedRoute
+            {...defaultProtectedRouteProps}
+            outlet={<ProfileFragment />}
+          />
+        }
+      />
       <Route path="/username/admin" element={<StartingAdminFragment />} />
       <Route path="*" element={<NotfoundFragment />} />
     </Routes>
