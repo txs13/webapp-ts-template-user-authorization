@@ -18,14 +18,14 @@ const getEnvVars = (): {
   // TODO 01: implement environmental vars read depending on the app startup mode,
   // error handler reading param
   // temporarily only dev vars are read
-  const devHost = process.env.HOST as string || "http://localhost";
-  const devPort = Number(process.env.PORT) || 1667;
-  const dbUri = process.env.DB_URI_DEV as string || "mongodb://mongo:27017";
-  const dbName = process.env.DB_NAME_DEV as string || "webapp-template-docker";
-  const testDbName = process.env.DB_NAME_TESTS as string || "webapp-template-docker-test";
-  const saltWorkFactor = Number(process.env.SALT_WORK_FACTOR || "10");
-  const accessTokenTtl = Number(process.env.ACCESS_TOKEN_TTL || "900");
-  const refreshTokenTtl = Number(process.env.REFRESH_TOKEN_TTL || "86400");
+  const devHost = process.env.HOST as string;
+  const devPort = Number(process.env.PORT);
+  let dbUri = process.env.DB_URI_DEV as string;
+  const dbName = process.env.DB_NAME_DEV as string;
+  const testDbName = process.env.DB_NAME_TESTS as string;
+  const saltWorkFactor = Number(process.env.SALT_WORK_FACTOR);
+  const accessTokenTtl = Number(process.env.ACCESS_TOKEN_TTL);
+  const refreshTokenTtl = Number(process.env.REFRESH_TOKEN_TTL);
   const keysFolder = path.join(__dirname, "..", "..", "keys");
   const privKey = fs.readFileSync(
     path.join(keysFolder, "id_rsa_priv.pem"),
@@ -36,6 +36,11 @@ const getEnvVars = (): {
     "utf8"
   ) as string;
 
+  const dockerEnvironment = process.env.NODE_ENV
+  if(dockerEnvironment) {
+    dbUri = process.env.DB_URI_DOCKER as string;
+  }
+    
   return {
     host: devHost,
     port: devPort,

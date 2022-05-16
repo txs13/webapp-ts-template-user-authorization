@@ -1,32 +1,24 @@
 version: '3.3'
 services:
   server:
-    image: ubuntu:focal
+    image: node:lts
     stdin_open: true
-    ports:
-      - "1667:1667"
+    tty: true
     depends_on:
       - mongo
-    links:
-      - client
     environment:
-      - NODE_ENV=development  
-    networks:
-      - webapp-network
+      - NODE_ENV=docker
     volumes:
       - ./server:/workspace
       - ~/.gitconfig:/root/.gitconfig
     command: sleep infinity 
   
   client:
-    image: ubuntu:focal
+    image: node:lts
     stdin_open: true
-    ports:
-      - "3000:3000"
+    tty: true
     depends_on:
       - server  
-    networks:
-      - webapp-network
     volumes:
       - ./client:/workspace
       - ~/.gitconfig:/root/.gitconfig
@@ -34,16 +26,11 @@ services:
   
   mongo:
     image: mongo:latest
-    ports:
-      - "27017:27017"
-    networks:
-      - webapp-network
     stdin_open: true
+    tty: true
     volumes:
       - mongo-data:/data/webapp-template-ts-db
-networks:
-  webapp-network:
-    driver: bridge
+
 volumes:
   mongo-data:
     driver: local
