@@ -1,0 +1,7 @@
+{
+    "name": "Development container for webapp template client in TS",
+    "dockerComposeFile": ["../docker-compose.dev.yml"],
+    "service": "client",
+    "workspaceFolder": "/workspace",
+    "shutdownAction": "none"
+}

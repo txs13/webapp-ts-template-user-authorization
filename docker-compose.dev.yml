@@ -1,34 +1,37 @@
-version: '3'
-
+version: '3.3'
 services:
   server:
-    build:
-      context: ../server
-      dockerFile: Dockerfile.dev
-    image: webapp-template-server
+    image: ubuntu:focal
     stdin_open: true
     ports:
       - "1667:1667"
-    depends_on: mongo
+    depends_on:
+      - mongo
+    links:
+      - client
     environment:
       - NODE_ENV=development  
     networks:
       - webapp-network
     volumes:
-      - ./server:/usr/src/app 
+      - ./server:/workspace
+      - ~/.gitconfig:/root/.gitconfig
+    command: sleep infinity 
+  
   client:
-    build:
-      context: ../client
-      dockerFile: Dockerfile.dev
-    image: webapp-template-client
+    image: ubuntu:focal
     stdin_open: true
     ports:
       - "3000:3000"
-    depends_on: server  
+    depends_on:
+      - server  
     networks:
       - webapp-network
     volumes:
-      - ./client:/usr/src/app  
+      - ./client:/workspace
+      - ~/.gitconfig:/root/.gitconfig
+    command: sleep infinity    
+  
   mongo:
     image: mongo:latest
     ports:
@@ -37,7 +40,7 @@ services:
       - webapp-network
     stdin_open: true
     volumes:
-      - mongo-data: /data/webapp-template-ts-db
+      - mongo-data:/data/webapp-template-ts-db
 networks:
   webapp-network:
     driver: bridge
