@@ -1,0 +1,46 @@
+version: '3'
+
+services:
+  server:
+    build:
+      context: ../server
+      dockerFile: Dockerfile.dev
+    image: webapp-template-server
+    stdin_open: true
+    ports:
+      - "1667:1667"
+    depends_on: mongo
+    environment:
+      - NODE_ENV=development  
+    networks:
+      - webapp-network
+    volumes:
+      - ./server:/usr/src/app 
+  client:
+    build:
+      context: ../client
+      dockerFile: Dockerfile.dev
+    image: webapp-template-client
+    stdin_open: true
+    ports:
+      - "3000:3000"
+    depends_on: server  
+    networks:
+      - webapp-network
+    volumes:
+      - ./client:/usr/src/app  
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    networks:
+      - webapp-network
+    stdin_open: true
+    volumes:
+      - mongo-data: /data/webapp-template-ts-db
+networks:
+  webapp-network:
+    driver: bridge
+volumes:
+  mongo-data:
+    driver: local
