@@ -2,7 +2,9 @@ module.exports = {
     launch: {
         headless: false,
         devtools: true,
-        timeout: 30000
+        timeout: 30000,
+        headless: true,
+        args: ['--no-sandbox']
     },
     server: {
         command: 'tsc && node ./build',

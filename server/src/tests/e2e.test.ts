@@ -4,7 +4,7 @@ let browser: Browser;
 
 describe("Complete e2e test", () => {
   beforeAll(async () => {
-    browser = await puppeteer.launch();
+    browser = await puppeteer.launch({args:["--no-sandbox"]});
   });
   afterAll(async () => {
     await browser.close();

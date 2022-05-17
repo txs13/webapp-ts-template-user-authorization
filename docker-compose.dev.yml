@@ -1,7 +1,10 @@
 version: '3.3'
 services:
   server:
-    image: node:lts
+    #image: node:lts
+    build:
+      context: ./server
+      dockerfile: Dockerfile.dev
     stdin_open: true
     tty: true
     depends_on:
@@ -14,7 +17,10 @@ services:
     command: sleep infinity 
   
   client:
-    image: node:lts
+    #image: node:lts
+    build:
+      context: ./client
+      dockerfile: Dockerfile.dev
     stdin_open: true
     tty: true
     depends_on:
