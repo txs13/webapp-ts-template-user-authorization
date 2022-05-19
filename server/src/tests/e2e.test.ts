@@ -1,3 +1,11 @@
+//Please be noticed!!!!!!!!
+
+// if you are running this test locally, you have to build the project before the test
+// you can do it with the command yarn build
+
+// if you are running this test in devcontainer, you have to run client dev server before the test
+// you can do it with the command yarn start in the client terminal
+
 import puppeteer, { Browser } from "puppeteer";
 
 let browser: Browser;

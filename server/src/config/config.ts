@@ -18,8 +18,8 @@ const getEnvVars = (): {
   // TODO 01: implement environmental vars read depending on the app startup mode,
   // error handler reading param
   // temporarily only dev vars are read
-  const devHost = process.env.HOST as string;
-  const devPort = Number(process.env.PORT);
+  const devHost = process.env.DEV_HOST as string;
+  const devPort = Number(process.env.DEV_PORT);
   let dbUri = process.env.DB_URI_DEV as string;
   const dbName = process.env.DB_NAME_DEV as string;
   const testDbName = process.env.DB_NAME_TESTS as string;
@@ -37,7 +37,7 @@ const getEnvVars = (): {
   ) as string;
 
   const dockerEnvironment = process.env.NODE_ENV
-  if(dockerEnvironment) {
+  if (dockerEnvironment === "docker") {
     dbUri = process.env.DB_URI_DOCKER as string;
   }
     

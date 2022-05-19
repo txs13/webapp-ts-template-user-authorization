@@ -4,41 +4,61 @@ import jwt from "jsonwebtoken";
 import log from "./logger";
 import genKeyPair from "./generateKeys";
 
-const envDefaultContent =
-  "HOST=localhost" + "\n" +
-  "PORT=1337" + "\n" +
-  "DB_URI_DEV=mongodb://localhost:27017" + "\n" +
-  "DB_URI_PROD=" + "\n" +
-  "DB_URI_DOCKER=mongodb://mongo:27017" + "\n" +
-  "DB_NAME_DEV=webapp-template-docker" + "\n" +
-  "DB_NAME_TESTS=webapp-template-docker-test" + "\n" +
-  "SALT_WORK_FACTOR=10" + "\n" +
-  "ACCESS_TOKEN_TTL=900" + "\n" +
-  "REFRESH_TOKEN_TTL=86400"
+export const envDefaultContent =
+  "DEV_HOST=localhost" +
+  "\n" +
+  "DEV_PORT=1337" +
+  "\n" +
+  "PROD_HOST=localhost" +
+  "\n" +
+  "PROD_PORT=1337" +
+  "\n" +
+  "DB_URI_DEV=mongodb://localhost:27017" +
+  "\n" +
+  "DB_URI_PROD=" +
+  "\n" +
+  "DB_URI_DOCKER=mongodb://mongo:27017" +
+  "\n" +
+  "DB_NAME_DEV=webapp-ts-template" +
+  "\n" +
+  "DB_NAME_TESTS=webapp-ts-template-test" +
+  "\n" +
+  "SALT_WORK_FACTOR=10" +
+  "\n" +
+  "ACCESS_TOKEN_TTL=900" +
+  "\n" +
+  "REFRESH_TOKEN_TTL=86400";
 
 const checkKeyPair = (): boolean => {
-  
   // check .env file and create it in case there is no one
   const envPath = path.join(__dirname, "..", "..", ".env");
   try {
-    const file = fs.readFileSync(envPath)
-    log.info(".env file is in place")
-  } catch(e:any) {
+    const file = fs.readFileSync(envPath);
+    if (file) {
+      log.info(".env file is in place");
+    } else {
+      log.error(
+        "Something is wrong with your .env file - please check manualy"
+      );
+    }
+  } catch (e: any) {
     try {
-      fs.writeFileSync(envPath, envDefaultContent)
-      log.info("New .env file is generated with default values")
-    } catch(e:any) {
-      log.error("Something is wrong with your .env file - please check manualy")
+      fs.writeFileSync(envPath, envDefaultContent);
+      log.info("New .env file is generated with default values");
+    } catch (e: any) {
+      log.error(
+        "Something is wrong with your .env file - please check manualy"
+      );
     }
   }
-  
+
   let pubKey: null | string;
   let privKey: null | string;
-  
+
   // getting and checking keys folder path
   const keysFolder = path.join(__dirname, "..", "..", "keys");
   if (!fs.existsSync(keysFolder)) {
-    fs.mkdirSync(keysFolder)
+    fs.mkdirSync(keysFolder);
     log.info("keys folder does not exist, new keys dir is created");
   }
 
@@ -92,11 +112,6 @@ const checkKeyPair = (): boolean => {
     log.error("Public key is corrupted");
     return false;
   }
-  
 };
-
-
-
-
 
 export default checkKeyPair;

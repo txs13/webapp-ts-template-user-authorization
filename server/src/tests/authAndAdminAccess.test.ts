@@ -24,6 +24,7 @@ const newUserRoleInput2: RoleInput = {
   role: "New test role to be created 2",
 };
 
+
 describe("authorization and admin access tests", () => {
   beforeAll(async () => {
     await mongoose.connect(dbUri, { dbName: testDbName });
@@ -257,7 +258,7 @@ describe("authorization and admin access tests", () => {
 
     const dbRole = await RoleModel.findOne({ role: newUserRoleInput1.role });
     expect(dbRole).toBeFalsy();
-  });
+  }, 10000);
 
   test("resource request without auth token", async () => {
     

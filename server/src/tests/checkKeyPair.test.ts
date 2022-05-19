@@ -3,22 +3,49 @@ import path from "path";
 import fs from "fs";
 import log from "../utils/logger";
 import checkKeyPair from "../utils/checkKeyPair";
+import { envDefaultContent } from "../utils/checkKeyPair";
+
+// if test runs in devcontainer, foldernames are going to be different
+let dockerMode: Boolean = false;
+const dockerEnvironment = process.env.NODE_ENV;
+if (dockerEnvironment === "docker") {
+  dockerMode = true;
+}
 
 jest.mock("fs");
 jest.mock("../utils/logger");
 
 describe("Encryption keys checking / generating function test", () => {
-
   let mockPubKey: string;
   let mockPrivKey: string;
 
-  test("path check", () => {
+  test("path check, .env does not exist", () => {
     // mocking path does not exist
     fs.existsSync = jest.fn().mockImplementation((keyPath) => {
       return false;
     });
+    fs.readFileSync = jest
+      .fn()
+      .mockImplementationOnce((filePath: string, param: string) => {
+        throw new Error("No such file");
+      })
+      .mockImplementation((filePath: string, param: string) => {
+        if (filePath.includes("id_rsa_priv.pem"))
+          throw new Error("No such file");
+        if (filePath.includes("id_rsa_pub.pem")) return "Some text";
+      });
+    fs.writeFileSync = jest
+      .fn()
+      .mockImplementationOnce(
+        (filePath: string, fileContent: string) => filePath
+      );
+
+    fs.mkdirSync = jest
+      .fn()
+      .mockImplementationOnce((filePath: string) => filePath);
 
     // mocking log calls
+    log.info = jest.fn().mockImplementation((msg) => msg);
     log.error = jest.fn().mockImplementation((msg) => msg);
 
     // check the correctness of the returned value
@@ -26,13 +53,25 @@ describe("Encryption keys checking / generating function test", () => {
     expect(result).toBe(false);
 
     // checking that path contained "key" word
-    expect(fs.existsSync).toHaveBeenCalledWith(
-      expect.stringContaining(path.join("server", "keys"))
-    );
+    if (dockerMode) {
+      expect(fs.existsSync).toHaveBeenCalledWith(
+        expect.stringContaining("keys")
+      );
+    } else {
+      expect(fs.existsSync).toHaveBeenCalledWith(
+        expect.stringContaining(path.join("server", "keys"))
+      );
+    }
+
+    // checking that keys folder was created
+    expect(fs.mkdirSync).toHaveBeenCalledWith(expect.stringContaining("keys"));
 
     // checking log message
-    expect(log.error).toHaveBeenCalledWith(
-      "keys folder does not exist, please create one"
+    expect(log.info).toHaveBeenCalledWith(
+      "New .env file is generated with default values"
+    );
+    expect(log.info).toHaveBeenCalledWith(
+      "keys folder does not exist, new keys dir is created"
     );
   });
 
@@ -83,6 +122,9 @@ describe("Encryption keys checking / generating function test", () => {
     fs.readFileSync = jest
       .fn()
       .mockImplementationOnce((filePath: string, param: string) => {
+        return "ENV MOCKED FILE CONTENT"
+      })
+      .mockImplementationOnce((filePath: string, param: string) => {
         throw new Error("No such file");
       })
       .mockImplementationOnce((filePath: string, param: string) => {
@@ -113,6 +155,7 @@ describe("Encryption keys checking / generating function test", () => {
     // calling function which should work
     const result = checkKeyPair();
     expect(result).toBe(true);
+    expect(log.info).toHaveBeenCalledWith(".env file is in place");
     expect(log.info).toHaveBeenCalledWith("Private key is not found");
     expect(log.info).toHaveBeenCalledWith("Public key is not found");
     expect(log.info).toHaveBeenCalledWith("New encryption keys are generated");
@@ -129,6 +172,9 @@ describe("Encryption keys checking / generating function test", () => {
     // mocking files read call to simulate that public key is not in the folder
     fs.readFileSync = jest
       .fn()
+      .mockImplementationOnce((filePath: string, param: string) => {
+        return "ENV MOCKED FILE CONTENT";
+      })
       .mockImplementationOnce((filePath: string, param: string) => {
         throw new Error("No such file");
       })
@@ -186,6 +232,9 @@ describe("Encryption keys checking / generating function test", () => {
     // mocking files read call to simulate that public key is not in the folder
     fs.readFileSync = jest
       .fn()
+      .mockImplementationOnce((filePath: string, param: string) => {
+        return "ENV MOCKED FILE CONTENT";
+      })
       .mockImplementationOnce((filePath: string, param: string) => {
         throw new Error("No such file");
       })
