@@ -1,4 +1,4 @@
-import {TextResources} from './textResourcesFunction'
+import { TextResources } from "./textResourcesFunction";
 
 export const textResourcesMultilang: TextResources = {
   // general purposes text resourses
@@ -31,7 +31,7 @@ export const textResourcesMultilang: TextResources = {
     EN: "starting page",
   },
   startingAdminMenuItemText: {
-    EN: "admin control panel",
+    EN: "admin panel",
   },
   // login fragment text resources
   emailInputLabel: {
@@ -172,6 +172,6 @@ export const textResourcesMultilang: TextResources = {
     EN: "You are successfully registered and will be forwarded to login soon",
   },
   passwordRecommendationsRegistrationMessage: {
-    EN: "please consider password not less than 6 chars including numbers, letters upper and lower case, special symbols"
-  }
+    EN: "please consider password not less than 6 chars including numbers, letters upper and lower case, special symbols",
+  },
 };

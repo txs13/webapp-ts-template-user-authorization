@@ -39,11 +39,20 @@ const Navbar: React.FunctionComponent = () => {
   const [menuItems, setMenuItems] = useState<string[]>();
   useEffect(() => {
     if (user.user) {
-      setMenuItems([
-        textResourses.startingAppMenuItemText,
-        textResourses.profileMenuItemText,
-        textResourses.logoutMenuItemText,
-      ]);
+      if (user.tokens?.isAdmin === true) {
+        setMenuItems([
+          textResourses.startingAppMenuItemText,
+          textResourses.profileMenuItemText,
+          textResourses.startingAdminMenuItemText,
+          textResourses.logoutMenuItemText,
+        ]);
+      } else {
+        setMenuItems([
+          textResourses.startingAppMenuItemText,
+          textResourses.profileMenuItemText,
+          textResourses.logoutMenuItemText,
+        ]);
+      }
     } else {
       setMenuItems([
         textResourses.loginMenuItemText,

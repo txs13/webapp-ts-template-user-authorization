@@ -61,7 +61,15 @@ const RouterFrame: React.FunctionComponent<RouterFramePropTypes> = ({
           />
         }
       />
-      <Route path="/username/admin" element={<StartingAdminFragment />} />
+      <Route
+        path={generatePath("/:id/adminpanel", { id: emailToPath(user.user) })}
+        element={
+          <ProtectedRoute
+            {...defaultProtectedRouteProps}
+            outlet={<StartingAdminFragment />}
+          />
+        }
+      />
       <Route path="*" element={<NotfoundFragment />} />
     </Routes>
   );

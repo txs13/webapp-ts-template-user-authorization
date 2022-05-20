@@ -3,7 +3,6 @@ import path from "path";
 import fs from "fs";
 import log from "../utils/logger";
 import checkKeyPair from "../utils/checkKeyPair";
-import { envDefaultContent } from "../utils/checkKeyPair";
 
 // if test runs in devcontainer, foldernames are going to be different
 let dockerMode: Boolean = false;
