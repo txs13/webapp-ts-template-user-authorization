@@ -29,6 +29,11 @@ const RouterFrame: React.FunctionComponent<RouterFramePropTypes> = ({
     authenticationPath: "/login",
   };
 
+  const defaultAdminProtectedRouteProps: Omit<ProtectedRouteProps, "outlet"> = {
+    isAuthenticated: user.user && user.tokens?.isAdmin === true ? true : false,
+    authenticationPath: "/"
+  }
+
   return !startUpActionsAreDone ? (
     <StartUpFragment startUpActionsAreDone={startUpActionsAreDone} />
   ) : (
@@ -65,7 +70,7 @@ const RouterFrame: React.FunctionComponent<RouterFramePropTypes> = ({
         path={generatePath("/:id/adminpanel", { id: emailToPath(user.user) })}
         element={
           <ProtectedRoute
-            {...defaultProtectedRouteProps}
+            {...defaultAdminProtectedRouteProps}
             outlet={<StartingAdminFragment />}
           />
         }

@@ -1,4 +1,4 @@
-import { loginApiCall, loginWithRefreshTokenApiCall } from "../../api/api";
+import { loginApiCall, refreshTokenApiCall } from "../../api/api";
 import store from "../store";
 import {
   successfulLoginUser,
@@ -35,14 +35,14 @@ export const loginWithRefreshTokenService = async (
   refreshToken: string,
   sessionTtl: number
 ) => {
-  const response = await loginWithRefreshTokenApiCall(refreshToken);
+  const response = await refreshTokenApiCall(refreshToken);
 
   if (response?.success) {
     // dispatching successful login
     const payload = {
       ...response.payload,
       refreshToken: refreshToken,
-      sessionTtl: sessionTtl
+      sessionTtl: sessionTtl,
     };
     return store.dispatch(successfulLoginUser(payload));
   } else {
