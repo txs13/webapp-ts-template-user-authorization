@@ -67,7 +67,7 @@ const RouterFrame: React.FunctionComponent<RouterFramePropTypes> = ({
         }
       />
       <Route
-        path={generatePath("/:id/adminpanel", { id: emailToPath(user.user) })}
+        path={`${generatePath("/:id/adminpanel", { id: emailToPath(user.user) })}/*`}
         element={
           <ProtectedRoute
             {...defaultAdminProtectedRouteProps}
