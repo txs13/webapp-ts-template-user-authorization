@@ -18,6 +18,7 @@ import navbarStyles from "./styles/navbarStyles";
 import getTextResources from "../res/textResourcesFunction";
 import { LocalizedTextResources } from "../res/textResourcesFunction";
 import emailToPath from "../utils/emailToPath";
+import { logoutService } from "../app/services/logoutService";
 
 const Navbar: React.FunctionComponent = () => {
   // get data from app settings store and get text resouses in proper language
@@ -70,7 +71,7 @@ const Navbar: React.FunctionComponent = () => {
     setAnchorElUser(event.currentTarget);
   };
 
-  const handleCloseUserMenu = (event: React.MouseEvent<HTMLElement>) => {
+  const handleCloseUserMenu = async (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElUser(null);
     const item = event.currentTarget;
     //console.log(item.getAttribute("value"));
@@ -82,13 +83,19 @@ const Navbar: React.FunctionComponent = () => {
         navigate(generatePath("/:id/profile", { id: emailToPath(user.user) }));
         break;
       case textResourses.logoutMenuItemText:
-        console.log("Logout menu item");
+        await logoutService();
+        navigate("/");
         break;
       case textResourses.loginMenuItemText:
         navigate("/login");
         break;
       case textResourses.registerMenuItemText:
         navigate("/register");
+        break;
+      case textResourses.startingAdminMenuItemText:
+        navigate(
+          generatePath("/:id/adminpanel", { id: emailToPath(user.user) })
+        );
         break;
       default:
         console.log("something went wrong with menu items selection");
