@@ -17,6 +17,7 @@ const defaultAdminUser = {
   password: "qwerty123",
   name: "Technical admin",
   userrole_id: "to be updated",
+  isConfirmed: true,
   description:
     "This is default admin user to create the initial system user and admin",
 };

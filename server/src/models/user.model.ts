@@ -28,6 +28,7 @@ const userSchema = new mongoose.Schema<UserDocument>(
     company: { type: String },
     position: { type: String },
     description: { type: String },
+    isConfirmed: { type: Boolean, default: false },
     userrole_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Role",
@@ -42,6 +43,7 @@ const userSchema = new mongoose.Schema<UserDocument>(
 export interface UserDocument extends UserInput, mongoose.Document {
   createdAt: Date;
   updatedAt: Date;
+  isConfirmed: boolean;
   comparePassword(candidatePassword: String): Promise<Boolean>;
 }
 

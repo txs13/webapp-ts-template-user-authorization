@@ -14,6 +14,7 @@ const { dbUri, testDbName, refreshTokenTtl, accessTokenTtl, pubKey } =
 // test input data
 const roleName = "test case role 00002";
 const userEmail = "test2@example.com";
+const notConfirmedUserEmail = "test3@example.com"
 const userPassword = "qwerty12345";
 const userAgentContent = "user agent content";
 
@@ -26,7 +27,7 @@ describe("login / logout tests", () => {
     };
     let dbRole = await RoleModel.create(roleInput);
     // user dataset
-    const userInput: UserInput = {
+    const userInput = {
       email: userEmail,
       password: userPassword,
       name: "Vasyliy",
@@ -36,10 +37,19 @@ describe("login / logout tests", () => {
       company: "Roga i Kopyta Ltd.",
       position: "anykey tester",
       description: "very important test case user",
+      isConfirmed: true,
+      userrole_id: dbRole._id.toString(),
+    };
+    // not confirmed user dataset
+    const notConfirmedUser = {
+      email: notConfirmedUserEmail,
+      password: userPassword,
+      name: "Vasyliy",
       userrole_id: dbRole._id.toString(),
     };
     // create user db record
     await UserModel.create(userInput);
+    await UserModel.create(notConfirmedUser);
   });
 
   afterAll(async () => {
@@ -154,9 +164,10 @@ describe("login / logout tests", () => {
 
   test("normal logout", async () => {
     // check if there is somethig left after prefious not successfull test and cleaning DB
-    let dbSessions = await SessionModel.find({ email: userEmail });
+    let user = await UserModel.findOne({ email: userEmail });
+    let dbSessions = await SessionModel.find({ userId: user?._id });
     if (dbSessions.length > 0) {
-      await SessionModel.deleteMany({ email: userEmail });
+      await SessionModel.deleteMany({ userId: user?._id });
     }
 
     // implies that login procedure works in teh scope of the preceeding test
@@ -201,10 +212,11 @@ describe("login / logout tests", () => {
   });
 
   test("get fresh access token using refresh token", async () => {
-    // check if there is somethig left after prefious not successfull test and cleaning DB
-    let dbSessions = await SessionModel.find({ email: userEmail });
+    // check if there is somethig left after previous not successfull test and cleaning DB
+    let user = await UserModel.findOne({ email: userEmail });
+    let dbSessions = await SessionModel.find({ userId: user?._id });
     if (dbSessions.length > 0) {
-      await SessionModel.deleteMany({ email: userEmail });
+      await SessionModel.deleteMany({ userId: user?._id });
     }
 
     // implies that login procedure works in teh scope of the preceeding test
@@ -269,12 +281,13 @@ describe("login / logout tests", () => {
 
   test("refresh access token using valid access token", async () => {
     // check if there is somethig left after prefious not successfull test and cleaning DB
-    let dbSessions = await SessionModel.find({ email: userEmail });
+    let user = await UserModel.findOne({ email: userEmail });
+    let dbSessions = await SessionModel.find({ userId: user?._id });
     if (dbSessions.length > 0) {
-      await SessionModel.deleteMany({ email: userEmail });
+      await SessionModel.deleteMany({ userId: user?._id });
     }
 
-    // implies that login procedure works in teh scope of the preceeding test
+    // implies that login procedure works in the scope of the preceeding test
     // performing pure login through the api call
     const loginResult = await request(app)
       .post("/api/v1/user/login")
@@ -315,4 +328,33 @@ describe("login / logout tests", () => {
     // clean up DB
     await SessionModel.deleteOne({ _id: dbSession?._id });
   });
+
+  test("login with not confirmed user", async () => {
+    // check if there is somethig left after prefious not successfull test and cleaning DB
+    let user = await UserModel.findOne({ email: notConfirmedUserEmail });
+    let dbSessions = await SessionModel.find({ userId: user?._id });
+    if (dbSessions.length > 0) {
+      await SessionModel.deleteMany({ userId: user?._id });
+    }
+
+    // implies that login procedure works in the scope of the preceeding test
+    // performing pure login through the api call
+    const loginResult = await request(app)
+      .post("/api/v1/user/login")
+      .set("User-agent", userAgentContent)
+      .send({
+        email: notConfirmedUserEmail,
+        password: userPassword,
+      });
+
+    // check the correctness of the error message
+    expect(loginResult.statusCode).toBe(401);
+    expect(loginResult.body.length).toBe(1);
+    expect(loginResult.body[0].message).toBe(
+      "Your accout is not confirmed yet"
+    );
+    // check that no new session was added
+    const dbSession = await SessionModel.find({ userId: user?._id });
+    expect(dbSession.length).toBe(0);
+  })
 });

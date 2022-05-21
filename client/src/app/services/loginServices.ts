@@ -9,8 +9,13 @@ import { LoginInput } from "../../interfaces/inputInterfaces";
 
 const currentState = store.getState();
 
-const { wrongUserNamePasswordMessage, wrongStoredTokenMessage } =
-  getTextResources(currentState.appSettings.value.language);
+const {
+  wrongUserNamePasswordMessage,
+  wrongStoredTokenMessage,
+  accountIsNotConfirmedMessage,
+  wrongNetworkSettingsMessage,
+  unknownErrorMessage,
+} = getTextResources(currentState.appSettings.value.language);
 
 export const loginService = async (loginInput: LoginInput) => {
   const response = await loginApiCall(loginInput);
@@ -25,9 +30,22 @@ export const loginService = async (loginInput: LoginInput) => {
       return store.dispatch(
         notSuccessfulLoginUser(wrongUserNamePasswordMessage)
       );
-    } else {
-      // TODO - some unknown error - redirect to Error fragment
     }
+    if (response.errorMessage === "Your accout is not confirmed yet") {
+      // normal server response with wrong password
+      return store.dispatch(
+        notSuccessfulLoginUser(accountIsNotConfirmedMessage)
+      );
+    }
+    if (
+      response.errorMessage === "Wrong network settings. Please contact admin"
+    ) {
+      return store.dispatch(
+        notSuccessfulLoginUser(wrongNetworkSettingsMessage)
+      );
+    }
+      return store.dispatch(notSuccessfulLoginUser(unknownErrorMessage));
+    
   }
 };
 

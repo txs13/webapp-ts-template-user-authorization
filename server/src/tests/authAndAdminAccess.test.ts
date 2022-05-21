@@ -39,17 +39,19 @@ describe("authorization and admin access tests", () => {
     const dbAdminRole: RoleDocument = await RoleModel.create(adminUserRole);
     expect(dbUserRole).toBeTruthy();
     expect(dbAdminRole).toBeTruthy();
-    const adminUser: UserInput = {
+    const adminUser = {
       email: adminEmail,
       password: adminPassword,
       userrole_id: dbAdminRole._id,
       name: "admin name",
+      isConfirmed: true
     };
-    const user: UserInput = {
+    const user = {
       email: userEmail,
       password: userPassword,
       userrole_id: dbUserRole._id,
       name: "user name",
+      isConfirmed: true,
     };
     const dbAdmin = await UserModel.create(adminUser);
     const dbUser = await UserModel.create(user);

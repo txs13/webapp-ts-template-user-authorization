@@ -83,6 +83,8 @@ describe("user api tests", () => {
     expect(dbUser?.description).toBe(userInput.description);
     expect(result.body.description).toBe(userInput.description);
 
+    expect(dbUser?.isConfirmed).toBeFalsy();
+
     expect(dbUser?.userrole_id.toString()).toEqual(
       userInput.userrole_id.toString()
     );
@@ -141,6 +143,8 @@ describe("user api tests", () => {
     expect(dbUser?.position).toBeFalsy();
 
     expect(dbUser?.description).toBeFalsy();
+
+    expect(dbUser?.isConfirmed).toBeFalsy();
 
     expect(dbUser?.userrole_id.toString()).toEqual(
       userInput.userrole_id.toString()

@@ -27,11 +27,12 @@ describe("role api tests", () => {
     const dbAdminRole: RoleDocument = await RoleModel.create(adminUserRole);
     expect(dbAdminRole).toBeTruthy();
     // create admin user
-    const adminUser: UserInput = {
+    const adminUser = {
       email: adminEmail,
       password: adminPassword,
       userrole_id: dbAdminRole._id,
       name: "admin name",
+      isConfirmed: true
     };
     const dbAdmin = await UserModel.create(adminUser);
     expect(dbAdmin).toBeTruthy();

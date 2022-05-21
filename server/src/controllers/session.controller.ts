@@ -32,6 +32,11 @@ export const loginUserHandler = async (
         .status(401)
         .send([{ message: "Wrong network settings. Please contact admin" }]);
     }
+    
+    // if admin has not yet approved th new user, login should be rejected
+    if (!user.isConfirmed) {
+      return res.status(401).send([{ message: "Your accout is not confirmed yet" }]);
+    }
 
     // TODO?: to check that user has opened sessions
 
@@ -50,7 +55,7 @@ export const loginUserHandler = async (
     await session.save();
 
     // create user JSON, exclude password record
-    const userData = omit(user.toJSON(), "password");
+    const userData = omit(user.toJSON(), "password", "isConfirmed");
     // checking is user has admin rights
     const isAdmin = await checkAdminByUserId(userData._id);
     let confirmationJson: Object = {
@@ -97,7 +102,7 @@ export const refreshTokenHandler = async (req: Request, res: Response) => {
   await session.save();
 
   // create user JSON, exclude password record
-  const userData = omit(res.locals.user.toJSON(), "password");
+  const userData = omit(res.locals.user.toJSON(), "password", "isConfirmed");
   // checking is user has admin rights
   const isAdmin = await checkAdminByUserId(userData._id);
   let refreshJson: Object = {

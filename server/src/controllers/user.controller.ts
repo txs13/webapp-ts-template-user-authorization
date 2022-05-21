@@ -16,7 +16,7 @@ export const createUserHandler = async (
       userrole_id: new mongoose.Types.ObjectId(req.body.userrole_id),
     };
     const user = await createUser(userInput);
-    return res.status(201).send(omit(user.toJSON(), "password"));
+    return res.status(201).send(omit(user.toJSON(), "password", "isConfirmed"));
   } catch (e: any) {
     log.error(e);
     return res.status(409).send(e.message);

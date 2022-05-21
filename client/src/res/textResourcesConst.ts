@@ -62,6 +62,15 @@ export const textResourcesMultilang: TextResources = {
   wrongStoredTokenMessage: {
     EN: "Wrong stored token, please log in",
   },
+  accountIsNotConfirmedMessage: {
+    EN: "Your accout is not confirmed yet",
+  },
+  wrongNetworkSettingsMessage: {
+    EN: "Wrong network settings. Please contact admin",
+  },
+  unknownErrorMessage: {
+    EN: "Unknown error. Please contact admin"
+  },
   // login input validation messages
   minOneCharEmailMessage: {
     EN: "please enter your email",
