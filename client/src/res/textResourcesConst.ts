@@ -183,4 +183,14 @@ export const textResourcesMultilang: TextResources = {
   passwordRecommendationsRegistrationMessage: {
     EN: "please consider password not less than 6 chars including numbers, letters upper and lower case, special symbols",
   },
+  // admin panel navigation labels
+  startingPageNavLabel: {
+    EN: "admin main"
+  },
+  userListNavLabel: {
+    EN: "users"
+  },
+  roleListNavLabel: {
+    EN: "roles"
+  }
 };

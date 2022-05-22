@@ -7,19 +7,21 @@ import AdminPanelUserListFragment from "./adminPanelFragments/AdminPanelUserList
 import AdminPanelRoleListFragment from "./adminPanelFragments/AdminPanelRoleListFragment";
 import AdminPanelStartingPageFragment from "./adminPanelFragments/AdminPanelStartingPageFragment";
 
+import startingAdminFragmentStyles from "../styles/startingAdminFragmentStyles"
+
 const StartingAdminFragment: React.FunctionComponent = () => {
 
   return (
-    <>
+    <Box sx={startingAdminFragmentStyles.fragmentFrame}>
       <AdminPanelNavigationFragment />
-      <Box>
+      <>
         <Routes>
           <Route path="" element={<AdminPanelStartingPageFragment />} />
           <Route path="userlist" element={<AdminPanelUserListFragment />} />
           <Route path="rolelist" element={<AdminPanelRoleListFragment />} />
         </Routes>
-      </Box>
-    </>
+      </>
+    </Box>
   );
 };
 
