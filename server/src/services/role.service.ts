@@ -56,3 +56,9 @@ export const getAllRolesWithoutAdmin = async () => {
   );
   return allPublicRoles.map(it => it.toJSON())
 };
+
+// get all roles for admin control panel
+export const getAllRoles = async () => {
+  const allRoles = await RoleModel.find();
+  return allRoles.map(it => it.toJSON())
+}

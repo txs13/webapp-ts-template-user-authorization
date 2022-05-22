@@ -4,8 +4,9 @@ import {
   logoutUserHandler,
   refreshTokenHandler,
 } from "../controllers/session.controller";
-import { createUserHandler } from "../controllers/user.controller";
+import { createUserHandler, getAllUsersHandler } from "../controllers/user.controller";
 import authorizedAccess from "../middleware/authorizedAccess";
+import adminAccess from "../middleware/adminAccess";
 import { validateResourceAsync } from "../middleware/validateResource";
 import { loginDataSchema } from "../schemas/login.schema";
 import { createUserSchema } from "../schemas/user.schema";
@@ -27,5 +28,7 @@ userRouter.post(
 userRouter.post("/logout", authorizedAccess, logoutUserHandler);
 
 userRouter.post("/refresh", authorizedAccess, refreshTokenHandler);
+
+userRouter.get("/allusers", authorizedAccess, adminAccess, getAllUsersHandler);
 
 export default userRouter;

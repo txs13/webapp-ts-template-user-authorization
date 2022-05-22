@@ -1,6 +1,10 @@
 import { Request, Response } from "express";
 import { CreateRoleInput } from "../schemas/role.schema";
-import { createRole, getAllRolesWithoutAdmin } from "../services/role.service";
+import {
+  createRole,
+  getAllRolesWithoutAdmin,
+  getAllRoles,
+} from "../services/role.service";
 import log from "../utils/logger";
 
 export const createRoleHandler = async (
@@ -29,3 +33,14 @@ export const getPublicRolesHandler = async (req: Request, res: Response) => {
     res.status(409).send(e.message);
   }
 } 
+
+export const getAllRolesHandler = async (req: Request, res: Response) => {
+  try {
+    const allRoles = await getAllRoles();
+    res.status(200).send(allRoles);
+  } catch (e: any) {
+    log.error(e);
+    res.status(409).send(e.message);
+  }
+
+}

@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import { Request, Response } from "express";
 import { UserInput } from "../models/user.model";
 import { CreateUserInput } from "../schemas/user.schema";
-import { createUser } from "../services/user.service";
+import { createUser, getAllusers } from "../services/user.service";
 import log from "../utils/logger";
 
 export const createUserHandler = async (
@@ -22,3 +22,14 @@ export const createUserHandler = async (
     return res.status(409).send(e.message);
   }
 };
+
+export const getAllUsersHandler = async (req: Request, res: Response) => {
+  try {
+    const allDBUsers = await getAllusers()
+    const userListToSend = allDBUsers.map(it => omit(it.toJSON(), "password"))
+    return res.status(200).send(userListToSend)
+  } catch (e:any) {
+    log.error(e);
+    return res.status(409).send(e.message);
+  }
+}

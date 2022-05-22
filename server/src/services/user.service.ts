@@ -71,3 +71,12 @@ export const findUser = async(query: FilterQuery<UserDocument>) => {
     throw new Error(e);
   }
 }
+
+// get all users
+export const getAllusers = async () => {
+  try {
+    return await UserModel.find()
+  } catch (e:any) {
+    throw new Error(e);
+  }
+}
