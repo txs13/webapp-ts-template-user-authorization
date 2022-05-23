@@ -318,6 +318,35 @@ describe("user api tests", () => {
     await RoleModel.deleteOne({ _id: dbRole?._id });
   });
 
+  test("isConfirmed added property should be rejected", async () => {
+    // check and create role - because it is needed for the user registration
+    const roleInput = {
+      role: "test case role 00001",
+    };
+    let dbRole = await RoleModel.create(roleInput);
+
+    // user dataset which is supposed to be accepted by api
+    const userInput = {
+      email: "test@example.com",
+      password: "qwerty12345",
+      name: "Vasyliy",
+      userrole_id: dbRole._id,
+      isConfirmed: true,
+    };
+
+    // pure api call
+    const result = await request(app)
+      .post("/api/v1/user/register")
+      .send(userInput);
+    // check api call status
+    expect(result.status).toBe(400)
+    expect(result.body.length).toBe(1)
+    expect(result.body[0].message).toBe("you are submitting to many parameters");
+
+    //clean up database
+    await RoleModel.deleteOne({ _id: dbRole?._id });
+  })
+
   test("get all users without authorization", async () => {
     // pure api call
     const result = await request(app)

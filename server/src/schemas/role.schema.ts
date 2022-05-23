@@ -11,7 +11,7 @@ export const createRoleSchema = object({
         .min(6, "role description should be 6 chars minimum")
         .regex(longTextRegex, "wrong format")
     ),
-  }),
+  }).strict({ message: "you are submitting to many parameters" }),
 });
 
 export type CreateRoleInput = TypeOf<typeof createRoleSchema>;

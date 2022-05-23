@@ -70,7 +70,7 @@ export const createUserSchema = object({
         message: "wrong role id",
       }
     ),
-  }),
+  }).strict({ message: "you are submitting to many parameters" }),
 });
 
 export type CreateUserInput = TypeOf<typeof createUserSchema>;

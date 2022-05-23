@@ -37,6 +37,7 @@ export interface UserDocument extends Omit<UserInput, "password"> {
   _id: string; // Types.ObjectId; - this item is different from UserDocument in back-end
   createdAt: Date;
   updatedAt: Date;
+  isConfirmed?: Boolean;
   __v: number;
 }
 

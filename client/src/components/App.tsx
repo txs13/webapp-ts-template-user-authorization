@@ -9,7 +9,7 @@ import { ThemeProvider } from "@mui/material/styles";
 import Navbar from "./Navbar";
 import appStyles from "./styles/appStyles";
 import RouterFrame from "./RouterFrame";
-import { fetchPublicRolesService } from "../app/services/publicRoles";
+import { fetchPublicRolesService } from "../app/services/roleServices";
 import { loginWithRefreshTokenService } from '../app/services/loginServices'
 
 const appTheme = createTheme(); 
