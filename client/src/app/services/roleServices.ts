@@ -28,7 +28,7 @@ export const fetchAllRoles = async () => {
       store.dispatch(accessTockenUpdate(response.updatedAccessToken));
     }
     // return array of user records
-    return response.payload as [RoleDocument];
+    return response.payload as RoleDocument[];
   } else {
     // logout precedure to be started
   }

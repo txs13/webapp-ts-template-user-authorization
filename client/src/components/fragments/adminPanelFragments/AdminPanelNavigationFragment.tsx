@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Box, ToggleButtonGroup, ToggleButton } from "@mui/material";
-import { useMediaQuery, useTheme } from "@mui/material"
+import { useMediaQuery, useTheme } from "@mui/material";
 
 import styles from "../../styles/adminPanelStyles/adminPanelNavigationStyles";
 import { LocalizedTextResources } from "../../../res/textResourcesFunction";
@@ -33,9 +33,9 @@ const AdminPanelNavigationFragment: React.FunctionComponent = () => {
   ) => {
     setAlignment(newAlignment);
     if (newAlignment !== alignment) {
-      switch(newAlignment) {
-        case "main": 
-          navigate("")
+      switch (newAlignment) {
+        case "main":
+          navigate("");
           break;
         case "rolelist":
           navigate("rolelist");
@@ -43,15 +43,13 @@ const AdminPanelNavigationFragment: React.FunctionComponent = () => {
         case "userlist":
           navigate("userlist");
           break;
-        default:
-          console.log("wrong menu identifier. please contact developers")      
       }
     }
   };
 
   // handle screen size change
-  const theme = useTheme()
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down("md")) 
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"));
 
   return (
     <Box sx={styles.fragmentFrame}>

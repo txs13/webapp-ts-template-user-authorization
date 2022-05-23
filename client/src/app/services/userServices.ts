@@ -40,7 +40,7 @@ export const fetchAllUsers = async () => {
       store.dispatch(accessTockenUpdate(response.updatedAccessToken));
     }
     // return array of user records
-    return response.payload as [UserDocument];
+    return response.payload as UserDocument[];
   } else {
     // logout precedure to be started
   }
