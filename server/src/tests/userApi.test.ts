@@ -2,12 +2,14 @@ import request from "supertest";
 import mongoose from "mongoose";
 import RoleModel, { RoleDocument } from "../models/role.model";
 import UserModel, { UserInput } from "../models/user.model";
-import AdminModel from "../models/admin.model";
+import AdminModel, { AdminInput } from "../models/admin.model";
 import SessionModel from "../models/session.model";
 import app from "../app";
 import getEnvVars from "../config/config";
 
 const { dbUri, testDbName } = getEnvVars();
+const userAgentContent = "user agent content";
+
 
 describe("user api tests", () => {
   beforeAll(async () => {
@@ -314,5 +316,123 @@ describe("user api tests", () => {
     //clean up database
     await UserModel.deleteOne({ _id: dbUser?._id });
     await RoleModel.deleteOne({ _id: dbRole?._id });
+  });
+
+  test("get all users without authorization", async () => {
+    // pure api call
+    const result = await request(app)
+      .get("/api/v1/user/allusers")
+      .set("User-agent", userAgentContent);
+    // no user data provided
+    expect(result.status).toBe(401);
+    expect(result.body.length).toBe(1);
+    expect(result.body[0].message).toBe("token is required");  
+  });
+
+  test("get all users without admin rights", async () => {
+    // check and create role - because it is needed for the user registration
+    const roleInput = {
+      role: "test case role 00001",
+    };
+    let dbRole = await RoleModel.create(roleInput);
+
+    // user dataset which is supposed to be accepted by api
+    const userInput = {
+      email: "test@example.com",
+      password: "qwerty12345",
+      name: "Vasyliy",
+      familyname: "Pupkin",
+      phone: "+1 254 456 23 45",
+      address: "USA, Philadelphia, Linkoln Str. 25",
+      company: "Roga i Kopyta Ltd.",
+      position: "anykey tester",
+      description: "very important test case user",
+      isConfirmed: true,
+      userrole_id: dbRole._id.toString(),
+    };
+    // create "existing" user record in the database
+    let dbUser = await UserModel.create(userInput);
+
+    // perform login in order to get access token
+    const loginResult = await request(app)
+      .post("/api/v1/user/login")
+      .send({ email: userInput.email, password: userInput.password })
+      .set("User-agent", userAgentContent);
+
+    expect(loginResult.status).toBe(200);
+    expect(loginResult.body.accessToken).toBeTruthy();
+
+    const accessToken = loginResult.body.accessToken;
+
+    const result = await request(app)
+      .get("/api/v1/user/allusers")
+      .set("Authorization", accessToken)
+      .set("User-agent", userAgentContent);
+
+    // no user data provided
+    expect(result.status).toBe(401);
+    expect(result.body.length).toBe(1);
+    expect(result.body[0].message).toBe("no admin rights granted");
+
+    //clean up database
+    await UserModel.deleteOne({ _id: dbUser?._id });
+    await RoleModel.deleteOne({ _id: dbRole?._id });
+  });
+
+  test("successfully get all users with admin rights", async () => {
+    // check and create role - because it is needed for the user registration
+    const roleInput = {
+      role: "test case role 00001",
+    };
+    let dbRole = await RoleModel.create(roleInput);
+
+    // user dataset which is supposed to be accepted by api
+    const userInput = {
+      email: "test@example.com",
+      password: "qwerty12345",
+      name: "Vasyliy",
+      familyname: "Pupkin",
+      phone: "+1 254 456 23 45",
+      address: "USA, Philadelphia, Linkoln Str. 25",
+      company: "Roga i Kopyta Ltd.",
+      position: "anykey tester",
+      description: "very important test case user",
+      isConfirmed: true,
+      userrole_id: dbRole._id.toString(),
+    };
+    // create "existing" user record in the database
+    let dbUser = await UserModel.create(userInput);
+
+    let adminInput: AdminInput = {
+      userId: dbUser._id,
+      description: "test case admin user record"
+    }
+    let adminRecord = await AdminModel.create(adminInput)
+
+    // perform login in order to get access token
+    const loginResult = await request(app)
+      .post("/api/v1/user/login")
+      .send({ email: userInput.email, password: userInput.password })
+      .set("User-agent", userAgentContent);
+
+    expect(loginResult.status).toBe(200);
+    expect(loginResult.body.accessToken).toBeTruthy();
+
+    const accessToken = loginResult.body.accessToken;
+
+    const result = await request(app)
+      .get("/api/v1/user/allusers")
+      .set("Authorization", accessToken)
+      .set("User-agent", userAgentContent);
+
+    expect(result.status).toBe(200);
+    expect(result.body.length).toBe(1);
+    expect(result.body[0]._id).toBe(dbUser?._id.toString());
+    expect(result.body[0].password).toBeFalsy();
+
+    //clean up database
+    await UserModel.deleteOne({ _id: dbUser?._id });
+    await RoleModel.deleteOne({ _id: dbRole?._id });
+    await AdminModel.deleteOne({_id: adminRecord?._id});
   });
 });
