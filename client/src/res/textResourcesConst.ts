@@ -69,7 +69,7 @@ export const textResourcesMultilang: TextResources = {
     EN: "Wrong network settings. Please contact admin",
   },
   unknownErrorMessage: {
-    EN: "Unknown error. Please contact admin"
+    EN: "Unknown error. Please contact admin",
   },
   // login input validation messages
   minOneCharEmailMessage: {
@@ -185,12 +185,50 @@ export const textResourcesMultilang: TextResources = {
   },
   // admin panel navigation labels
   startingPageNavLabel: {
-    EN: "admin main"
+    EN: "admin main",
   },
   userListNavLabel: {
-    EN: "users"
+    EN: "users",
   },
   roleListNavLabel: {
-    EN: "roles"
-  }
+    EN: "roles",
+  },
+  // admin panel user list search panel
+  searchFieldLabel: {
+    EN: "search by"
+  },
+  searchWhatlabel: {
+    EN: "search what"
+  },
+  toBeConfirmedSwitchLabel: {
+    EN: "only not confirmed"
+  },
+  // admin panel user list labels
+  userNameLabel: {
+    EN: "name",
+  },
+  userEmailLabel: {
+    EN: "email",
+  },
+  userCompanyLabel: {
+    EN: "company",
+  },
+  userPortalRoleLabel: {
+    EN: "portal role",
+  },
+  userYStatusLabel: {
+    EN: "is confirmed",
+  },
+  userNStatusLabel: {
+    EN: "is NOT confirmed",
+  },
+  confirmBtnLabel: {
+    EN: "confirm"
+  },
+  editBtnLabel: {
+    EN: "edit"
+  },
+  deleteBtnLabel: {
+    EN: "delete"
+  },
 };
