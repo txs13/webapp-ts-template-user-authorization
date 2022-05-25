@@ -10,6 +10,7 @@ import {
   RoleDocument,
   UserDocument,
 } from "../../../interfaces/inputInterfaces";
+import styles from "../../styles/adminPanelStyles/adminPanelUserDetailsDialogStyles"
 
 export interface AdminPanelUserDetailsDialogPropsTypes {
   openStatus: OpenUserDetailsStatus;
@@ -39,23 +40,68 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
     <Dialog open={openStatus.open} onClose={handleClose}>
       <DialogTitle>User details</DialogTitle>
       <DialogContent>
-        <TextField label="id" />
-        <TextField label="id" />
-        <TextField label="id" />
-        <TextField label="id" />
-        <TextField label="id" />
-        <TextField label="id" />
-        <TextField label="id" />
-        <TextField label="id" />
-        <TextField label="id" />
-        <TextField label="id" />
+        <TextField
+          sx={styles.inputField}
+          variant="outlined"
+          label={textResourses.nameDialogBoxlabel}
+        />
+        <TextField
+          sx={styles.inputField}
+          variant="outlined"
+          label={textResourses.familynameDialogBoxlabel}
+        />
+        <TextField
+          sx={styles.inputField}
+          variant="outlined"
+          label={textResourses.emailDialogBoxlabel}
+        />
+        <TextField
+          sx={styles.inputField}
+          variant="outlined"
+          label={textResourses.phoneDialogBoxlabel}
+        />
+        <TextField
+          sx={styles.inputField}
+          variant="outlined"
+          label={textResourses.addressDialogBoxlabel}
+        />
+        <TextField
+          sx={styles.inputField}
+          variant="outlined"
+          label={textResourses.companyDialogBoxlabel}
+        />
+        <TextField
+          sx={styles.inputField}
+          variant="outlined"
+          label={textResourses.positionDialogBoxlabel}
+        />
+        <TextField
+          sx={styles.inputField}
+          variant="outlined"
+          label={textResourses.descriptionDialogBoxlabel}
+        />
+        <TextField
+          sx={styles.inputField}
+          variant="outlined"
+          label={textResourses.userRoleDialogBoxlabel}
+        />
+        <TextField
+          sx={styles.inputField}
+          variant="outlined"
+          label={textResourses.createdAtDialogBoxlabel}
+        />
+        <TextField
+          sx={styles.inputField}
+          variant="outlined"
+          label={textResourses.updatedAtDialogBoxlabel}
+        />
       </DialogContent>
       <DialogActions>
         <ButtonGroup>
           <Button>edit</Button>
           <Button>confirm</Button>
           <Button>delete</Button>
-          <Button onClick={()=>closeDialog()}>close</Button>
+          <Button onClick={() => closeDialog()}>close</Button>
         </ButtonGroup>
       </DialogActions>
     </Dialog>

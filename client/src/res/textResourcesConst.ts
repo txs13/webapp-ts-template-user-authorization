@@ -195,13 +195,13 @@ export const textResourcesMultilang: TextResources = {
   },
   // admin panel user list search panel
   searchFieldLabel: {
-    EN: "search by"
+    EN: "search by",
   },
   searchWhatlabel: {
-    EN: "search what"
+    EN: "search what",
   },
   toBeConfirmedSwitchLabel: {
-    EN: "only not confirmed"
+    EN: "only not confirmed",
   },
   // admin panel user list labels
   userNameLabel: {
@@ -223,12 +223,47 @@ export const textResourcesMultilang: TextResources = {
     EN: "is NOT confirmed",
   },
   confirmBtnLabel: {
-    EN: "confirm"
+    EN: "confirm",
   },
   editBtnLabel: {
-    EN: "edit"
+    EN: "edit",
   },
   deleteBtnLabel: {
-    EN: "delete"
+    EN: "delete",
   },
+  // admin panel dialog window labels
+  nameDialogBoxlabel: {
+    EN: "name",
+  },
+  familynameDialogBoxlabel: {
+    EN: "familyname",
+  },
+  emailDialogBoxlabel: {
+    EN: "email",
+  },
+  phoneDialogBoxlabel: {
+    EN: "phone",
+  },
+  addressDialogBoxlabel: {
+    EN: "address",
+  },
+  companyDialogBoxlabel: {
+    EN: "company",
+  },
+  positionDialogBoxlabel: {
+    EN: "position",
+  },
+  descriptionDialogBoxlabel: {
+    EN: "description",
+  },
+  userRoleDialogBoxlabel: {
+    EN: "is confirmed",
+  },
+  createdAtDialogBoxlabel: {
+    EN: "created at",
+  },
+  updatedAtDialogBoxlabel: {
+    EN: "updated at",
+  },
+
 };
