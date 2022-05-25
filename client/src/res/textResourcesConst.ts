@@ -232,6 +232,9 @@ export const textResourcesMultilang: TextResources = {
     EN: "delete",
   },
   // admin panel dialog window labels
+  headerDialogBoxLabel: {
+    EN: "user details"
+  },
   nameDialogBoxlabel: {
     EN: "name",
   },

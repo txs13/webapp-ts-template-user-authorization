@@ -1,9 +1,17 @@
 import { ComponentStylesDatatype } from "../componentStylesDatatype";
 
 const adminPanelUserListFragmentStyles: ComponentStylesDatatype = {
-    inputField: {
-        margin: "5px"
-    }
-}
+  mainFrame: {
+    
+  },
+  inputsBlock:{
+   
+    
+  },
+  inputField: {
+    marginTop: "4px",
+    marginBottom: "4px"
+  },
+};
 
-export default adminPanelUserListFragmentStyles
+export default adminPanelUserListFragmentStyles;

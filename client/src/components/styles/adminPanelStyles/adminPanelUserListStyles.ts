@@ -4,7 +4,7 @@ const adminPanelUserListFragmentStyles: ComponentStylesDatatype = {
   fragmentFrame: {
     width: { xs: "100%", md: "100%" },
     height: { xs: "100%", md: "100%" },
-    backgroundColor: "WindowFrame",
+    backgroundColor: "primary.light",
   },
   toolbox: {
     backgroundColor: "Window",
@@ -22,12 +22,8 @@ const adminPanelUserListFragmentStyles: ComponentStylesDatatype = {
     width: "auto",
     height: "auto",
   },
-  searchFieldLabel: {
-    
-  },
-  searchWhatlabel: {
-    
-  },
+  searchFieldLabel: {},
+  searchWhatlabel: {},
 };
 
 export default adminPanelUserListFragmentStyles;
