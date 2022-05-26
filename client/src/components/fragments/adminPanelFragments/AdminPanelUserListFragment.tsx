@@ -70,10 +70,10 @@ const AdminPanelUserListFragment: React.FunctionComponent = () => {
       case "start":
         fetchAllUsers().then((userres) => {
           setUsers(userres);
-          console.log(userres);
+          //console.log(userres);
           fetchAllRoles().then((roleres) => {
             setRoles(roleres);
-            console.log(roleres);
+            //console.log(roleres);
             setDataRefreshState("waiting");
           });
         });
@@ -81,7 +81,7 @@ const AdminPanelUserListFragment: React.FunctionComponent = () => {
       case "userupdate":
         fetchAllUsers().then((userres) => {
           setUsers(userres);
-          console.log(userres);
+          //console.log(userres);
           setDataRefreshState("waiting");
         });
         break;

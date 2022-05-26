@@ -233,7 +233,10 @@ export const textResourcesMultilang: TextResources = {
   },
   // admin panel dialog window labels
   headerDialogBoxLabel: {
-    EN: "user details"
+    EN: "user details",
+  },
+  idDialogBoxlabel: {
+    EN: "id",
   },
   nameDialogBoxlabel: {
     EN: "name",
@@ -260,6 +263,9 @@ export const textResourcesMultilang: TextResources = {
     EN: "description",
   },
   userRoleDialogBoxlabel: {
+    EN: "portal role",
+  },
+  isconfirmedDialogBoxlabel: {
     EN: "is confirmed",
   },
   createdAtDialogBoxlabel: {
@@ -268,5 +274,4 @@ export const textResourcesMultilang: TextResources = {
   updatedAtDialogBoxlabel: {
     EN: "updated at",
   },
-
 };

@@ -28,6 +28,23 @@ export interface AdminPanelUserDetailsDialogPropsTypes {
   dataUpdate: Function;
 }
 
+const initialUserValue: UserDocument = {
+  _id: "",
+  name: "",
+  familyname: "",
+  email: "",
+  phone: "",
+  address: "",
+  company: "",
+  position: "",
+  description: "",
+  isConfirmed: false,
+  userrole_id: "",
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  __v: 0,
+};
+
 const AdminPanelUserDetailsDialog: React.FunctionComponent<
   AdminPanelUserDetailsDialogPropsTypes
 > = ({ openStatus, roles, closeDialog, dataUpdate }) => {
@@ -45,6 +62,17 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
   // callback function to be done after screen is closed
   const handleClose = () => {};
 
+  // variable to store user changes
+  const [currentUser, setCurrentUser] =
+    useState<UserDocument>(initialUserValue);
+  useEffect(() => {
+    const userData = openStatus.currentUser as UserDocument;
+    if (userData) {
+      setCurrentUser({ ...initialUserValue, ...userData });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [openStatus]);
+
   return (
     <Dialog open={openStatus.open} onClose={handleClose} sx={styles.mainFrame}>
       <DialogTitle>
@@ -55,67 +83,92 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
           fullWidth
           sx={styles.inputField}
           variant="outlined"
+          label={textResourses.idDialogBoxlabel}
+          value={currentUser._id}
+        />
+        <TextField
+          fullWidth
+          sx={styles.inputField}
+          variant="outlined"
           label={textResourses.nameDialogBoxlabel}
+          value={currentUser.name}
         />
         <TextField
           fullWidth
           sx={styles.inputField}
           variant="outlined"
           label={textResourses.familynameDialogBoxlabel}
+          value={currentUser.familyname}
         />
         <TextField
           fullWidth
           sx={styles.inputField}
           variant="outlined"
           label={textResourses.emailDialogBoxlabel}
+          value={currentUser.email}
         />
         <TextField
           fullWidth
           sx={styles.inputField}
           variant="outlined"
           label={textResourses.phoneDialogBoxlabel}
+          value={currentUser.phone}
         />
         <TextField
           fullWidth
           sx={styles.inputField}
           variant="outlined"
           label={textResourses.addressDialogBoxlabel}
+          value={currentUser.address}
         />
         <TextField
           fullWidth
           sx={styles.inputField}
           variant="outlined"
           label={textResourses.companyDialogBoxlabel}
+          value={currentUser.company}
         />
         <TextField
           fullWidth
           sx={styles.inputField}
           variant="outlined"
           label={textResourses.positionDialogBoxlabel}
+          value={currentUser.position}
         />
         <TextField
           fullWidth
           sx={styles.inputField}
           variant="outlined"
           label={textResourses.descriptionDialogBoxlabel}
+          value={currentUser.description}
         />
         <TextField
           fullWidth
           sx={styles.inputField}
           variant="outlined"
           label={textResourses.userRoleDialogBoxlabel}
+          value={currentUser.userrole_id}
+        />
+        <TextField
+          fullWidth
+          sx={styles.inputField}
+          variant="outlined"
+          label={textResourses.isconfirmedDialogBoxlabel}
+          value={currentUser.isConfirmed}
         />
         <TextField
           fullWidth
           sx={styles.inputField}
           variant="outlined"
           label={textResourses.createdAtDialogBoxlabel}
+          value={currentUser.createdAt}
         />
         <TextField
           fullWidth
           sx={styles.inputField}
           variant="outlined"
           label={textResourses.updatedAtDialogBoxlabel}
+          value={currentUser.updatedAt}
         />
       </DialogContent>
       <DialogActions>
