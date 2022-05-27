@@ -23,11 +23,23 @@ import {
 } from "../../../interfaces/inputInterfaces";
 import AdminPanelUserDetailsDialog from "./AdminPanelUserDetailsDialog";
 
+
 type DataRefreshState = "start" | "userupdate" | "waiting";
 
 export interface OpenUserDetailsStatus {
   open: boolean;
   currentUser: UserDocument | undefined;
+}
+
+export interface OpenConfimationStatus {
+  open: boolean;
+  message: string;
+  successCBFunction: Function | undefined;
+}
+
+export interface ConfimationResult {
+  status: boolean | undefined;
+  successCBFunction: Function | undefined;
 }
 
 export interface UserItem {
@@ -134,6 +146,49 @@ const AdminPanelUserListFragment: React.FunctionComponent = () => {
   const closeUserDetails = () => {
     setOpenUserDetailsStatus({ open: false, currentUser: undefined });
   }
+
+  // this block is responsibelt for the universal model / confimation window
+  const [openConfirmationStatus, setOpenConfirmationStatus] = useState<OpenConfimationStatus>({open:false, message: "", successCBFunction: undefined});
+  const openConfirmation = (message: string, successCBFunction: Function) => {
+    setOpenConfirmationStatus({
+      open: true,
+      message: message,
+      successCBFunction: successCBFunction,
+    });
+  };
+  const [confirmationResult, setConfirmationResult] =
+    useState<ConfimationResult>({ status: undefined, successCBFunction: undefined});
+  const confirmAction = (status: boolean, successCBFunction?:Function) => {
+    if (status) { 
+      setConfirmationResult({status: status, successCBFunction: successCBFunction as Function})
+     } else {
+      setConfirmationResult({
+        status: status,
+        successCBFunction: undefined,
+      });
+    }
+  }
+  useEffect(()=>{
+    if (confirmationResult.status !== undefined) {
+      if (
+        confirmationResult.status === true &&
+        confirmationResult.successCBFunction !== undefined
+      ) {
+        // user confirmed the action, callback function should be called
+        confirmationResult.successCBFunction();
+      } 
+        // user did NOT confirm the action, call back function should NOT be called
+        setConfirmationResult({
+          status: undefined,
+          successCBFunction: undefined,
+        });
+        setOpenConfirmationStatus({
+          open: false,
+          message: "",
+          successCBFunction: undefined,
+        });
+    }
+  },[confirmationResult])   
 
   return (
     <Box sx={styles.fragmentFrame}>
