@@ -3,6 +3,8 @@ import {
   registerApi,
   fetchAllUsersApiCall,
   APICallInterface,
+  putUserApiCall,
+  deleteUserApiCall
 } from "../../api/api";
 import store from "../store";
 import { accessTockenUpdate } from "../features/user.slice";
@@ -43,5 +45,49 @@ export const fetchAllUsers = async () => {
     return response.payload as UserDocument[];
   } else {
     // logout precedure to be started
+  }
+};
+
+export const putUser = async (updatedUser: UserDocument, newPassword?: string) => {
+  // get actual store state
+  const storeState = store.getState();
+  // api call
+  const response = (await putUserApiCall(
+    storeState.user.value.tokens?.accessToken as string,
+    storeState.user.value.tokens?.refreshToken as string,
+    false,
+    updatedUser
+  )) as APICallInterface;
+  if (response.success) {
+    // update the store with new access tocken if we got one
+    if (response.updatedAccessToken) {
+      store.dispatch(accessTockenUpdate(response.updatedAccessToken));
+    }
+    // return array of user records
+    return response.payload as UserDocument;
+  } else {
+    // somehow show the error
+  }
+}
+
+export const deleteUser = async (userId: string) => {
+  // get actual store state
+  const storeState = store.getState();
+  // api call
+  const response = (await deleteUserApiCall(
+    storeState.user.value.tokens?.accessToken as string,
+    storeState.user.value.tokens?.refreshToken as string,
+    false,
+    userId
+  )) as APICallInterface;
+  if (response.success) {
+    // update the store with new access tocken if we got one
+    if (response.updatedAccessToken) {
+      store.dispatch(accessTockenUpdate(response.updatedAccessToken));
+    }
+    // return array of user records
+    return response.payload;
+  } else {
+    // somehow show the error
   }
 };

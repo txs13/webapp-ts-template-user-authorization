@@ -6,18 +6,24 @@ import { LocalizedTextResources } from "../../../res/textResourcesFunction";
 import getTextResources from "../../../res/textResourcesFunction";
 import { RootState } from "../../../app/store";
 import { UserItem } from "./AdminPanelUserListFragment";
-import styles from "../../styles/adminPanelStyles/adminPanelUserCardStyles"
+import styles from "../../styles/adminPanelStyles/adminPanelUserCardStyles";
 
 interface UserCardPropsTypes {
   user: UserItem;
   dataUpdate: Function;
   openUserDetails: Function;
+  openConfirmationDialog: Function;
+  confirmUserServiceCall: Function;
+  deleteUserServiceCall: Function;
 }
 
 const AdminPanelUserCard: React.FunctionComponent<UserCardPropsTypes> = ({
   user,
   dataUpdate,
-  openUserDetails
+  openUserDetails,
+  openConfirmationDialog,
+  confirmUserServiceCall,
+  deleteUserServiceCall,
 }) => {
   // get data from app settings store and get text resouses in proper language
   const appSettings = useSelector(
@@ -35,6 +41,20 @@ const AdminPanelUserCard: React.FunctionComponent<UserCardPropsTypes> = ({
 
   const onCardClickHandler = () => {
     setExtended(!extended);
+  };
+  // call cinfirmation dialog for the user confirmation buttton
+  const confirmClickHandler = () => {
+    openConfirmationDialog(
+      `${textResourses.confirmUserCardMessage}: ${user.email}`,
+      () => confirmUserServiceCall(user._id)
+    );
+  };
+
+  const deleteUserClickHandler = () => {
+    openConfirmationDialog(
+      `${textResourses.deleteUserCardMessage}: ${user.email}`,
+      () => deleteUserServiceCall(user._id)
+    );
   };
 
   return (
@@ -89,6 +109,7 @@ const AdminPanelUserCard: React.FunctionComponent<UserCardPropsTypes> = ({
                 color="error"
                 size="small"
                 sx={styles.btn}
+                onClick={() => deleteUserClickHandler()}
               >
                 {textResourses.deleteBtnLabel}
               </Button>
@@ -106,6 +127,7 @@ const AdminPanelUserCard: React.FunctionComponent<UserCardPropsTypes> = ({
                 color="success"
                 size="small"
                 sx={styles.btn}
+                onClick={() => confirmClickHandler()}
               >
                 {textResourses.confirmBtnLabel}
               </Button>

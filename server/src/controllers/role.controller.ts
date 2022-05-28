@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { SessionDocument } from "../models/session.model";
 import { CreateRoleInput } from "../schemas/role.schema";
 import {
   createRole,
@@ -13,12 +14,16 @@ export const createRoleHandler = async (
 ) => {
   try {
     const role = await createRole(req.body);
-    const session = res.locals.session
+    const session: SessionDocument = res.locals.session
     session.addUserAction(req.originalUrl, req.method, true);
     await session.save();
     return res.status(201).send(role.toJSON());
   } catch (e: any) {
     log.error(e);
+    const session: SessionDocument = res.locals.session
+    session.addUserAction(req.originalUrl, req.method, false);
+    await session.save();
+
     res.status(409).send(e.message);
   }
 };
@@ -37,9 +42,17 @@ export const getPublicRolesHandler = async (req: Request, res: Response) => {
 export const getAllRolesHandler = async (req: Request, res: Response) => {
   try {
     const allRoles = await getAllRoles();
+    const session: SessionDocument = res.locals.session
+    session.addUserAction(req.originalUrl, req.method, true);
+    await session.save();
+
     res.status(200).send(allRoles);
   } catch (e: any) {
     log.error(e);
+    const session: SessionDocument = res.locals.session
+    session.addUserAction(req.originalUrl, req.method, false);
+    await session.save();
+
     res.status(409).send(e.message);
   }
 

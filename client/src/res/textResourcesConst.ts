@@ -231,6 +231,12 @@ export const textResourcesMultilang: TextResources = {
   deleteBtnLabel: {
     EN: "delete",
   },
+  confirmUserCardMessage: {
+    EN: "You are going to grant access to the web-portal for the user",
+  },
+  deleteUserCardMessage: {
+    EN: "You are going to delete the user",
+  },
   // admin panel dialog window labels
   headerDialogBoxLabel: {
     EN: "user details",
@@ -273,5 +279,15 @@ export const textResourcesMultilang: TextResources = {
   },
   updatedAtDialogBoxlabel: {
     EN: "updated at",
+  },
+  // confirmation dialog box labels
+  headerConfimationDialogLabel: {
+    EN: "please confirm",
+  },
+  btnYesConfimationDialogLabel: {
+    EN: "confirm",
+  },
+  btnNoConfimationDialogLabel: {
+    EN: "cancel",
   },
 };

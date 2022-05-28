@@ -80,3 +80,17 @@ export const getAllusers = async () => {
     throw new Error(e);
   }
 }
+
+// check user service - to check that user ID exists in the database
+export const checkUserById = async (id: string) => {
+  try {
+    const role = await UserModel.findById(id);
+    if (role) {
+      return true;
+    } else {
+      return false;
+    }
+  } catch (e: any) {
+    throw new Error(e);
+  }
+};

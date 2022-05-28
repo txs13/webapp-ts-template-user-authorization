@@ -6,7 +6,7 @@ import {
   TextField,
   Switch,
   FormControlLabel,
-  Grid
+  Grid,
 } from "@mui/material";
 
 import { LocalizedTextResources } from "../../../res/textResourcesFunction";
@@ -15,14 +15,18 @@ import { RootState } from "../../../app/store";
 import AdminPanelUserCard from "./AdminPanelUserCard";
 import AdminPanelLoadingFragment from "./AdminPanelLoadingFragment";
 import styles from "../../styles/adminPanelStyles/adminPanelUserListStyles";
-import { fetchAllUsers } from "../../../app/services/userServices";
+import {
+  deleteUser,
+  fetchAllUsers,
+  putUser,
+} from "../../../app/services/userServices";
 import { fetchAllRoles } from "../../../app/services/roleServices";
 import {
   RoleDocument,
   UserDocument,
 } from "../../../interfaces/inputInterfaces";
 import AdminPanelUserDetailsDialog from "./AdminPanelUserDetailsDialog";
-
+import AdminPanelUserListConfirmationDialog from "./AdminPanelUserListConfirmationDialog";
 
 type DataRefreshState = "start" | "userupdate" | "waiting";
 
@@ -34,13 +38,14 @@ export interface OpenUserDetailsStatus {
 export interface OpenConfimationStatus {
   open: boolean;
   message: string;
-  successCBFunction: Function | undefined;
+  successCBFunction: Function;
 }
 
-export interface ConfimationResult {
-  status: boolean | undefined;
-  successCBFunction: Function | undefined;
-}
+const openConfimationInitialState: OpenConfimationStatus = {
+  open: false,
+  message: "",
+  successCBFunction: () => {},
+};
 
 export interface UserItem {
   _id: string;
@@ -63,12 +68,12 @@ const AdminPanelUserListFragment: React.FunctionComponent = () => {
   useEffect(() => {
     setTextResourses(getTextResources(appSettings.language));
   }, [appSettings]);
-  
+
   // variables to store list of users, roles, shortened list to be mapped and shown
   const [users, setUsers] = useState<UserDocument[]>();
   const [roles, setRoles] = useState<RoleDocument[]>();
   const [userItems, setUserItems] = useState<UserItem[]>();
-  
+
   // this structure is needed in order to fetch data once after fragment is shown and
   // then I could initiate another datafetch for instance after I delete a user or edit it
   // "start" to fetch both users and roles after fragment is rendered
@@ -103,7 +108,7 @@ const AdminPanelUserListFragment: React.FunctionComponent = () => {
   }, [dataRefreshState]);
   const dataUpdate = () => {
     setDataRefreshState("userupdate");
-  }
+  };
   // as soon as both users and roles are fetched or one of them is changed to initiate
   // update of the list to be shown
   useEffect(() => {
@@ -136,59 +141,59 @@ const AdminPanelUserListFragment: React.FunctionComponent = () => {
   };
 
   // this variable is needed to open dialog screen with user details
-  const [openUserDetailsStatus, setOpenUserDetailsStatus] = useState<OpenUserDetailsStatus>({open:false, currentUser: undefined})
+  const [openUserDetailsStatus, setOpenUserDetailsStatus] =
+    useState<OpenUserDetailsStatus>({ open: false, currentUser: undefined });
   const openUserDetails = (userId: string) => {
-    const user = users?.find((user)=> user._id === userId)
+    const user = users?.find((user) => user._id === userId);
     if (user) {
-      setOpenUserDetailsStatus({open: true, currentUser: user})
+      setOpenUserDetailsStatus({ open: true, currentUser: user });
     }
-  }
+  };
   const closeUserDetails = () => {
     setOpenUserDetailsStatus({ open: false, currentUser: undefined });
-  }
+  };
 
   // this block is responsibelt for the universal model / confimation window
-  const [openConfirmationStatus, setOpenConfirmationStatus] = useState<OpenConfimationStatus>({open:false, message: "", successCBFunction: undefined});
-  const openConfirmation = (message: string, successCBFunction: Function) => {
+  const [openConfirmationStatus, setOpenConfirmationStatus] =
+    useState<OpenConfimationStatus>(openConfimationInitialState);
+  const openConfirmationDialog = (
+    message: string,
+    successCBFunction: Function
+  ) => {
     setOpenConfirmationStatus({
       open: true,
       message: message,
       successCBFunction: successCBFunction,
     });
   };
-  const [confirmationResult, setConfirmationResult] =
-    useState<ConfimationResult>({ status: undefined, successCBFunction: undefined});
-  const confirmAction = (status: boolean, successCBFunction?:Function) => {
-    if (status) { 
-      setConfirmationResult({status: status, successCBFunction: successCBFunction as Function})
-     } else {
-      setConfirmationResult({
-        status: status,
-        successCBFunction: undefined,
-      });
+  const submitConfirmationDecision = (
+    decision: "yes" | "no",
+    successCBFunction?: Function
+  ) => {
+    if (decision === "yes" && successCBFunction) {
+      successCBFunction();
     }
-  }
-  useEffect(()=>{
-    if (confirmationResult.status !== undefined) {
-      if (
-        confirmationResult.status === true &&
-        confirmationResult.successCBFunction !== undefined
-      ) {
-        // user confirmed the action, callback function should be called
-        confirmationResult.successCBFunction();
-      } 
-        // user did NOT confirm the action, call back function should NOT be called
-        setConfirmationResult({
-          status: undefined,
-          successCBFunction: undefined,
-        });
-        setOpenConfirmationStatus({
-          open: false,
-          message: "",
-          successCBFunction: undefined,
-        });
-    }
-  },[confirmationResult])   
+    setOpenConfirmationStatus(openConfimationInitialState);
+  };
+
+  // functions to call proper services and api calls
+  const confirmUserServiceCall = async (userId: string) => {
+    const updatedUser: UserDocument = {
+      ...users?.find((it) => it._id === userId),
+    } as UserDocument;
+
+    updatedUser.isConfirmed = true;
+    const result = await putUser(updatedUser);
+    // to process user updated result
+
+    console.log(result);
+  };
+
+  const deleteUserServiceCall = async (userId: string) => {
+    const result = await deleteUser(userId);
+    // to process user updated result
+    console.log(result);
+  };
 
   return (
     <Box sx={styles.fragmentFrame}>
@@ -233,6 +238,9 @@ const AdminPanelUserListFragment: React.FunctionComponent = () => {
                   user={user}
                   dataUpdate={dataUpdate}
                   openUserDetails={openUserDetails}
+                  openConfirmationDialog={openConfirmationDialog}
+                  confirmUserServiceCall={confirmUserServiceCall}
+                  deleteUserServiceCall={deleteUserServiceCall}
                 />
               </Grid>
             ))}
@@ -246,6 +254,10 @@ const AdminPanelUserListFragment: React.FunctionComponent = () => {
         roles={roles}
         closeDialog={closeUserDetails}
         dataUpdate={dataUpdate}
+      />
+      <AdminPanelUserListConfirmationDialog
+        openStatus={openConfirmationStatus}
+        submitConfirmationDecision={submitConfirmationDecision}
       />
     </Box>
   );

@@ -4,7 +4,6 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  TextField,
   ButtonGroup,
   Button,
   Typography,
@@ -13,13 +12,42 @@ import { useSelector } from "react-redux";
 import { LocalizedTextResources } from "../../../res/textResourcesFunction";
 import getTextResources from "../../../res/textResourcesFunction";
 import { RootState } from "../../../app/store";
+import { OpenConfimationStatus } from "./AdminPanelUserListFragment";
 
-const AdminPanelUserListConfimationDialog = () => {
+interface AdminPanelUserListConfirmationPropsTypes {
+  openStatus: OpenConfimationStatus;
+  submitConfirmationDecision: Function;
+}
+
+const AdminPanelUserListConfimationDialog: React.FunctionComponent<
+  AdminPanelUserListConfirmationPropsTypes
+> = ({ openStatus, submitConfirmationDecision }) => {
+  // get data from app settings store and get text resouses in proper language
+  const appSettings = useSelector(
+    (state: RootState) => state.appSettings.value
+  );
+  const [textResourses, setTextResourses] = useState<LocalizedTextResources>(
+    {}
+  );
+  useEffect(() => {
+    setTextResourses(getTextResources(appSettings.language));
+  }, [appSettings]);
   return (
-    <Dialog>
-      <DialogTitle></DialogTitle>
-      <DialogContent></DialogContent>
-      <DialogActions></DialogActions>
+    <Dialog open={openStatus.open}>
+      <DialogTitle>{textResourses.headerConfimationDialogLabel}</DialogTitle>
+      <DialogContent>
+        <Typography variant="body1">{openStatus.message}</Typography>
+      </DialogContent>
+      <DialogActions>
+        <ButtonGroup fullWidth>
+          <Button onClick={() => submitConfirmationDecision("no")}>
+            {textResourses.btnNoConfimationDialogLabel}
+          </Button>
+          <Button onClick={() => submitConfirmationDecision("yes", openStatus.successCBFunction)}>
+            {textResourses.btnYesConfimationDialogLabel}
+          </Button>
+        </ButtonGroup>
+      </DialogActions>
     </Dialog>
   );
 };
