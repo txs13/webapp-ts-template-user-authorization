@@ -28,18 +28,41 @@ export interface AdminPanelUserDetailsDialogPropsTypes {
   dataUpdate: Function;
 }
 
-const initialUserValue: UserDocument = {
+interface UserDocumentForm extends UserDocument {
+  nameError: string;
+  familynameError: string;
+  emailError: string;
+  phoneError: string;
+  addressError: string;
+  companyError: string;
+  positionError: string;
+  descriptionError: string;
+  isConfirmedError: string;
+  userroleError: string;
+}
+
+const initialUserValue: UserDocumentForm = {
   _id: "",
   name: "",
+  nameError: "",
   familyname: "",
+  familynameError: "",
   email: "",
+  emailError: "",
   phone: "",
+  phoneError: "",
   address: "",
+  addressError: "",
   company: "",
+  companyError: "",
   position: "",
+  positionError: "",
   description: "",
+  descriptionError: "",
   isConfirmed: false,
+  isConfirmedError: "",
   userrole_id: "",
+  userroleError: "",
   createdAt: new Date(),
   updatedAt: new Date(),
   __v: 0,
@@ -59,12 +82,15 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
     setTextResourses(getTextResources(appSettings.language));
   }, [appSettings]);
 
+  // user card state variable
+  const [cardState, setCardState] = useState<"view" | "edit">("view");
+
   // callback function to be done after screen is closed
   const handleClose = () => {};
 
   // variable to store user changes
   const [currentUser, setCurrentUser] =
-    useState<UserDocument>(initialUserValue);
+    useState<UserDocumentForm>(initialUserValue);
   useEffect(() => {
     const userData = openStatus.currentUser as UserDocument;
     if (userData) {
@@ -72,6 +98,27 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [openStatus]);
+  // input changes handler
+  const changeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    switch (e.target.name) {
+      case "id":
+        break;
+    }
+  };
+
+  // buttons' click handlers
+  const clipboardClickHandler = () => {};
+  const editClickHandler = () => {
+    setCardState("edit");
+  };
+  const viewClickHandler = () => {
+    setCardState("view");
+  };
+  const deleteClickHandler = () => {};
+  const saveClickHandler = () => {};
+  const closeClickHandler = () => {
+    closeDialog();
+  };
 
   return (
     <Dialog open={openStatus.open} onClose={handleClose} sx={styles.mainFrame}>
@@ -84,6 +131,8 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
           sx={styles.inputField}
           variant="outlined"
           label={textResourses.idDialogBoxlabel}
+          name="id"
+          onChange={changeHandler}
           value={currentUser._id}
         />
         <TextField
@@ -173,10 +222,36 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
       </DialogContent>
       <DialogActions>
         <ButtonGroup fullWidth>
-          <Button>edit</Button>
-          <Button>confirm</Button>
-          <Button>delete</Button>
-          <Button onClick={() => closeDialog()}>close</Button>
+          <Button onClick={clipboardClickHandler}>
+            {textResourses.clipboardBtnDialogBoxLabel}
+          </Button>
+          <Button
+            sx={{ display: cardState === "view" ? "none" : "" }}
+            onClick={deleteClickHandler}
+          >
+            {textResourses.deleteBtnDialogBoxLabel}
+          </Button>
+          <Button
+            sx={{ display: cardState === "view" ? "none" : "" }}
+            onClick={saveClickHandler}
+          >
+            {textResourses.saveBtnDialogBoxLabel}
+          </Button>
+          <Button
+            sx={{ display: cardState === "view" ? "" : "none" }}
+            onClick={editClickHandler}
+          >
+            {textResourses.editBtnDialogBoxLabel}
+          </Button>
+          <Button
+            sx={{ display: cardState === "view" ? "none" : "" }}
+            onClick={viewClickHandler}
+          >
+            {textResourses.cancelBtnDialogBoxLabel}
+          </Button>
+          <Button onClick={closeClickHandler}>
+            {textResourses.closeBtnDialogBoxLabel}
+          </Button>
         </ButtonGroup>
       </DialogActions>
     </Dialog>

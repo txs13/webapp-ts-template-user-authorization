@@ -237,7 +237,7 @@ export const textResourcesMultilang: TextResources = {
   deleteUserCardMessage: {
     EN: "You are going to delete the user",
   },
-  // admin panel dialog window labels
+  // admin panel user details dialog window labels
   headerDialogBoxLabel: {
     EN: "user details",
   },
@@ -279,6 +279,24 @@ export const textResourcesMultilang: TextResources = {
   },
   updatedAtDialogBoxlabel: {
     EN: "updated at",
+  },
+  clipboardBtnDialogBoxLabel: {
+    EN: "clipboard",
+  },
+  editBtnDialogBoxLabel: {
+    EN: "edit",
+  },
+  cancelBtnDialogBoxLabel: {
+    EN: "calcel",
+  },
+  deleteBtnDialogBoxLabel: {
+    EN: "delete",
+  },
+  saveBtnDialogBoxLabel: {
+    EN: "save",
+  },
+  closeBtnDialogBoxLabel: {
+    EN: "close",
   },
   // confirmation dialog box labels
   headerConfimationDialogLabel: {

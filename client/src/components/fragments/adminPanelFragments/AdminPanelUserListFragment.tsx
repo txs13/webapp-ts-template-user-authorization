@@ -185,14 +185,27 @@ const AdminPanelUserListFragment: React.FunctionComponent = () => {
     updatedUser.isConfirmed = true;
     const result = await putUser(updatedUser);
     // to process user updated result
-
-    console.log(result);
+    if (Array.isArray(result)) {
+      if (result[0].message === "user is successfully updated") {
+        setDataRefreshState("userupdate");
+        // TODO: show confirmation message
+      } else {
+        // TODO: show error
+      }
+    }
   };
 
   const deleteUserServiceCall = async (userId: string) => {
     const result = await deleteUser(userId);
-    // to process user updated result
-    console.log(result);
+    // to process user delete result
+    if (Array.isArray(result)) {
+      if (result[0].message === "user is successfully deleted") {
+        setDataRefreshState("userupdate");
+        // TODO: show confirmation message
+      } else {
+        // TODO: show error
+      }
+    }
   };
 
   return (

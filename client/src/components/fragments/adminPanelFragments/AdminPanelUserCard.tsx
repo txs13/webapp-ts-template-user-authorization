@@ -38,11 +38,11 @@ const AdminPanelUserCard: React.FunctionComponent<UserCardPropsTypes> = ({
 
   //extended form visibility
   const [extended, setExtended] = useState(false);
-
   const onCardClickHandler = () => {
     setExtended(!extended);
   };
-  // call cinfirmation dialog for the user confirmation buttton
+
+  // call confirmation dialog for the user confirmation buttton
   const confirmClickHandler = () => {
     openConfirmationDialog(
       `${textResourses.confirmUserCardMessage}: ${user.email}`,
@@ -50,6 +50,7 @@ const AdminPanelUserCard: React.FunctionComponent<UserCardPropsTypes> = ({
     );
   };
 
+  // call confirmation dialog for the user deletion button
   const deleteUserClickHandler = () => {
     openConfirmationDialog(
       `${textResourses.deleteUserCardMessage}: ${user.email}`,

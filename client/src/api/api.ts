@@ -261,7 +261,6 @@ export const putUserApiCall = async (
   } catch (e: any) {
     response = e.response;
   }
-  console.log(response.data);
   // if logout api call was successful, we return proper message
   if (response.status === 200) {
     if (secondCall) {
@@ -307,7 +306,6 @@ export const deleteUserApiCall = async (
     response = await client.delete(`${userApi}/deleteuser/${userId}`, {
       ...reqOptionsToken(accessToken),
     });
-    console.log(response.status)
   } catch (e: any) {
     response = e.response;
   }
