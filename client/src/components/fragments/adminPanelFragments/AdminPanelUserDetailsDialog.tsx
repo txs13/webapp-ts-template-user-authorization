@@ -111,7 +111,9 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
   const editClickHandler = () => {
     setCardState("edit");
   };
-  const viewClickHandler = () => {
+  const calcelClickHandler = () => {
+    const userData = openStatus.currentUser as UserDocument;
+    setCurrentUser({ ...initialUserValue, ...userData });
     setCardState("view");
   };
   const deleteClickHandler = () => {};
@@ -128,6 +130,7 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
       <DialogContent sx={styles.inputsBlock}>
         <TextField
           fullWidth
+          disabled={true}
           sx={styles.inputField}
           variant="outlined"
           label={textResourses.idDialogBoxlabel}
@@ -137,6 +140,7 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
         />
         <TextField
           fullWidth
+          disabled={cardState === "view" ? true : false}
           sx={styles.inputField}
           variant="outlined"
           label={textResourses.nameDialogBoxlabel}
@@ -144,6 +148,7 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
         />
         <TextField
           fullWidth
+          disabled={cardState === "view" ? true : false}
           sx={styles.inputField}
           variant="outlined"
           label={textResourses.familynameDialogBoxlabel}
@@ -151,6 +156,7 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
         />
         <TextField
           fullWidth
+          disabled={cardState === "view" ? true : false}
           sx={styles.inputField}
           variant="outlined"
           label={textResourses.emailDialogBoxlabel}
@@ -158,6 +164,7 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
         />
         <TextField
           fullWidth
+          disabled={cardState === "view" ? true : false}
           sx={styles.inputField}
           variant="outlined"
           label={textResourses.phoneDialogBoxlabel}
@@ -165,6 +172,7 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
         />
         <TextField
           fullWidth
+          disabled={cardState === "view" ? true : false}
           sx={styles.inputField}
           variant="outlined"
           label={textResourses.addressDialogBoxlabel}
@@ -172,6 +180,7 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
         />
         <TextField
           fullWidth
+          disabled={cardState === "view" ? true : false}
           sx={styles.inputField}
           variant="outlined"
           label={textResourses.companyDialogBoxlabel}
@@ -179,6 +188,7 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
         />
         <TextField
           fullWidth
+          disabled={cardState === "view" ? true : false}
           sx={styles.inputField}
           variant="outlined"
           label={textResourses.positionDialogBoxlabel}
@@ -186,6 +196,7 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
         />
         <TextField
           fullWidth
+          disabled={cardState === "view" ? true : false}
           sx={styles.inputField}
           variant="outlined"
           label={textResourses.descriptionDialogBoxlabel}
@@ -193,6 +204,7 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
         />
         <TextField
           fullWidth
+          disabled={cardState === "view" ? true : false}
           sx={styles.inputField}
           variant="outlined"
           label={textResourses.userRoleDialogBoxlabel}
@@ -200,6 +212,7 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
         />
         <TextField
           fullWidth
+          disabled={cardState === "view" ? true : false}
           sx={styles.inputField}
           variant="outlined"
           label={textResourses.isconfirmedDialogBoxlabel}
@@ -208,12 +221,14 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
         <TextField
           fullWidth
           sx={styles.inputField}
+          disabled={true}
           variant="outlined"
           label={textResourses.createdAtDialogBoxlabel}
           value={currentUser.createdAt}
         />
         <TextField
           fullWidth
+          disabled={true}
           sx={styles.inputField}
           variant="outlined"
           label={textResourses.updatedAtDialogBoxlabel}
@@ -245,7 +260,7 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
           </Button>
           <Button
             sx={{ display: cardState === "view" ? "none" : "" }}
-            onClick={viewClickHandler}
+            onClick={calcelClickHandler}
           >
             {textResourses.cancelBtnDialogBoxLabel}
           </Button>
