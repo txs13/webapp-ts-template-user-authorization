@@ -4,7 +4,7 @@
 
 // IF SOMETHING IS NOT WORKING WITH API CALL PLEASE CHECK THIS FIRST
 
-import { object, string, TypeOf, optional } from "zod";
+import { object, string, TypeOf, optional, number, boolean } from "zod";
 import store from "../app/store";
 import {
   addressTextRegex,
@@ -41,6 +41,9 @@ const {
   roleIsRequiredMessage,
   roleIsWrongMessage,
   passwordsDoNotMatchMessage,
+  userIdIsRequired,
+  userIdIsNotValid,
+  isConfirmedIsRequiredMessage,
 } = getTextResources(storeState.appSettings.value.language);
 
 // schema for checking login data
@@ -141,3 +144,79 @@ export const createRoleSchema = object({
 });
 
 export type CreateRoleInput = TypeOf<typeof createRoleSchema>;
+
+export const putUserSchema = object({
+  _id: string({ required_error: `${userIdIsRequired}` }).refine(
+    (id) => id.match(/^[0-9a-fA-F]{24}$/), // TODO - replace to regex folder and test
+    { message: `${userIdIsNotValid}` }
+  ),
+  __v: number({ required_error: "this is fake user" }),
+  isConfirmed: boolean({ required_error: `${isConfirmedIsRequiredMessage}` }),
+  email: string({ required_error: `${emailIsRequiredMessage}` }).email(
+    `${emailNotValidMessage}`
+  ),
+  password: optional(string().min(6, `${passwordMin6CharsMessage}`)),
+  name: string({ required_error: `${nameIsRequiredMessage}` })
+    .min(2, `${nameMin2CharsMessage}`)
+    .regex(nameRegex, `${nameWrongFormatMessage}`),
+  familyname: optional(
+    string()
+      .min(2, `${familynameMin2CharsMessage}`)
+      .regex(nameRegex, `${familynameWrongFormatMessage}`)
+  ),
+  phone: optional(
+    string()
+      .min(6, `${phoneMin6CharsMessage}`)
+      .regex(phoneNumberTextRegex, `${phoneWrongFormatMessage}`)
+  ),
+  address: optional(
+    string()
+      .min(6, `${addressMin6CharsMessage}`)
+      .regex(addressTextRegex, `${addressWrongFormatMessage}`)
+  ),
+  company: optional(
+    string()
+      .min(2, `${companyMin2CharsMessage}`)
+      .regex(nameRegex, `${companyWrongFormatMessage}`)
+  ),
+  position: optional(
+    string()
+      .min(2, `${positionMin2CharsMessage}`)
+      .regex(nameRegex, `${positionWrongFormatMessage}`)
+  ),
+  description: optional(
+    string()
+      .min(6, `${descriptionMin6CharsMessage}`)
+      .regex(longTextRegex, `${descriptionWrongFormatMessage}`)
+  ),
+  createdAt: string({ required_error: "this is fake user" }).refine(
+    (dateString) => {
+      const date = Date.parse(dateString);
+      if (date) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    { message: "this is fake user" }
+  ),
+  updatedAt: string({ required_error: "this is fake user" }).refine(
+    (dateString) => {
+      const date = Date.parse(dateString);
+      if (date) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    { message: "this is fake user" }
+  ),
+  userrole_id: string({ required_error: `${roleIsRequiredMessage}` }).refine(
+    (id) => id.match(/^[0-9a-fA-F]{24}$/), // TODO - replace to regex folder and test
+    {
+      message: `${roleIsWrongMessage}`,
+    }
+  ),
+});
+
+export type PutUserInput = TypeOf<typeof putUserSchema>;

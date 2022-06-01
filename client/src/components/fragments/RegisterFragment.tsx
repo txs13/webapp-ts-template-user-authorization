@@ -447,6 +447,7 @@ const RegisterFragment: React.FunctionComponent = () => {
               label={textResourses.nameInputLabel}
               data-testid="nameInput"
               name="name"
+              type="text"
               required
               value={formState.name}
               onChange={onInputChange}
@@ -462,6 +463,7 @@ const RegisterFragment: React.FunctionComponent = () => {
               label={textResourses.familynameInputLabel}
               data-testid="familynameInput"
               name="familyname"
+              type="text"
               value={formState.familyname}
               onChange={onInputChange}
               helperText={formState.familynameError}

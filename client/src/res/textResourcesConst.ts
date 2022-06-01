@@ -97,7 +97,7 @@ export const textResourcesMultilang: TextResources = {
   roleInputLabel: {
     EN: "role",
   },
-  // register form validation messages
+  // user validation messages
   emailIsRequiredMessage: {
     EN: "please enter your email",
   },
@@ -163,6 +163,15 @@ export const textResourcesMultilang: TextResources = {
   },
   passwordsDoNotMatchMessage: {
     EN: "entered passwords do not match",
+  },
+  userIdIsRequiredMessage: {
+    EN: "user id is required"
+  },
+  userIdIsNotValidMessage: {
+    EN: "user id is not valid"
+  },
+  isConfirmedIsRequiredMessage: {
+    EN: "missing user confirmation"
   },
   // register form alert messages
   successfulRegisterSubmissionMessage: {
