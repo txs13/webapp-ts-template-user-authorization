@@ -21,8 +21,11 @@ import {
   UserDocument,
 } from "../../../interfaces/inputInterfaces";
 import styles from "../../styles/adminPanelStyles/adminPanelUserDetailsDialogStyles";
-import { validateResourceAsync } from "../../../utils/validateResource"
-import { putUserSchema, PutUserInput } from "../../../schemas/InputValidationSchemas"
+import { validateResourceAsync } from "../../../utils/validateResource";
+import {
+  putUserSchema,
+  PutUserInput,
+} from "../../../schemas/InputValidationSchemas";
 
 export interface AdminPanelUserDetailsDialogPropsTypes {
   openStatus: OpenUserDetailsStatus;
@@ -219,7 +222,7 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
       isConfirmed: currentUser.isConfirmed as boolean,
     };
     if (currentUser.familyname !== "") {
-      user = { ...user, familyname: currentUser.familyname};
+      user = { ...user, familyname: currentUser.familyname };
     }
     if (currentUser.company !== "") {
       user = { ...user, company: currentUser.company };
@@ -237,23 +240,68 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
       user = { ...user, phone: currentUser.phone };
     }
 
-
-    const errors: any[] = await validateResourceAsync(putUserSchema, user)
+    const errors: any[] = await validateResourceAsync(putUserSchema, user);
     if (!errors) {
-      return true
+      return true;
     } else {
       //console.log(errors)
-      let errorsToShow: ValidationErrors = {}
+      let errorsToShow: ValidationErrors = {};
       errors.forEach((it) => {
-        switch(it.path[0]) {
+        switch (it.path[0]) {
           case "email":
-            errorsToShow.emailError = it.message
+            if (!errorsToShow.emailError) {
+              errorsToShow.emailError = it.message;
+            }
             break;
-          // TODO: add the rest of the cases  
+          case "name":
+            if (!errorsToShow.nameError) {
+              errorsToShow.nameError = it.message;
+            }
+            break;
+          case "familyname":
+            if (!errorsToShow.familynameError) {
+              errorsToShow.familynameError = it.message;
+            }
+            break;
+          case "phone":
+            if (!errorsToShow.phoneError) {
+              errorsToShow.phoneError = it.message;
+            }
+            break;
+          case "address":
+            if (!errorsToShow.addressError) {
+              errorsToShow.addressError = it.message;
+            }
+            break;
+          case "company":
+            if (!errorsToShow.companyError) {
+              errorsToShow.companyError = it.message;
+            }
+            break;
+          case "position":
+            if (!errorsToShow.positionError) {
+              errorsToShow.positionError = it.message;
+            }
+            break;
+          case "description":
+            if (!errorsToShow.descriptionError) {
+              errorsToShow.descriptionError = it.message;
+            }
+            break;
+          case "portalrole":
+            if(!errorsToShow.userroleError) {
+              errorsToShow.userroleError = it.message;
+            }  
+            break;
+          case "isconfirmed":
+            if(!errorsToShow.isConfirmedError) {
+              errorsToShow.isConfirmedError = it.message;
+            }  
+          // TODO: add the rest of the cases
         }
-      })
-      setCurrentUser({...currentUser, ...errorsToShow})
-      return false
+      });
+      setCurrentUser({ ...currentUser, ...errorsToShow });
+      return false;
     }
   };
 
@@ -289,6 +337,7 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
           value={currentUser._id}
         />
         <TextField
+          required
           fullWidth
           disabled={cardState === "view" ? true : false}
           sx={styles.inputField}
@@ -319,6 +368,7 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
           onBlur={validateInputs}
         />
         <TextField
+        required
           fullWidth
           disabled={cardState === "view" ? true : false}
           sx={styles.inputField}
@@ -409,6 +459,7 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
           onBlur={validateInputs}
         />
         <TextField
+          required
           select
           fullWidth
           disabled={cardState === "view" ? true : false}
@@ -430,6 +481,7 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
         </TextField>
 
         <TextField
+          required
           select
           fullWidth
           disabled={cardState === "view" ? true : false}
