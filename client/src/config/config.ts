@@ -2,6 +2,7 @@ const SERVER_URL = "http://localhost";
 const SERVER_PORT = 1337;
 const USER_API = "/api/v1/user";
 const ROLE_API = "/api/v1/role";
+const ALERT_MESSAGE_TIMEOUT = 5000;
 const OPTIONS = {
   headers: { "Content-Type": "application/json" },
 };
@@ -22,6 +23,7 @@ const getConfig = () => {
     roleApi: `${ROLE_API}`,
     reqOptions: OPTIONS,
     reqOptionsToken: OPTIONS_WITH_TOKEN,
+    messageTimeout: ALERT_MESSAGE_TIMEOUT
   };
 };
 

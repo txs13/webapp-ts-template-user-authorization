@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import {
   Box,
   Toolbar,
@@ -27,6 +27,10 @@ import {
 } from "../../../interfaces/inputInterfaces";
 import AdminPanelUserDetailsDialog from "./AdminPanelUserDetailsDialog";
 import AdminPanelUserListConfirmationDialog from "./AdminPanelUserListConfirmationDialog";
+import {
+  AppAlertMessage,
+  showMessage,
+} from "../../../app/features/appAlertMessage.slice";
 
 type DataRefreshState = "start" | "userupdate" | "waiting";
 
@@ -58,6 +62,7 @@ export interface UserItem {
 }
 
 const AdminPanelUserListFragment: React.FunctionComponent = () => {
+  const dispatch = useDispatch();
   // get data from app settings store and get text resouses in proper language
   const appSettings = useSelector(
     (state: RootState) => state.appSettings.value
@@ -188,9 +193,38 @@ const AdminPanelUserListFragment: React.FunctionComponent = () => {
     if (Array.isArray(result)) {
       if (result[0].message === "user is successfully updated") {
         setDataRefreshState("userupdate");
-        // TODO: show confirmation message
+        const successMessage: AppAlertMessage = {
+          alertType: "success",
+          alertMessage: textResourses.userConfirmSuccessMessage,
+        };
+        dispatch(showMessage(successMessage));
       } else {
-        // TODO: show error
+        const successMessage: AppAlertMessage = {
+          alertType: "error",
+          alertMessage: textResourses.userConfirmFailureMessage,
+        };
+        dispatch(showMessage(successMessage));
+      }
+    }
+  };
+
+  const updateUserServiceCall = async (updatedUser: UserDocument) => {
+    const result = await putUser(updatedUser);
+    // to process user updated result
+    if (Array.isArray(result)) {
+      if (result[0].message === "user is successfully updated") {
+        setDataRefreshState("userupdate");
+        const successMessage: AppAlertMessage = {
+          alertType: "success",
+          alertMessage: textResourses.userUpdateSuccessMessage,
+        };
+        dispatch(showMessage(successMessage));
+      } else {
+        const successMessage: AppAlertMessage = {
+          alertType: "error",
+          alertMessage: textResourses.userUpdateFailureMessage,
+        };
+        dispatch(showMessage(successMessage));
       }
     }
   };
@@ -201,9 +235,18 @@ const AdminPanelUserListFragment: React.FunctionComponent = () => {
     if (Array.isArray(result)) {
       if (result[0].message === "user is successfully deleted") {
         setDataRefreshState("userupdate");
-        // TODO: show confirmation message
+        closeUserDetails();
+        const successMessage: AppAlertMessage = {
+          alertType: "success",
+          alertMessage: textResourses.userDeleteSuccessMessage,
+        };
+        dispatch(showMessage(successMessage));
       } else {
-        // TODO: show error
+        const successMessage: AppAlertMessage = {
+          alertType: "error",
+          alertMessage: textResourses.userDeleteFailureMessage,
+        };
+        dispatch(showMessage(successMessage));
       }
     }
   };
@@ -267,6 +310,9 @@ const AdminPanelUserListFragment: React.FunctionComponent = () => {
         roles={roles}
         closeDialog={closeUserDetails}
         dataUpdate={dataUpdate}
+        openConfirmationDialog={openConfirmationDialog}
+        updateUserServiceCall={updateUserServiceCall}
+        deleteUserServiceCall={deleteUserServiceCall}
       />
       <AdminPanelUserListConfirmationDialog
         openStatus={openConfirmationStatus}

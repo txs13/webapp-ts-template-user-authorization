@@ -13,9 +13,7 @@ export const appSettingsSlice = createSlice({
   name: "appSettings",
   initialState: { value: initialAppSettingsValue },
   reducers: {
-    setAppLanguage: (state, action) => {
-
-    },
+    setAppLanguage: (state, action) => {},
   },
 });
 

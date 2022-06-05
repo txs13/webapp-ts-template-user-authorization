@@ -7,6 +7,7 @@ import { createTheme, CssBaseline } from "@mui/material";
 import { ThemeProvider } from "@mui/material/styles";
 
 import Navbar from "./Navbar";
+import AlertFragment from "./fragments/AlertFragment";
 import appStyles from "./styles/appStyles";
 import RouterFrame from "./RouterFrame";
 import { fetchPublicRolesService } from "../app/services/roleServices";
@@ -54,6 +55,7 @@ const App: React.FunctionComponent = () => {
             <CssBaseline />
             <Box className="app" sx={appStyles.app}>
               <Navbar />
+              <AlertFragment />
               <Box className="appframe" sx={appStyles.appframe}>
                 <RouterFrame startUpActionsAreDone={startUpActionsAreDone} />
               </Box>

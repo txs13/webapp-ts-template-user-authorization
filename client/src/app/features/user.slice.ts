@@ -45,8 +45,11 @@ export const userSlice = createSlice({
       state.value = initialUserValue;
     },
     accessTockenUpdate: (state, action) => {
-      state.value = {...state.value, tokens: {...state.value.tokens, accessToken: action.payload}} as UserValue
-    }
+      state.value = {
+        ...state.value,
+        tokens: { ...state.value.tokens, accessToken: action.payload },
+      } as UserValue;
+    },
   },
 });
 

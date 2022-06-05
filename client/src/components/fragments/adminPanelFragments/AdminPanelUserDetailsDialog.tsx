@@ -32,6 +32,9 @@ export interface AdminPanelUserDetailsDialogPropsTypes {
   roles: RoleDocument[] | undefined;
   closeDialog: Function;
   dataUpdate: Function;
+  openConfirmationDialog: Function;
+  updateUserServiceCall: Function;
+  deleteUserServiceCall: Function;
 }
 
 interface UserDocumentForm extends UserDocument {
@@ -95,7 +98,15 @@ const initialUserValue: UserDocumentForm = {
 
 const AdminPanelUserDetailsDialog: React.FunctionComponent<
   AdminPanelUserDetailsDialogPropsTypes
-> = ({ openStatus, roles, closeDialog, dataUpdate }) => {
+> = ({
+  openStatus,
+  roles,
+  closeDialog,
+  dataUpdate,
+  openConfirmationDialog,
+  updateUserServiceCall,
+  deleteUserServiceCall,
+}) => {
   // get data from app settings store and get text resouses in proper language
   const appSettings = useSelector(
     (state: RootState) => state.appSettings.value
@@ -134,6 +145,7 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
     const userData = openStatus.currentUser as UserDocument;
     if (userData) {
       setCurrentUser({ ...initialUserValue, ...userData });
+      setCardState("view");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [openStatus]);
@@ -209,8 +221,12 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
     }
   };
 
-  // input calidation
-  const validateInputs = async (): Promise<boolean> => {
+  // the function to combine current user parameters as either UserDocument
+  // or PutUserInput object
+
+  const assembleUserObject = (
+    type: "PutUserInput" | "UserDocument"
+  ): PutUserInput | UserDocument => {
     let user: PutUserInput = {
       _id: currentUser._id,
       __v: currentUser.__v,
@@ -239,6 +255,21 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
     if (currentUser.phone !== "") {
       user = { ...user, phone: currentUser.phone };
     }
+    if (type === "PutUserInput") {
+      return user;
+    } else {
+      let userDocType: UserDocument = {
+        ...user,
+        createdAt: currentUser.createdAt,
+        updatedAt: currentUser.updatedAt,
+      };
+      return userDocType;
+    }
+  };
+
+  // input validation
+  const validateInputs = async (): Promise<boolean> => {
+    let user = assembleUserObject("PutUserInput");
 
     const errors: any[] = await validateResourceAsync(putUserSchema, user);
     if (!errors) {
@@ -289,15 +320,14 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
             }
             break;
           case "portalrole":
-            if(!errorsToShow.userroleError) {
+            if (!errorsToShow.userroleError) {
               errorsToShow.userroleError = it.message;
-            }  
+            }
             break;
           case "isconfirmed":
-            if(!errorsToShow.isConfirmedError) {
+            if (!errorsToShow.isConfirmedError) {
               errorsToShow.isConfirmedError = it.message;
-            }  
-          // TODO: add the rest of the cases
+            }
         }
       });
       setCurrentUser({ ...currentUser, ...errorsToShow });
@@ -306,7 +336,45 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
   };
 
   // buttons' click handlers
-  const clipboardClickHandler = () => {};
+  const clipboardClickHandler = () => {
+    let userDetails = "";
+    userDetails +=
+      `name: ${openStatus.currentUser?.name}` +
+      (openStatus.currentUser?.familyname
+        ? ` ${openStatus.currentUser?.familyname}\n`
+        : `\n`);
+    userDetails += `email: ${openStatus.currentUser?.email}\n`;
+    if (openStatus.currentUser?.phone) {
+      userDetails += `phone: ${openStatus.currentUser?.phone}\n`;
+    }
+    if (openStatus.currentUser?.company) {
+      userDetails += `company: ${openStatus.currentUser?.company}\n`;
+    }
+    if (openStatus.currentUser?.position) {
+      userDetails += `position: ${openStatus.currentUser?.position}\n`;
+    }
+    if (openStatus.currentUser?.address) {
+      userDetails += `address: ${openStatus.currentUser?.address}\n`;
+    }
+    if (openStatus.currentUser?.description) {
+      userDetails += `description: ${openStatus.currentUser?.description}`;
+    }
+    let data = [
+      new window.ClipboardItem({
+        "text/plain": new Blob([userDetails], { type: "text/plain" }),
+      }),
+    ];
+    navigator.clipboard
+      .write(data)
+      .then(() => {
+        // TODO: show confirmation message
+      })
+      .catch((error) => {
+        console.log(error);
+        // TODO: show error message
+        
+      });
+  };
   const editClickHandler = () => {
     setCardState("edit");
   };
@@ -315,8 +383,21 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
     setCurrentUser({ ...initialUserValue, ...userData });
     setCardState("view");
   };
-  const deleteClickHandler = () => {};
-  const saveClickHandler = () => {};
+  const deleteClickHandler = async () => {
+    openConfirmationDialog(
+      `${textResourses.deleteUserCardMessage}: ${openStatus.currentUser?.email}`,
+      () => deleteUserServiceCall(openStatus.currentUser?._id)
+    );
+  };
+  const saveClickHandler = async () => {
+    const inputsAreOk = await validateInputs();
+    if (inputsAreOk) {
+      const updatedUser = assembleUserObject("UserDocument");
+      openConfirmationDialog(`${textResourses.saveUserUpdatesMessage}`, () =>
+        updateUserServiceCall(updatedUser)
+      );
+    }
+  };
   const closeClickHandler = () => {
     closeDialog();
   };
@@ -368,7 +449,7 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
           onBlur={validateInputs}
         />
         <TextField
-        required
+          required
           fullWidth
           disabled={cardState === "view" ? true : false}
           sx={styles.inputField}

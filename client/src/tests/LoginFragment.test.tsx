@@ -75,6 +75,13 @@ describe("login form tests", () => {
         language: AppLanguageOptions.EN,
       },
     },
+    appAlertMessage: {
+      value: {
+        alertMessage: null,
+        alertType: null,
+        actionDescription: null,
+      },
+    },
   };
 
   afterEach(() => {
@@ -291,11 +298,14 @@ describe("login form tests", () => {
     expect(alert).toBeVisible();
     await waitFor(() => {
       expect(mockAdapter.history.post[1].data).toBe(
-        JSON.stringify({ email: "fake@user.com", password: "not fake password" })
+        JSON.stringify({
+          email: "fake@user.com",
+          password: "not fake password",
+        })
       );
     });
     await waitFor(() => {
       expect(mockedUsedNavigate).toHaveBeenCalledWith("/fake");
-    })
+    });
   });
 });

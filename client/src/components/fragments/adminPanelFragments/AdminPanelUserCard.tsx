@@ -124,6 +124,7 @@ const AdminPanelUserCard: React.FunctionComponent<UserCardPropsTypes> = ({
                 {textResourses.editBtnLabel}
               </Button>
               <Button
+                disabled={user.isConfirmed as boolean}
                 variant="contained"
                 color="success"
                 size="small"

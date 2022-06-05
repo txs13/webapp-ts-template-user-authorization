@@ -165,13 +165,13 @@ export const textResourcesMultilang: TextResources = {
     EN: "entered passwords do not match",
   },
   userIdIsRequiredMessage: {
-    EN: "user id is required"
+    EN: "user id is required",
   },
   userIdIsNotValidMessage: {
-    EN: "user id is not valid"
+    EN: "user id is not valid",
   },
   isConfirmedIsRequiredMessage: {
-    EN: "missing user confirmation"
+    EN: "missing user confirmation",
   },
   // register form alert messages
   successfulRegisterSubmissionMessage: {
@@ -243,8 +243,29 @@ export const textResourcesMultilang: TextResources = {
   confirmUserCardMessage: {
     EN: "You are going to grant access to the web-portal for the user",
   },
+  saveUserUpdatesMessage: {
+    EN: "Please cinfirm you would like to save these changes",
+  },
   deleteUserCardMessage: {
     EN: "You are going to delete the user",
+  },
+  userConfirmSuccessMessage: {
+    EN: "User was confirmed successfully"
+  },
+  userConfirmFailureMessage: {
+    EN: "User was NOT confirmed"
+  },
+  userUpdateSuccessMessage: {
+    EN: "User data was updated successfully",
+  },
+  userUpdateFailureMessage: {
+    EN: "User data was NOT updated",
+  },
+  userDeleteSuccessMessage: {
+    EN: "User was successfully deleted"
+  },
+  userDeleteFailureMessage: {
+    EN: "User was NOT deleted"
   },
   // admin panel user details dialog window labels
   headerDialogBoxLabel: {

@@ -26,6 +26,13 @@ describe("start up fragment tests", () => {
         language: AppLanguageOptions.EN,
       },
     },
+    appAlertMessage: {
+      value: {
+        alertMessage: null,
+        alertType: null,
+        actionDescription: null,
+      },
+    },
   };
 
   afterEach(() => {
@@ -37,7 +44,7 @@ describe("start up fragment tests", () => {
     render(
       <Provider store={store}>
         <BrowserRouter>
-          <StartUpFragment startUpActionsAreDone ={false}/>
+          <StartUpFragment startUpActionsAreDone={false} />
         </BrowserRouter>
       </Provider>
     );

@@ -26,6 +26,13 @@ describe("navbar tests", () => {
         language: AppLanguageOptions.EN,
       },
     },
+    appAlertMessage: {
+      value: {
+        alertMessage: null,
+        alertType: null,
+        actionDescription: null,
+      },
+    },
   };
 
   const initialStoreStateLoggedUser = {

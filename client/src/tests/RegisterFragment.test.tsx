@@ -17,11 +17,18 @@ describe("register form tests", () => {
   const middleware = [thunk];
   const mockStore = configureMockStore(middleware);
   const initialStoreStateNoUser: RootState = {
-    user: { value: {user: null, tokens: null, loginError: null} },
+    user: { value: { user: null, tokens: null, loginError: null } },
     role: { value: [] },
     appSettings: {
       value: {
         language: AppLanguageOptions.EN,
+      },
+    },
+    appAlertMessage: {
+      value: {
+        alertMessage: null,
+        alertType: null,
+        actionDescription: null,
       },
     },
   };
