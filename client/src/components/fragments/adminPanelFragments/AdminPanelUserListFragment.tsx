@@ -7,6 +7,7 @@ import {
   Switch,
   FormControlLabel,
   Grid,
+  MenuItem,
 } from "@mui/material";
 
 import { LocalizedTextResources } from "../../../res/textResourcesFunction";
@@ -61,6 +62,20 @@ export interface UserItem {
   isConfirmed?: Boolean;
 }
 
+type MenuValue = "name" | "familyname" | "email" | "company" | "userrole";
+
+interface FilterMenuItem {
+  id: string;
+  label: string;
+  value: MenuValue;
+}
+
+interface UserFilters {
+  field: MenuValue;
+  filterValue: string;
+  showNotConfirmed: boolean;
+}
+
 const AdminPanelUserListFragment: React.FunctionComponent = () => {
   const dispatch = useDispatch();
   // get data from app settings store and get text resouses in proper language
@@ -78,6 +93,7 @@ const AdminPanelUserListFragment: React.FunctionComponent = () => {
   const [users, setUsers] = useState<UserDocument[]>();
   const [roles, setRoles] = useState<RoleDocument[]>();
   const [userItems, setUserItems] = useState<UserItem[]>();
+  const [userItemsToShow, setUserItemsToShow] = useState<UserItem[]>();
 
   // this structure is needed in order to fetch data once after fragment is shown and
   // then I could initiate another datafetch for instance after I delete a user or edit it
@@ -144,6 +160,85 @@ const AdminPanelUserListFragment: React.FunctionComponent = () => {
       return userItem;
     });
   };
+
+  // filter block handling variables
+  const menuItems: FilterMenuItem[] = [
+    { id: "1", label: textResourses.nameDialogBoxlabel, value: "name" },
+    {
+      id: "2",
+      label: textResourses.familynameDialogBoxlabel,
+      value: "familyname",
+    },
+    { id: "3", label: textResourses.emailDialogBoxlabel, value: "email" },
+    { id: "4", label: textResourses.companyDialogBoxlabel, value: "company" },
+    { id: "5", label: textResourses.userRoleDialogBoxlabel, value: "userrole" },
+  ];
+  const [filters, setFilters] = useState<UserFilters>({
+    field: "familyname",
+    filterValue: "",
+    showNotConfirmed: true,
+  });
+  const filtersChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    switch (e.target.name) {
+      case "field":
+        setFilters({ ...filters, field: e.target.value as MenuValue });
+        break;
+      case "filterValue":
+        setFilters({ ...filters, filterValue: e.target.value });
+        break;
+      case "showNotConfirmed":
+        setFilters({ ...filters, showNotConfirmed: !filters.showNotConfirmed });
+    }
+  };
+
+  // here user filters are applied depending on user choices
+  useEffect(() => {
+    let filteredItems: UserItem[] | undefined = userItems?.filter((item) => {
+      switch (filters.field) {
+        case "name":
+          if (item.name.includes(filters.filterValue) || filters.filterValue === "") {
+            return true;
+          }
+          break;
+        case "familyname":
+          if (
+            item.familyname?.includes(filters.filterValue) ||
+            filters.filterValue === ""
+          ) {
+            return true;
+          }
+          break;
+        case "email":
+          if (item.email.includes(filters.filterValue) || filters.filterValue === "") {
+            return true;
+          }
+          break;
+        case "company":
+          if (
+            item.company?.includes(filters.filterValue) ||
+            filters.filterValue === ""
+          ) {
+            return true;
+          }
+          break;
+        case "userrole":
+          if (
+            item.userrole.includes(filters.filterValue) ||
+            filters.filterValue === ""
+          ) {
+            return true;
+          }
+          break;
+      }
+      return false;
+    });
+
+    if (filters.showNotConfirmed) {
+      filteredItems = filteredItems?.filter((it) => !it.isConfirmed);
+    }
+
+    setUserItemsToShow(filteredItems);
+  }, [filters, userItems]);
 
   // this variable is needed to open dialog screen with user details
   const [openUserDetailsStatus, setOpenUserDetailsStatus] =
@@ -214,6 +309,7 @@ const AdminPanelUserListFragment: React.FunctionComponent = () => {
     if (Array.isArray(result)) {
       if (result[0].message === "user is successfully updated") {
         setDataRefreshState("userupdate");
+        closeUserDetails();
         const successMessage: AppAlertMessage = {
           alertType: "success",
           alertMessage: textResourses.userUpdateSuccessMessage,
@@ -255,17 +351,38 @@ const AdminPanelUserListFragment: React.FunctionComponent = () => {
     <Box sx={styles.fragmentFrame}>
       <Toolbar sx={styles.toolbox}>
         <TextField
+          select
+          name="field"
+          value={filters.field}
+          onChange={filtersChangeHandler}
           sx={styles.searchFieldLabel}
           label={textResourses.searchFieldLabel}
           variant="standard"
-        />
+        >
+          {menuItems.map((item) => (
+            <MenuItem key={item.id} value={item.value}>
+              {item.label}
+            </MenuItem>
+          ))}
+        </TextField>
         <TextField
+          name="filterValue"
+          onChange={filtersChangeHandler}
+          value={filters.filterValue}
           sx={styles.searchWhatlabel}
           label={textResourses.searchWhatlabel}
           variant="standard"
         />
         <FormControlLabel
-          control={<Switch size="small" defaultChecked />}
+          control={
+            <Switch
+              name="showNotConfirmed"
+              onChange={filtersChangeHandler}
+              value={filters.showNotConfirmed}
+              size="small"
+              defaultChecked
+            />
+          }
           label={textResourses.toBeConfirmedSwitchLabel}
         />
       </Toolbar>
@@ -279,7 +396,7 @@ const AdminPanelUserListFragment: React.FunctionComponent = () => {
             alignItems="center"
             columns={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}
           >
-            {userItems.map((user) => (
+            {userItemsToShow?.map((user) => (
               <Grid
                 item
                 key={user._id}

@@ -250,10 +250,10 @@ export const textResourcesMultilang: TextResources = {
     EN: "You are going to delete the user",
   },
   userConfirmSuccessMessage: {
-    EN: "User was confirmed successfully"
+    EN: "User was confirmed successfully",
   },
   userConfirmFailureMessage: {
-    EN: "User was NOT confirmed"
+    EN: "User was NOT confirmed",
   },
   userUpdateSuccessMessage: {
     EN: "User data was updated successfully",
@@ -262,10 +262,16 @@ export const textResourcesMultilang: TextResources = {
     EN: "User data was NOT updated",
   },
   userDeleteSuccessMessage: {
-    EN: "User was successfully deleted"
+    EN: "User was successfully deleted",
   },
   userDeleteFailureMessage: {
-    EN: "User was NOT deleted"
+    EN: "User was NOT deleted",
+  },
+  userDataIsInClipboardMessage: {
+    EN: "User data successfully copied to the clipboard",
+  },
+  userDataIsNotInClipboardMessage: {
+    EN: "User data was NOT copied to the clipboard",
   },
   // admin panel user details dialog window labels
   headerDialogBoxLabel: {

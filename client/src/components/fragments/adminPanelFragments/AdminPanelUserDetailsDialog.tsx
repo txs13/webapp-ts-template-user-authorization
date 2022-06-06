@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -10,7 +10,7 @@ import {
   Typography,
   MenuItem,
 } from "@mui/material";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 
 import { LocalizedTextResources } from "../../../res/textResourcesFunction";
 import getTextResources from "../../../res/textResourcesFunction";
@@ -26,6 +26,10 @@ import {
   putUserSchema,
   PutUserInput,
 } from "../../../schemas/InputValidationSchemas";
+import {
+  AppAlertMessage,
+  showMessage,
+} from "../../../app/features/appAlertMessage.slice";
 
 export interface AdminPanelUserDetailsDialogPropsTypes {
   openStatus: OpenUserDetailsStatus;
@@ -107,6 +111,7 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
   updateUserServiceCall,
   deleteUserServiceCall,
 }) => {
+  const dispatch = useDispatch();
   // get data from app settings store and get text resouses in proper language
   const appSettings = useSelector(
     (state: RootState) => state.appSettings.value
@@ -335,6 +340,41 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
     }
   };
 
+  // compare function to have the difference between saved and updated user data
+  // in order to disable "save" button properly
+  const fieldsAreEqual = (
+    initialParam: string | Boolean | undefined,
+    updatedParam: string | Boolean | undefined
+  ): boolean => {
+    if (!initialParam && updatedParam === "") {
+      return true
+    }
+    if (initialParam === updatedParam) {
+      return true
+    }
+    return false
+  };
+  const compareSavedData = (): boolean => {
+    const noEdits =
+      fieldsAreEqual(openStatus.currentUser?.name, currentUser?.name) &&
+      fieldsAreEqual(openStatus.currentUser?.familyname, currentUser?.familyname) &&
+      fieldsAreEqual(openStatus.currentUser?.email, currentUser?.email) &&
+      fieldsAreEqual(openStatus.currentUser?.phone, currentUser?.phone) &&
+      fieldsAreEqual(openStatus.currentUser?.company, currentUser?.company) &&
+      fieldsAreEqual(openStatus.currentUser?.position, currentUser?.position) &&
+      fieldsAreEqual(openStatus.currentUser?.address, currentUser?.address) &&
+      fieldsAreEqual(openStatus.currentUser?.description, currentUser?.description) &&
+      fieldsAreEqual(openStatus.currentUser?.isConfirmed, currentUser?.isConfirmed) &&
+      fieldsAreEqual(openStatus.currentUser?.userrole_id, currentUser?.userrole_id);
+    return !noEdits;
+  };
+  const [edits, setEdits] = useState<boolean>(false);
+  useMemo(() => {
+    const changes = compareSavedData();
+    setEdits(changes);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUser]);
+
   // buttons' click handlers
   const clipboardClickHandler = () => {
     let userDetails = "";
@@ -367,12 +407,19 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
     navigator.clipboard
       .write(data)
       .then(() => {
-        // TODO: show confirmation message
+        const successMessage: AppAlertMessage = {
+          alertType: "success",
+          alertMessage: textResourses.userDataIsInClipboardMessage,
+        };
+        dispatch(showMessage(successMessage));
       })
       .catch((error) => {
         console.log(error);
-        // TODO: show error message
-        
+        const successMessage: AppAlertMessage = {
+          alertType: "error",
+          alertMessage: textResourses.userDataIsNotInClipboardMessage,
+        };
+        dispatch(showMessage(successMessage));
       });
   };
   const editClickHandler = () => {
@@ -606,22 +653,33 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
 
       <DialogActions>
         <ButtonGroup fullWidth>
-          <Button onClick={clipboardClickHandler}>
+          <Button
+            color="info"
+            variant="contained"
+            onClick={clipboardClickHandler}
+          >
             {textResourses.clipboardBtnDialogBoxLabel}
           </Button>
           <Button
+            color="error"
+            variant="contained"
             sx={{ display: cardState === "view" ? "none" : "" }}
             onClick={deleteClickHandler}
           >
             {textResourses.deleteBtnDialogBoxLabel}
           </Button>
           <Button
+            color="success"
+            variant="contained"
+            disabled={!edits}
             sx={{ display: cardState === "view" ? "none" : "" }}
             onClick={saveClickHandler}
           >
             {textResourses.saveBtnDialogBoxLabel}
           </Button>
           <Button
+            color="success"
+            variant="contained"
             sx={{ display: cardState === "view" ? "" : "none" }}
             onClick={editClickHandler}
           >
