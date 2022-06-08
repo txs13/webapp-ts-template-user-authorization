@@ -323,7 +323,7 @@ export const textResourcesMultilang: TextResources = {
     EN: "edit",
   },
   cancelBtnDialogBoxLabel: {
-    EN: "calcel",
+    EN: "cancel",
   },
   deleteBtnDialogBoxLabel: {
     EN: "delete",
@@ -344,4 +344,8 @@ export const textResourcesMultilang: TextResources = {
   btnNoConfimationDialogLabel: {
     EN: "cancel",
   },
+  // user profile settings
+  profileCardHeader: {
+    EN: "profile settings"
+  }
 };

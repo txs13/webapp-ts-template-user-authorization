@@ -1,18 +1,53 @@
-import { fetchPublicRolesApiCall, fetchAllRolesApiCall, APICallInterface } from '../../api/api'
-import { updatePublicRoles } from '../features/role.slice' 
-import store from '../store'
-import { accessTockenUpdate } from "../features/user.slice"
-import { RoleDocument } from '../../interfaces/inputInterfaces'
+import {
+  fetchPublicRolesApiCall,
+  fetchAllRolesApiCall,
+  APICallInterface,
+} from "../../api/api";
+import { updatePublicRoles } from "../features/role.slice";
+import store from "../store";
+import { accessTockenUpdate } from "../features/user.slice";
+import { RoleDocument } from "../../interfaces/inputInterfaces";
 
-export const fetchPublicRolesService = async ()  => {
-    const response = await fetchPublicRolesApiCall();
+export const fetchPublicRolesService = async () => {
+  const response = await fetchPublicRolesApiCall();
 
-    if (response.success) {
-        return store.dispatch(updatePublicRoles(response.payload))
-    } else {
-        // TODO - redirect to Error fragment
+  if (response.success) {
+    return store.dispatch(updatePublicRoles(response.payload));
+  } else {
+    // TODO - redirect to Error fragment
+  }
+};
+
+export const fetchAllRolesService = async (
+  accessToken?: string,
+  refreshToken?: string
+) => {
+  // get actual store state
+  const storeState = store.getState();
+  // api call
+  let response: APICallInterface;
+  if (accessToken && refreshToken) {
+    response = (await fetchAllRolesApiCall(
+      accessToken,
+      refreshToken
+    )) as APICallInterface;
+  } else {
+    response = (await fetchAllRolesApiCall(
+      storeState.user.value.tokens?.accessToken as string,
+      storeState.user.value.tokens?.refreshToken as string
+    )) as APICallInterface;
+  }
+  if (response.success) {
+    // update the store with new access tocken if we got one
+    if (response.updatedAccessToken) {
+      store.dispatch(accessTockenUpdate(response.updatedAccessToken));
     }
-}
+    // store update
+    return store.dispatch(updatePublicRoles(response.payload));
+  } else {
+    // TODO - redirect to Error fragment
+  }
+};
 
 export const fetchAllRoles = async () => {
   // get actual store state

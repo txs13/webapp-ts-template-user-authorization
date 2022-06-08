@@ -6,6 +6,7 @@ import {
 } from "../features/user.slice";
 import getTextResources from "../../res/textResourcesFunction";
 import { LoginInput } from "../../interfaces/inputInterfaces";
+import { fetchAllRolesService } from "./roleServices";
 
 const currentState = store.getState();
 
@@ -21,6 +22,10 @@ export const loginService = async (loginInput: LoginInput) => {
   const response = await loginApiCall(loginInput);
 
   if (response.success) {
+    // get all roles is user is admin
+    if (response.payload?.tokens?.isAdmin) {
+      await fetchAllRolesService();
+    }
     // dispatching successful login
     return store.dispatch(successfulLoginUser(response.payload));
   } else {
@@ -44,8 +49,7 @@ export const loginService = async (loginInput: LoginInput) => {
         notSuccessfulLoginUser(wrongNetworkSettingsMessage)
       );
     }
-      return store.dispatch(notSuccessfulLoginUser(unknownErrorMessage));
-    
+    return store.dispatch(notSuccessfulLoginUser(unknownErrorMessage));
   }
 };
 
@@ -56,6 +60,10 @@ export const loginWithRefreshTokenService = async (
   const response = await refreshTokenApiCall(refreshToken);
 
   if (response?.success) {
+    // get all roles is user is admin
+    if (response.payload?.isAdmin) {
+      await fetchAllRolesService(response.payload?.accessToken, refreshToken);
+    }
     // dispatching successful login
     const payload = {
       ...response.payload,

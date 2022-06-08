@@ -27,11 +27,15 @@ import {
   UserDocument,
 } from "../../../interfaces/inputInterfaces";
 import AdminPanelUserDetailsDialog from "./AdminPanelUserDetailsDialog";
-import AdminPanelUserListConfirmationDialog from "./AdminPanelUserListConfirmationDialog";
+import AdminPanelUserListConfirmationDialog from "../reusableComponents/ConfirmationDialog";
 import {
   AppAlertMessage,
   showMessage,
 } from "../../../app/features/appAlertMessage.slice";
+import {
+  OpenConfimationStatus,
+  openConfimationInitialState,
+} from "../reusableComponents/ConfirmationDialog";
 
 type DataRefreshState = "start" | "userupdate" | "waiting";
 
@@ -39,18 +43,6 @@ export interface OpenUserDetailsStatus {
   open: boolean;
   currentUser: UserDocument | undefined;
 }
-
-export interface OpenConfimationStatus {
-  open: boolean;
-  message: string;
-  successCBFunction: Function;
-}
-
-const openConfimationInitialState: OpenConfimationStatus = {
-  open: false,
-  message: "",
-  successCBFunction: () => {},
-};
 
 export interface UserItem {
   _id: string;
@@ -196,7 +188,10 @@ const AdminPanelUserListFragment: React.FunctionComponent = () => {
     let filteredItems: UserItem[] | undefined = userItems?.filter((item) => {
       switch (filters.field) {
         case "name":
-          if (item.name.includes(filters.filterValue) || filters.filterValue === "") {
+          if (
+            item.name.includes(filters.filterValue) ||
+            filters.filterValue === ""
+          ) {
             return true;
           }
           break;
@@ -209,7 +204,10 @@ const AdminPanelUserListFragment: React.FunctionComponent = () => {
           }
           break;
         case "email":
-          if (item.email.includes(filters.filterValue) || filters.filterValue === "") {
+          if (
+            item.email.includes(filters.filterValue) ||
+            filters.filterValue === ""
+          ) {
             return true;
           }
           break;
