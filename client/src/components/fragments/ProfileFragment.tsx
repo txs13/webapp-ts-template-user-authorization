@@ -1,3 +1,8 @@
+// the important this to keep in mind i sthat the majority of this code was copied
+// from AdminPanelUserDetailsDialog component. I was looking for the way to 
+// refactor the code to avoid simlar code and functions in different files, 
+// but so far have not found any good way to reorganize / refactor it
+
 import React, { useState, useEffect, useMemo } from "react";
 import {
   Box,
@@ -8,11 +13,12 @@ import {
   MenuItem,
 } from "@mui/material";
 import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 import { LocalizedTextResources } from "../../res/textResourcesFunction";
 import getTextResources from "../../res/textResourcesFunction";
 import { RootState } from "../../app/store";
-import { RoleDocument, UserDocument } from "../../interfaces/inputInterfaces";
+import { UserDocument } from "../../interfaces/inputInterfaces";
 import styles from "../styles/profileFragmentStyles";
 import { validateResourceAsync } from "../../utils/validateResource";
 import {
@@ -29,6 +35,7 @@ import {
   openConfimationInitialState,
 } from "./reusableComponents/ConfirmationDialog";
 import { deleteUser, putUser } from "../../app/services/userServices";
+import { logoutService } from "../../app/services/logoutService";
 
 interface UserDocumentForm extends UserDocument {
   nameError: string;
@@ -54,12 +61,6 @@ interface ValidationErrors {
   descriptionError?: string;
   isConfirmedError?: string;
   userroleError?: string;
-}
-
-interface IsConfirmedMenuItem {
-  id: string;
-  label: string;
-  value: string;
 }
 
 const initialUserValue: UserDocumentForm = {
@@ -90,6 +91,7 @@ const initialUserValue: UserDocumentForm = {
 };
 
 const ProfileFragment: React.FunctionComponent = () => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   // get current user
   const storeUser = useSelector((state: RootState) => state.user.value);
@@ -108,20 +110,6 @@ const ProfileFragment: React.FunctionComponent = () => {
 
   // user card state variable
   const [cardState, setCardState] = useState<"view" | "edit">("view");
-
-  // hanling right names for is confirmed drop-down menu
-  const [isConfirmedMenu, setIsConfirmedMenu] = useState<IsConfirmedMenuItem[]>(
-    [
-      { id: "0", label: "true", value: "true" },
-      { id: "1", label: "false", value: "false" },
-    ]
-  );
-  useEffect(() => {
-    setIsConfirmedMenu([
-      { id: "0", label: textResourses.userYStatusLabel, value: "true" },
-      { id: "1", label: textResourses.userNStatusLabel, value: "false" },
-    ]);
-  }, [textResourses]);
 
   // variable to store user changes
   const [currentUser, setCurrentUser] =
@@ -344,7 +332,6 @@ const ProfileFragment: React.FunctionComponent = () => {
       fieldsAreEqual(storeUser?.user?.position, currentUser?.position) &&
       fieldsAreEqual(storeUser?.user?.address, currentUser?.address) &&
       fieldsAreEqual(storeUser?.user?.description, currentUser?.description) &&
-      fieldsAreEqual(storeUser?.user?.isConfirmed, currentUser?.isConfirmed) &&
       fieldsAreEqual(storeUser?.user?.userrole_id, currentUser?.userrole_id);
     return !noEdits;
   };
@@ -475,12 +462,21 @@ const ProfileFragment: React.FunctionComponent = () => {
     // to process user delete result
     if (Array.isArray(result)) {
       if (result[0].message === "user is successfully deleted") {
-        // TODO: logout procedure
+        // show confirmation message
         const successMessage: AppAlertMessage = {
           alertType: "success",
           alertMessage: textResourses.userDeleteSuccessMessage,
         };
         dispatch(showMessage(successMessage));
+
+        // delete email from cookies if it is there
+        const oldSettings = localStorage.getItem("rememberEmail");
+        if (oldSettings) {
+          localStorage.removeItem("rememberEmail");
+        }
+        // call logout service to clean up the store
+        await logoutService();
+        navigate("/");
       } else {
         const successMessage: AppAlertMessage = {
           alertType: "error",
@@ -646,28 +642,6 @@ const ProfileFragment: React.FunctionComponent = () => {
           {roles?.map((role) => (
             <MenuItem key={role._id} value={role._id}>
               {role.role}
-            </MenuItem>
-          ))}
-        </TextField>
-
-        <TextField
-          required
-          select
-          fullWidth
-          disabled={cardState === "view" ? true : false}
-          sx={styles.inputField}
-          variant="outlined"
-          name="isconfirmed"
-          label={textResourses.isconfirmedDialogBoxlabel}
-          value={currentUser.isConfirmed}
-          onChange={changeHandler}
-          helperText={currentUser.isConfirmedError}
-          FormHelperTextProps={{ error: true }}
-          error={currentUser.isConfirmedError === "" ? false : true}
-        >
-          {isConfirmedMenu?.map((item) => (
-            <MenuItem key={item.id} value={item.value}>
-              {item.label}
             </MenuItem>
           ))}
         </TextField>

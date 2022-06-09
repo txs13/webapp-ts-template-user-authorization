@@ -3,6 +3,8 @@ import { Request, Response, NextFunction } from "express";
 import { decodeJwt } from "../utils/jwt.utils";
 import { getUserById } from "../services/user.service";
 import { getSessionById } from "../services/session.service";
+import { SessionDocument } from "../models/session.model";
+import { UserDocument } from "../models/user.model";
 
 const authorizedAccess = async (
   req: Request,
@@ -25,10 +27,24 @@ const authorizedAccess = async (
     return res.status(401).send([{ message: "wrong token" }]);
   } else {
     // get proper user and session records
-    const user = await getUserById(decoded.userId);
-    const session = await getSessionById(decoded.sessionId);
+    let user: UserDocument
+    let session: SessionDocument
+    try{
+      user = await getUserById(decoded.userId);
+      session = await getSessionById(decoded.sessionId);
+    } catch (e:any) {
+      return res.status(409).send([{ message: "wrong id" }]);
+    }
     // if somehow wrong id is coded into jwt
     if (!user || !session) {
+      if (session && !user) {
+        // update session closed field
+        session.closedAt = new Date();
+        // add user action
+        session.addUserAction(req.originalUrl, req.method, false);
+        await session.save();
+        return res.status(409).send([{ message: "user is deleted" }]);
+      }
       return res.status(409).send([{ message: "wrong id" }]);
     }
     // if session is already closed

@@ -55,7 +55,7 @@ export const loginUserHandler = async (
     await session.save();
 
     // create user JSON, exclude password record
-    const userData = omit(user.toJSON(), "password", "isConfirmed");
+    const userData = omit(user.toJSON(), "password");
     // checking is user has admin rights
     const isAdmin = await checkAdminByUserId(userData._id);
     let confirmationJson: Object = {
@@ -102,7 +102,7 @@ export const refreshTokenHandler = async (req: Request, res: Response) => {
   await session.save();
 
   // create user JSON, exclude password record
-  const userData = omit(res.locals.user.toJSON(), "password", "isConfirmed");
+  const userData = omit(res.locals.user.toJSON(), "password");
   // checking is user has admin rights
   const isAdmin = await checkAdminByUserId(userData._id);
   let refreshJson: Object = {
