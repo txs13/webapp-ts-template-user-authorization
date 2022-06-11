@@ -347,5 +347,30 @@ export const textResourcesMultilang: TextResources = {
   // user profile settings
   profileCardHeader: {
     EN: "profile settings"
+  },
+  // admin panel roles list labels
+  roleNameCardlabel: {
+    EN: "role name"
+  },
+  roleDescriptionCardlabel: {
+    EN: "description"
+  },
+  usersListCardlabel: {
+    EN: "users"
+  },
+  usersNumberWithRolelabel: {
+    EN: "role users"
+  },
+  roleIsPubliclabel: {
+    EN: "is public"
+  },
+  roleIsNotPubliclabel: {
+    EN: "is NOT public"
+  },
+  addRoleBtnLabel: {
+    EN: "add role"
+  },
+  refreshRolesBtnLabel: {
+    EN: "refresh"
   }
 };

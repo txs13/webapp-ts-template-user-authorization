@@ -8,20 +8,19 @@ import {
   FormControlLabel,
   Grid,
   MenuItem,
+  IconButton
 } from "@mui/material";
+import CachedIcon from "@mui/icons-material/Cached";
 
 import { LocalizedTextResources } from "../../../res/textResourcesFunction";
 import getTextResources from "../../../res/textResourcesFunction";
 import { RootState } from "../../../app/store";
 import AdminPanelUserCard from "./AdminPanelUserCard";
-import AdminPanelLoadingFragment from "./AdminPanelLoadingFragment";
 import styles from "../../styles/adminPanelStyles/adminPanelUserListStyles";
 import {
   deleteUser,
-  fetchAllUsers,
   putUser,
 } from "../../../app/services/userServices";
-import { fetchAllRoles } from "../../../app/services/roleServices";
 import {
   RoleDocument,
   UserDocument,
@@ -36,8 +35,6 @@ import {
   OpenConfimationStatus,
   openConfimationInitialState,
 } from "../reusableComponents/ConfirmationDialog";
-
-type DataRefreshState = "start" | "userupdate" | "waiting";
 
 export interface OpenUserDetailsStatus {
   open: boolean;
@@ -68,7 +65,15 @@ interface UserFilters {
   showNotConfirmed: boolean;
 }
 
-const AdminPanelUserListFragment: React.FunctionComponent = () => {
+interface AdminPanelUserListFragmentPropsTypes {
+  users: UserDocument[] | undefined;
+  roles: RoleDocument[] | undefined;
+  dataUpdate: Function;
+}
+
+const AdminPanelUserListFragment: React.FunctionComponent<
+  AdminPanelUserListFragmentPropsTypes
+> = ({ users, roles, dataUpdate }) => {
   const dispatch = useDispatch();
   // get data from app settings store and get text resouses in proper language
   const appSettings = useSelector(
@@ -82,46 +87,9 @@ const AdminPanelUserListFragment: React.FunctionComponent = () => {
   }, [appSettings]);
 
   // variables to store list of users, roles, shortened list to be mapped and shown
-  const [users, setUsers] = useState<UserDocument[]>();
-  const [roles, setRoles] = useState<RoleDocument[]>();
   const [userItems, setUserItems] = useState<UserItem[]>();
   const [userItemsToShow, setUserItemsToShow] = useState<UserItem[]>();
 
-  // this structure is needed in order to fetch data once after fragment is shown and
-  // then I could initiate another datafetch for instance after I delete a user or edit it
-  // "start" to fetch both users and roles after fragment is rendered
-  // "userupdate" to fetch only users - there is not going to be option to change roles so
-  // there is no need to fetch roles once again
-  // "waiting" to do nothing unless another data fetching is needed
-  const [dataRefreshState, setDataRefreshState] =
-    useState<DataRefreshState>("start");
-  useEffect(() => {
-    switch (dataRefreshState) {
-      case "start":
-        fetchAllUsers().then((userres) => {
-          setUsers(userres);
-          //console.log(userres);
-          fetchAllRoles().then((roleres) => {
-            setRoles(roleres);
-            //console.log(roleres);
-            setDataRefreshState("waiting");
-          });
-        });
-        break;
-      case "userupdate":
-        fetchAllUsers().then((userres) => {
-          setUsers(userres);
-          //console.log(userres);
-          setDataRefreshState("waiting");
-        });
-        break;
-      case "waiting":
-        break;
-    }
-  }, [dataRefreshState]);
-  const dataUpdate = () => {
-    setDataRefreshState("userupdate");
-  };
   // as soon as both users and roles are fetched or one of them is changed to initiate
   // update of the list to be shown
   useEffect(() => {
@@ -285,7 +253,7 @@ const AdminPanelUserListFragment: React.FunctionComponent = () => {
     // to process user updated result
     if (Array.isArray(result)) {
       if (result[0].message === "user is successfully updated") {
-        setDataRefreshState("userupdate");
+        dataUpdate();
         const successMessage: AppAlertMessage = {
           alertType: "success",
           alertMessage: textResourses.userConfirmSuccessMessage,
@@ -306,7 +274,7 @@ const AdminPanelUserListFragment: React.FunctionComponent = () => {
     // to process user updated result
     if (Array.isArray(result)) {
       if (result[0].message === "user is successfully updated") {
-        setDataRefreshState("userupdate");
+        dataUpdate()
         closeUserDetails();
         const successMessage: AppAlertMessage = {
           alertType: "success",
@@ -328,7 +296,7 @@ const AdminPanelUserListFragment: React.FunctionComponent = () => {
     // to process user delete result
     if (Array.isArray(result)) {
       if (result[0].message === "user is successfully deleted") {
-        setDataRefreshState("userupdate");
+        dataUpdate()
         closeUserDetails();
         const successMessage: AppAlertMessage = {
           alertType: "success",
@@ -345,9 +313,17 @@ const AdminPanelUserListFragment: React.FunctionComponent = () => {
     }
   };
 
+  // click handlers
+  const refreshDataClickHandler = () => {
+    dataUpdate()
+  }
+
   return (
     <Box sx={styles.fragmentFrame}>
       <Toolbar sx={styles.toolbox}>
+        <IconButton aria-label="delete" size="large" onClick={refreshDataClickHandler}>
+          <CachedIcon fontSize="inherit" />
+        </IconButton>
         <TextField
           select
           name="field"
@@ -385,7 +361,6 @@ const AdminPanelUserListFragment: React.FunctionComponent = () => {
         />
       </Toolbar>
       <Box sx={styles.databox}>
-        {userItems ? (
           <Grid
             container
             rowSpacing={1}
@@ -416,9 +391,6 @@ const AdminPanelUserListFragment: React.FunctionComponent = () => {
               </Grid>
             ))}
           </Grid>
-        ) : (
-          <AdminPanelLoadingFragment />
-        )}
       </Box>
       <AdminPanelUserDetailsDialog
         openStatus={openUserDetailsStatus}
