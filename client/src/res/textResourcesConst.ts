@@ -1,3 +1,5 @@
+// before making any changes, ALWAYS check that exact property is used only once!!!!!
+
 import { TextResources } from "./textResourcesFunction";
 
 export const textResourcesMultilang: TextResources = {
@@ -346,31 +348,71 @@ export const textResourcesMultilang: TextResources = {
   },
   // user profile settings
   profileCardHeader: {
-    EN: "profile settings"
+    EN: "profile settings",
   },
   // admin panel roles list labels
   roleNameCardlabel: {
-    EN: "role name"
+    EN: "role name",
   },
   roleDescriptionCardlabel: {
-    EN: "description"
+    EN: "description",
   },
   usersListCardlabel: {
-    EN: "users"
+    EN: "users",
   },
   usersNumberWithRolelabel: {
-    EN: "role users"
+    EN: "role users",
   },
   roleIsPubliclabel: {
-    EN: "is public"
+    EN: "is public",
   },
   roleIsNotPubliclabel: {
-    EN: "is NOT public"
+    EN: "is NOT public",
   },
   addRoleBtnLabel: {
-    EN: "add role"
+    EN: "add role",
   },
   refreshRolesBtnLabel: {
-    EN: "refresh"
-  }
+    EN: "refresh",
+  },
+  // role details dialog labels
+  roleEditDetailsDialogHeader: {
+    EN: "role details",
+  },
+  roleCreateDetailsDialogHeader: {
+    EN: "create new role",
+  },
+  roleIdInputLabel: {
+    EN: "role id",
+  },
+  roleNameInputLabel: {
+    EN: "role name",
+  },
+  roleDescriptionLabel: {
+    EN: "description",
+  },
+  createdAtInputLabel: {
+    EN: "created",
+  },
+  updatedAtInputLabel: {
+    EN: "updated",
+  },
+  roleDetailsCloseBtnLabel: {
+    EN: "close",
+  },
+  roleDetailsSaveBtnLabel: {
+    EN: "save",
+  },
+  roleDetailsDeleteBtnLabel: {
+    EN: "delete",
+  },
+  roleDetailsEditBtnLabel: {
+    EN: "edit",
+  },
+  roleDetailsCancelBtnLabel: {
+    EN: "cancel",
+  },
+  roleDetailsCreateBtnLabel: {
+    EN: "create",
+  },
 };

@@ -21,7 +21,13 @@ import {
 import { LocalizedTextResources } from "../../../res/textResourcesFunction";
 import getTextResources from "../../../res/textResourcesFunction";
 import { RootState } from "../../../app/store";
+import {
+  OpenConfimationStatus,
+  openConfimationInitialState,
+} from "../reusableComponents/ConfirmationDialog";
 import AdminPanelRoleCard from "./AdminPanelRoleCard";
+import AdminPanelRoleDetailsDialog from "./AdminPanelRoleDetailsDialog";
+import ConfirmationDialog from "../reusableComponents/ConfirmationDialog";
 
 interface AdminPanelRoleListFragmentPropsTypes {
   users: UserDocument[] | undefined;
@@ -35,6 +41,13 @@ export interface RoleItem {
   description?: string;
   usersNumber: number;
   isPublic: boolean;
+}
+
+// if undefined value is transferred to the open status, form is
+// going to use "new role mode"
+export interface OpenRoleDetailsStatus {
+  open: boolean;
+  currentRole: RoleDocument | undefined;
 }
 
 type MenuValue = "role" | "description";
@@ -151,13 +164,55 @@ const AdminPanelRoleListFragment: React.FunctionComponent<
     setRoleItemsToShow(filteredItems);
   }, [filters, roleItems]);
 
+  // dialog forms state variables
+  // role edit / new role dialog form state variable
+  // this variable is needed to open dialog screen with user details
+  const [openRoleDetailsStatus, setOpenRoleDetailsStatus] =
+    useState<OpenRoleDetailsStatus>({ open: false, currentRole: undefined });
+  const openRoleDetails = (roleId?: string) => {
+    if (roleId) {
+      const role = roles?.find((role) => role._id === roleId);
+      if (role) {
+        setOpenRoleDetailsStatus({ open: true, currentRole: role });
+      }
+    } else {
+      setOpenRoleDetailsStatus({ open: true, currentRole: undefined });
+    }
+  };
+  const closeRoleDetails = () => {
+    setOpenRoleDetailsStatus({ open: false, currentRole: undefined });
+  };
+
+  // this block is responsibelt for the universal model / confimation window
+  const [openConfirmationStatus, setOpenConfirmationStatus] =
+    useState<OpenConfimationStatus>(openConfimationInitialState);
+  const openConfirmationDialog = (
+    message: string,
+    successCBFunction: Function
+  ) => {
+    setOpenConfirmationStatus({
+      open: true,
+      message: message,
+      successCBFunction: successCBFunction,
+    });
+  };
+  const submitConfirmationDecision = (
+    decision: "yes" | "no",
+    successCBFunction?: Function
+  ) => {
+    if (decision === "yes" && successCBFunction) {
+      successCBFunction();
+    }
+    setOpenConfirmationStatus(openConfimationInitialState);
+  };
+
   // click handlers
   const refreshDataClickHandler = () => {
     dataUpdate();
   };
 
   const addRoleClickHandler = () => {
-    // TODO: add role click handler
+    openRoleDetails();
   };
 
   // handle screen size change
@@ -231,11 +286,26 @@ const AdminPanelRoleListFragment: React.FunctionComponent<
               lg={4}
               xl={3}
             >
-              <AdminPanelRoleCard roleItem={roleItem} />
+              <AdminPanelRoleCard
+                roleItem={roleItem}
+                dataUpdate={dataUpdate}
+                openRoleDetails={openRoleDetails}
+                openConfirmationDialog={openConfirmationDialog}
+              />
             </Grid>
           ))}
         </Grid>
       </Box>
+      <AdminPanelRoleDetailsDialog
+        openStatus={openRoleDetailsStatus}
+        closeRoleDetails={closeRoleDetails}
+        roles={roles}
+        users={users}
+      />
+      <ConfirmationDialog
+        openStatus={openConfirmationStatus}
+        submitConfirmationDecision={submitConfirmationDecision}
+      />
     </Box>
   );
 };

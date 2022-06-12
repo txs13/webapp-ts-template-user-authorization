@@ -1,6 +1,6 @@
 import { ComponentStylesDatatype } from "../componentStylesDatatype";
 
-const adminPanelUserDetailsDialogStyles: ComponentStylesDatatype = {
+const adminPanelRoleDetailsDialogStyles: ComponentStylesDatatype = {
   mainFrame: {},
   inputsBlock: {},
   inputField: {
@@ -12,4 +12,4 @@ const adminPanelUserDetailsDialogStyles: ComponentStylesDatatype = {
   },
 };
 
-export default adminPanelUserDetailsDialogStyles;
+export default adminPanelRoleDetailsDialogStyles;

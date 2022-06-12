@@ -5,14 +5,22 @@ import { useSelector } from "react-redux";
 import { LocalizedTextResources } from "../../../res/textResourcesFunction";
 import getTextResources from "../../../res/textResourcesFunction";
 import { RootState } from "../../../app/store";
-import styles from "../../styles/adminPanelStyles/adminPanelRoleCardStyles"
-import { RoleItem } from "./AdminPanelRoleListFragment"
+import styles from "../../styles/adminPanelStyles/adminPanelRoleCardStyles";
+import { RoleItem } from "./AdminPanelRoleListFragment";
 
 interface RoleCardPropsTypes {
-    roleItem: RoleItem;
-} 
+  roleItem: RoleItem;
+  dataUpdate: Function;
+  openRoleDetails: Function;
+  openConfirmationDialog: Function;
+}
 
-const AdminPanelRoleCard: React.FunctionComponent<RoleCardPropsTypes> = ({roleItem}) => {
+const AdminPanelRoleCard: React.FunctionComponent<RoleCardPropsTypes> = ({
+  roleItem,
+  dataUpdate,
+  openRoleDetails,
+  openConfirmationDialog,
+}) => {
   // get data from app settings store and get text resouses in proper language
   const appSettings = useSelector(
     (state: RootState) => state.appSettings.value
@@ -31,15 +39,16 @@ const AdminPanelRoleCard: React.FunctionComponent<RoleCardPropsTypes> = ({roleIt
   };
 
   // click handlers
-  const deleteRoleClickHandler = (id: string) => {
+  const deleteRoleClickHandler = () => {
     // TODO: delete role click handler
   };
 
-  const openRoleDetails = (id: string) => {
+  const openRoleDetailsClickHandler = () => {
     // TODO : open role details handler
+    openRoleDetails(roleItem._id);
   };
 
-  const openRoleList = (id: string) => {
+  const openRoleListClickHandler = () => {
     // TODO : oper user list handler
   };
 
@@ -84,7 +93,8 @@ const AdminPanelRoleCard: React.FunctionComponent<RoleCardPropsTypes> = ({roleIt
               color="error"
               size="small"
               sx={styles.btn}
-              onClick={() => deleteRoleClickHandler("role._id")}
+              disabled={roleItem.usersNumber === 0 ? false : true}
+              onClick={() => deleteRoleClickHandler()}
             >
               {textResourses.deleteBtnLabel}
             </Button>
@@ -93,7 +103,7 @@ const AdminPanelRoleCard: React.FunctionComponent<RoleCardPropsTypes> = ({roleIt
               color="info"
               size="small"
               sx={styles.btn}
-              onClick={() => openRoleDetails("role._id")}
+              onClick={() => openRoleDetailsClickHandler()}
             >
               {textResourses.editBtnLabel}
             </Button>
@@ -102,7 +112,7 @@ const AdminPanelRoleCard: React.FunctionComponent<RoleCardPropsTypes> = ({roleIt
               color="info"
               size="small"
               sx={styles.btn}
-              onClick={() => openRoleList("role._id")}
+              onClick={() => openRoleListClickHandler()}
             >
               {textResourses.usersListCardlabel}
             </Button>
