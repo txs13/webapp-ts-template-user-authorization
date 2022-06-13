@@ -415,4 +415,20 @@ export const textResourcesMultilang: TextResources = {
   roleDetailsCreateBtnLabel: {
     EN: "create",
   },
+  // role validation messages
+  roleNameIsRequiredMessage: {
+    EN: "role name is required",
+  },
+  roleNameMin4CharsMessage: {
+    EN: "role name should be at least 4 chars",
+  },
+  roleNameWrongFormatMessage: {
+    EN: "role name contains wrong symbols",
+  },
+  roleDescMin6CharsMessage: {
+    EN: "role description should be at least 6 chars",
+  },
+  roleDescWrongFormatMessage: {
+    EN: "role description contains wrong symbols",
+  },
 };

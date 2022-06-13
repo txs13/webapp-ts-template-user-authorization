@@ -44,6 +44,11 @@ const {
   userIdIsRequired,
   userIdIsNotValid,
   isConfirmedIsRequiredMessage,
+  roleNameIsRequiredMessage,
+  roleNameMin4CharsMessage,
+  roleNameWrongFormatMessage,
+  roleDescMin6CharsMessage,
+  roleDescWrongFormatMessage,
 } = getTextResources(storeState.appSettings.value.language);
 
 // schema for checking login data
@@ -130,21 +135,6 @@ export const createUserSchema = object({
 
 export type CreateUserInput = TypeOf<typeof createUserSchema>;
 
-export const createRoleSchema = object({
-  body: object({
-    role: string({ required_error: "role name is required" })
-      .min(4, "role should be 4 chars minimum")
-      .regex(nameRegex, "wrong format"),
-    description: optional(
-      string()
-        .min(6, "role description should be 6 chars minimum")
-        .regex(longTextRegex, "wrong format")
-    ),
-  }),
-});
-
-export type CreateRoleInput = TypeOf<typeof createRoleSchema>;
-
 export const putUserSchema = object({
   _id: string({ required_error: `${userIdIsRequired}` }).refine(
     (id) => id.match(/^[0-9a-fA-F]{24}$/), // TODO - replace to regex folder and test
@@ -220,3 +210,16 @@ export const putUserSchema = object({
 });
 
 export type PutUserInput = TypeOf<typeof putUserSchema>;
+
+export const roleSchema = object({
+  role: string({ required_error: `${roleNameIsRequiredMessage}` })
+    .min(4, `${roleNameMin4CharsMessage}`)
+    .regex(nameRegex, `${roleNameWrongFormatMessage}`),
+  description: optional(
+    string()
+      .min(6, `${roleDescMin6CharsMessage}`)
+      .regex(longTextRegex, `${roleDescWrongFormatMessage}`)
+  ),
+});
+
+export type RoleInput = TypeOf<typeof roleSchema>;
