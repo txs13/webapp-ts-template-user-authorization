@@ -415,6 +415,12 @@ export const textResourcesMultilang: TextResources = {
   roleDetailsCreateBtnLabel: {
     EN: "create",
   },
+  roleDetailsShowUsersLabel: {
+    EN: "users",
+  },
+  roleDetailsUsersWithRoleHeader: {
+    EN: "users with this role",
+  },
   // role validation messages
   roleNameIsRequiredMessage: {
     EN: "role name is required",
@@ -430,5 +436,11 @@ export const textResourcesMultilang: TextResources = {
   },
   roleDescWrongFormatMessage: {
     EN: "role description contains wrong symbols",
+  },
+  successCreateRoleMessage: {
+    EN: "new role is successfully created",
+  },
+  errorCreateRoleMessage: {
+    EN: "something went wrong, new role was NOT created",
   },
 };

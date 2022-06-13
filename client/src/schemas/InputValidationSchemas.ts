@@ -222,4 +222,4 @@ export const roleSchema = object({
   ),
 });
 
-export type RoleInput = TypeOf<typeof roleSchema>;
+export type RoleInputSchemaType = TypeOf<typeof roleSchema>;

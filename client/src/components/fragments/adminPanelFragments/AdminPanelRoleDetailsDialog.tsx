@@ -17,9 +17,16 @@ import { RootState } from "../../../app/store";
 import {
   RoleDocument,
   UserDocument,
+  RoleInput,
 } from "../../../interfaces/inputInterfaces";
 import { OpenRoleDetailsStatus } from "./AdminPanelRoleListFragment";
 import styles from "../../styles/adminPanelStyles/adminPanelRoleDetailsDialogStyles";
+import {
+  RoleInputSchemaType,
+  roleSchema,
+} from "../../../schemas/InputValidationSchemas";
+import { validateResourceAsync } from "../../../utils/validateResource";
+import { createRoleService } from "../../../app/services/roleServices";
 
 interface AdminPanelRoleDetailDialogPropsTypes {
   openStatus: OpenRoleDetailsStatus;
@@ -66,6 +73,16 @@ const AdminPanelRoleDetailsDialog: React.FunctionComponent<
 
   // user card state variable
   const [cardState, setCardState] = useState<"view" | "edit">("view");
+  // users number calculation / update
+  const [usersNum, setUsersNum] = useState(0);
+  useEffect(() => {
+    if (users && openStatus.currentRole) {
+      const usersNumber = users.filter(
+        (it) => it.userrole_id === openStatus.currentRole?._id
+      ).length;
+      setUsersNum(usersNumber);
+    }
+  }, [users, openStatus]);
 
   // variable to store user input / role data changes
   const [currentRole, setCurrentRole] =
@@ -81,6 +98,45 @@ const AdminPanelRoleDetailsDialog: React.FunctionComponent<
       setCardState("edit");
     }
   }, [openStatus.currentRole]);
+
+  // input validation
+  const validateInputs = async (
+    callType: "fill" | "submit"
+  ): Promise<boolean> => {
+    // assembling create role object
+    let roleInput: RoleInputSchemaType = {
+      role: currentRole.role,
+    };
+    if (currentRole.description) {
+      roleInput.description = currentRole.description;
+    }
+    // passing scheme validation
+    const errors: any[] = await validateResourceAsync(roleSchema, roleInput);
+    if (!errors) {
+      return true;
+    } else {
+      let errorsToShow: ValidationErrors = {};
+      errors.forEach((it) => {
+        switch (it.path[0]) {
+          case "role":
+            if (!errorsToShow.roleError) {
+              if (callType === "fill" && currentRole.role === "") {
+              } else {
+                errorsToShow.roleError = it.message;
+              }
+            }
+            break;
+          case "description":
+            if (!errorsToShow.descriptionError) {
+              errorsToShow.descriptionError = it.message;
+            }
+            break;
+        }
+      });
+      setCurrentRole({ ...currentRole, ...errorsToShow });
+      return false;
+    }
+  };
 
   // input change handler
   const changeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -115,8 +171,27 @@ const AdminPanelRoleDetailsDialog: React.FunctionComponent<
   const deleteClickHandler = () => {
     // TODO: initiate delete api call
   };
-  const createClickHandler = () => {
-    // TODO: initiate create api call
+  const createClickHandler = async () => {
+    // validating inputs
+    const inputsAreOk = await validateInputs("submit");
+    if (inputsAreOk) {
+      // assembling object for create role api call
+      let roleInput: RoleInput = {
+        role: currentRole.role,
+      };
+      if (currentRole.description !== "") {
+        roleInput.description = currentRole.description;
+      }
+      // calling create role api service
+      const result = await createRoleService(roleInput);
+      // if role is created - close the dialog window
+      if (result) {
+        closeRoleDetails();
+      }
+    }
+  };
+  const showUsersClickHandler = () => {
+    // TODO: show users with current role
   };
   return (
     <Dialog open={openStatus.open} sx={styles.mainFrame}>
@@ -126,6 +201,11 @@ const AdminPanelRoleDetailsDialog: React.FunctionComponent<
             ? textResourses.roleEditDetailsDialogHeader
             : textResourses.roleCreateDetailsDialogHeader}
         </Typography>
+        {openStatus.currentRole ? (
+          <Typography>
+            {`${usersNum} ` + textResourses.roleDetailsUsersWithRoleHeader}
+          </Typography>
+        ) : null}
       </DialogTitle>
       <DialogContent>
         <TextField
@@ -154,6 +234,7 @@ const AdminPanelRoleDetailsDialog: React.FunctionComponent<
           helperText={currentRole.roleError}
           FormHelperTextProps={{ error: true }}
           error={currentRole.roleError === "" ? false : true}
+          onBlur={() => validateInputs("fill")}
         />
         <TextField
           fullWidth
@@ -168,6 +249,7 @@ const AdminPanelRoleDetailsDialog: React.FunctionComponent<
           helperText={currentRole.descriptionError}
           FormHelperTextProps={{ error: true }}
           error={currentRole.descriptionError === "" ? false : true}
+          onBlur={() => validateInputs("fill")}
         />
         <TextField
           fullWidth
@@ -197,6 +279,12 @@ const AdminPanelRoleDetailsDialog: React.FunctionComponent<
       <DialogActions>
         <ButtonGroup fullWidth>
           <Button
+            sx={{ display: openStatus.currentRole ? "" : "none" }}
+            onClick={showUsersClickHandler}
+          >
+            {textResourses.roleDetailsShowUsersLabel}
+          </Button>
+          <Button
             sx={{
               display:
                 openStatus.currentRole || cardState === "view" ? "none" : "",
@@ -212,6 +300,7 @@ const AdminPanelRoleDetailsDialog: React.FunctionComponent<
               display:
                 !openStatus.currentRole || cardState === "view" ? "none" : "",
             }}
+            disabled={usersNum > 0}
             variant="contained"
             color="error"
             onClick={deleteClickHandler}
@@ -236,7 +325,10 @@ const AdminPanelRoleDetailsDialog: React.FunctionComponent<
             {textResourses.roleDetailsEditBtnLabel}
           </Button>
           <Button
-            sx={{ display: !openStatus.currentRole || cardState === "view" ? "none" : "" }}
+            sx={{
+              display:
+                !openStatus.currentRole || cardState === "view" ? "none" : "",
+            }}
             onClick={cancelClickHandler}
           >
             {textResourses.roleDetailsCancelBtnLabel}

@@ -1,26 +1,25 @@
 import React, { useState, useEffect } from "react";
-import { Box } from '@mui/material'
-import {Routes, Route} from 'react-router-dom'
+import { Box } from "@mui/material";
+import { Routes, Route } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux"
 
 import AdminPanelNavigationFragment from "./adminPanelFragments/AdminPanelNavigationFragment";
 import AdminPanelUserListFragment from "./adminPanelFragments/AdminPanelUserListFragment";
 import AdminPanelRoleListFragment from "./adminPanelFragments/AdminPanelRoleListFragment";
 import AdminPanelStartingPageFragment from "./adminPanelFragments/AdminPanelStartingPageFragment";
-
-import startingAdminFragmentStyles from "../styles/startingAdminFragmentStyles"
+import startingAdminFragmentStyles from "../styles/startingAdminFragmentStyles";
 import { fetchAllUsers } from "../../app/services/userServices";
-import { fetchAllRoles } from "../../app/services/roleServices";
-import {
-  RoleDocument,
-  UserDocument,
-} from "../../interfaces/inputInterfaces";
+import { RoleDocument, UserDocument } from "../../interfaces/inputInterfaces";
+import { RootState } from "../../app/store";
 
-type DataRefreshState = "start" | "userupdate" | "waiting";
+type DataRefreshState = "userupdate" | "waiting";
 
 const StartingAdminFragment: React.FunctionComponent = () => {
+  const dispatch = useDispatch()
   // variables to store list of users, roles, shortened list to be mapped and shown
   const [users, setUsers] = useState<UserDocument[]>();
-  const [roles, setRoles] = useState<RoleDocument[]>();
+  //const [roles, setRoles] = useState<RoleDocument[]>();
+  const roles = useSelector((state: RootState) => state.role.value)
 
   // this structure is needed in order to fetch data once after fragment is shown and
   // then I could initiate another datafetch for instance after I delete a user or edit it
@@ -29,34 +28,24 @@ const StartingAdminFragment: React.FunctionComponent = () => {
   // there is no need to fetch roles once again
   // "waiting" to do nothing unless another data fetching is needed
   const [dataRefreshState, setDataRefreshState] =
-    useState<DataRefreshState>("start");
+    useState<DataRefreshState>("userupdate");
   useEffect(() => {
     switch (dataRefreshState) {
-      case "start":
-        fetchAllUsers().then((userres) => {
-          setUsers(userres);
-          //console.log(userres);
-          fetchAllRoles().then((roleres) => {
-            setRoles(roleres);
-            //console.log(roleres);
-            setDataRefreshState("waiting");
-          });
-        });
-        break;
       case "userupdate":
         fetchAllUsers().then((userres) => {
           setUsers(userres);
-          //console.log(userres);
           setDataRefreshState("waiting");
         });
         break;
       case "waiting":
         break;
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataRefreshState]);
   const dataUpdate = () => {
     setDataRefreshState("userupdate");
   };
+
   return (
     <Box sx={startingAdminFragmentStyles.fragmentFrame}>
       <AdminPanelNavigationFragment />
