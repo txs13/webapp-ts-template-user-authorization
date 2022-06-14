@@ -1,5 +1,9 @@
+import { Types } from "mongoose";
+
 import RoleModel, { RoleDocument, RoleInput } from "../models/role.model";
 import { FilterQuery } from "mongoose";
+import { PutRoleInput } from "../schemas/role.schema";
+import UserModel from "../models/user.model";
 
 // create role service
 export const createRole = async (input: RoleInput) => {
@@ -54,11 +58,56 @@ export const getAllRolesWithoutAdmin = async () => {
   const allPublicRoles = allRoles.filter(
     (it) => !it.role.toLowerCase().includes("admin")
   );
-  return allPublicRoles.map(it => it.toJSON())
+  return allPublicRoles.map((it) => it.toJSON());
 };
 
 // get all roles for admin control panel
 export const getAllRoles = async () => {
   const allRoles = await RoleModel.find();
-  return allRoles.map(it => it.toJSON())
-}
+  return allRoles.map((it) => it.toJSON());
+};
+
+// put / update role service
+export const putRole = async (updatedRole: PutRoleInput["body"]) => {
+  try {
+    const role = await RoleModel.findById(updatedRole._id);
+    if (role) {
+      role.role = updatedRole.role;
+      if (updatedRole.description) {
+        role.description = updatedRole.description;
+      } else {
+        role.description = undefined;
+      }
+      await role.save();
+      return true;
+    } else {
+      throw new Error("wrong role id");
+    }
+  } catch (e: any) {
+    throw new Error(e);
+  }
+};
+
+// delete user service
+export const deleteRole = async (id: string) => {
+  try {
+    const role = await RoleModel.findById(id);
+    if (role) {
+      // user can delete the role only if there are no users
+      // with such a role id
+      const roleUsers = await UserModel.find({
+        userrole_id: id,
+      });
+      if (roleUsers.length === 0) {
+        await role.delete();
+      } else {
+        throw new Error("users with this role still exist");  
+      }
+      return true;
+    } else {
+      throw new Error("wrong role id");
+    }
+  } catch (e: any) {
+    throw new Error(e);
+  }
+};

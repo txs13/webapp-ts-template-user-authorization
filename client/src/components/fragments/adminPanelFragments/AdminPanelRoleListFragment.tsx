@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import CachedIcon from "@mui/icons-material/Cached";
 import AddIcon from "@mui/icons-material/Add";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { useTheme, useMediaQuery } from "@mui/material";
 
 import styles from "../../styles/adminPanelStyles/adminPanelRoleListStyles";
@@ -67,7 +67,6 @@ interface UserFilters {
 const AdminPanelRoleListFragment: React.FunctionComponent<
   AdminPanelRoleListFragmentPropsTypes
 > = ({ users, roles, dataUpdate }) => {
-  const dispatch = useDispatch();
   // get data from app settings store and get text resouses in proper language
   const appSettings = useSelector(
     (state: RootState) => state.appSettings.value
@@ -299,6 +298,7 @@ const AdminPanelRoleListFragment: React.FunctionComponent<
       <AdminPanelRoleDetailsDialog
         openStatus={openRoleDetailsStatus}
         closeRoleDetails={closeRoleDetails}
+        openConfirmationDialog={openConfirmationDialog}
         roles={roles}
         users={users}
       />

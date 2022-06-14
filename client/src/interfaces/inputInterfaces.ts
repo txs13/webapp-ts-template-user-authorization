@@ -39,6 +39,7 @@ export interface UserDocument extends Omit<UserInput, "password"> {
   updatedAt: Date;
   isConfirmed?: Boolean;
   __v: number;
+  password?: string;
 }
 
 export interface RoleInput {

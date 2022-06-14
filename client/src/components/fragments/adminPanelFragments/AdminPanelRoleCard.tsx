@@ -7,6 +7,7 @@ import getTextResources from "../../../res/textResourcesFunction";
 import { RootState } from "../../../app/store";
 import styles from "../../styles/adminPanelStyles/adminPanelRoleCardStyles";
 import { RoleItem } from "./AdminPanelRoleListFragment";
+import { deleteRoleService } from "../../../app/services/roleServices";
 
 interface RoleCardPropsTypes {
   roleItem: RoleItem;
@@ -39,17 +40,24 @@ const AdminPanelRoleCard: React.FunctionComponent<RoleCardPropsTypes> = ({
   };
 
   // click handlers
-  const deleteRoleClickHandler = () => {
-    // TODO: delete role click handler
+  const deleteRoleClickHandler = async () => {
+    openConfirmationDialog(
+      `${textResourses.deleteRoleCardMessage} ${roleItem.role}`,
+      () => deleteRoleApiServiceCall()
+    );
   };
 
   const openRoleDetailsClickHandler = () => {
-    // TODO : open role details handler
     openRoleDetails(roleItem._id);
   };
 
   const openRoleListClickHandler = () => {
-    // TODO : oper user list handler
+    // TODO: open roles list
+  };
+
+  // api service call fuunctions
+  const deleteRoleApiServiceCall = async () => {
+    await deleteRoleService(roleItem._id);
   };
 
   return (

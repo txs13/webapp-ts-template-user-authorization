@@ -4,11 +4,15 @@ import {
   fetchAllUsersApiCall,
   APICallInterface,
   putUserApiCall,
-  deleteUserApiCall
+  deleteUserApiCall,
 } from "../../api/api";
 import store from "../store";
 import { accessTockenUpdate } from "../features/user.slice";
 import getTextResources from "../../res/textResourcesFunction";
+import {
+  AppAlertMessage,
+  showMessage,
+} from "../features/appAlertMessage.slice";
 
 const currentState = store.getState();
 
@@ -48,29 +52,54 @@ export const fetchAllUsers = async () => {
   }
 };
 
-export const putUser = async (updatedUser: UserDocument, newPassword?: string) => {
+export const putUserService = async (
+  updatedUser: UserDocument,
+  newPassword?: string
+): Promise<boolean> => {
   // get actual store state
   const storeState = store.getState();
+  // add new password to the object if any
+  let user: UserDocument = {...updatedUser}
+  if (newPassword) {
+    user.password = newPassword
+  }
   // api call
   const response = (await putUserApiCall(
     storeState.user.value.tokens?.accessToken as string,
     storeState.user.value.tokens?.refreshToken as string,
     false,
-    updatedUser
+    user
   )) as APICallInterface;
   if (response.success) {
     // update the store with new access tocken if we got one
     if (response.updatedAccessToken) {
       store.dispatch(accessTockenUpdate(response.updatedAccessToken));
     }
-    // return array of user records
-    return response.payload as UserDocument;
+    // show confirmation message
+    const { userUpdateSuccessMessage } = getTextResources(
+      storeState.appSettings.value.language
+    );
+    const successMessage: AppAlertMessage = {
+      alertType: "success",
+      alertMessage: userUpdateSuccessMessage,
+    };
+    store.dispatch(showMessage(successMessage));
+    return true;
   } else {
-    // somehow show the error
+    // show the error message
+    const { userUpdateFailureMessage } = getTextResources(
+      storeState.appSettings.value.language
+    );
+    const errorMessage: AppAlertMessage = {
+      alertType: "error",
+      alertMessage: userUpdateFailureMessage,
+    };
+    store.dispatch(showMessage(errorMessage));
+    return false;
   }
-}
+};
 
-export const deleteUser = async (userId: string) => {
+export const deleteUser = async (userId: string): Promise<boolean> => {
   // get actual store state
   const storeState = store.getState();
   // api call
@@ -85,9 +114,26 @@ export const deleteUser = async (userId: string) => {
     if (response.updatedAccessToken) {
       store.dispatch(accessTockenUpdate(response.updatedAccessToken));
     }
-    // return array of user records
-    return response.payload;
+    // show confirmation message
+    const { userDeleteSuccessMessage } = getTextResources(
+      storeState.appSettings.value.language
+    );
+    const successMessage: AppAlertMessage = {
+      alertType: "success",
+      alertMessage: userDeleteSuccessMessage,
+    };
+    store.dispatch(showMessage(successMessage));
+    return true;
   } else {
-    // somehow show the error
+    // show the error message
+    const { userDeleteFailureMessage } = getTextResources(
+      storeState.appSettings.value.language
+    );
+    const errorMessage: AppAlertMessage = {
+      alertType: "error",
+      alertMessage: userDeleteFailureMessage,
+    };
+    store.dispatch(showMessage(errorMessage));
+    return false;
   }
 };

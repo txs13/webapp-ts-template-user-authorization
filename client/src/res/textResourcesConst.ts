@@ -437,10 +437,31 @@ export const textResourcesMultilang: TextResources = {
   roleDescWrongFormatMessage: {
     EN: "role description contains wrong symbols",
   },
+  // role api messages
   successCreateRoleMessage: {
     EN: "new role is successfully created",
   },
   errorCreateRoleMessage: {
     EN: "something went wrong, new role was NOT created",
   },
+  roleUpdateSuccessMessage: {
+    EN: "Role data was updated successfully",
+  },
+  roleUpdateFailureMessage: {
+    EN: "Role data was NOT updated",
+  },
+  roleDeleteSuccessMessage: {
+    EN: "Role was successfully deleted",
+  },
+  roleDeleteFailureMessage: {
+    EN: "Role was NOT deleted",
+  },
+  // role related confirmation messages
+  saveRoleUpdatesMessage: {
+    EN: "Please cinfirm you would like to save these changes",
+  },
+  deleteRoleCardMessage: {
+    EN: "You are going to delete the role",
+  },
+
 };

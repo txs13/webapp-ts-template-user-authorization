@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import {
   Box,
   Toolbar,
@@ -8,7 +8,7 @@ import {
   FormControlLabel,
   Grid,
   MenuItem,
-  IconButton
+  IconButton,
 } from "@mui/material";
 import CachedIcon from "@mui/icons-material/Cached";
 
@@ -17,20 +17,13 @@ import getTextResources from "../../../res/textResourcesFunction";
 import { RootState } from "../../../app/store";
 import AdminPanelUserCard from "./AdminPanelUserCard";
 import styles from "../../styles/adminPanelStyles/adminPanelUserListStyles";
-import {
-  deleteUser,
-  putUser,
-} from "../../../app/services/userServices";
+import { deleteUser, putUserService } from "../../../app/services/userServices";
 import {
   RoleDocument,
   UserDocument,
 } from "../../../interfaces/inputInterfaces";
 import AdminPanelUserDetailsDialog from "./AdminPanelUserDetailsDialog";
 import AdminPanelUserListConfirmationDialog from "../reusableComponents/ConfirmationDialog";
-import {
-  AppAlertMessage,
-  showMessage,
-} from "../../../app/features/appAlertMessage.slice";
 import {
   OpenConfimationStatus,
   openConfimationInitialState,
@@ -74,7 +67,6 @@ interface AdminPanelUserListFragmentPropsTypes {
 const AdminPanelUserListFragment: React.FunctionComponent<
   AdminPanelUserListFragmentPropsTypes
 > = ({ users, roles, dataUpdate }) => {
-  const dispatch = useDispatch();
   // get data from app settings store and get text resouses in proper language
   const appSettings = useSelector(
     (state: RootState) => state.appSettings.value
@@ -244,84 +236,56 @@ const AdminPanelUserListFragment: React.FunctionComponent<
 
   // functions to call proper services and api calls
   const confirmUserServiceCall = async (userId: string) => {
+    // assemble ready to transmit updated user object
     const updatedUser: UserDocument = {
       ...users?.find((it) => it._id === userId),
     } as UserDocument;
-
     updatedUser.isConfirmed = true;
-    const result = await putUser(updatedUser);
-    // to process user updated result
-    if (Array.isArray(result)) {
-      if (result[0].message === "user is successfully updated") {
-        dataUpdate();
-        const successMessage: AppAlertMessage = {
-          alertType: "success",
-          alertMessage: textResourses.userConfirmSuccessMessage,
-        };
-        dispatch(showMessage(successMessage));
-      } else {
-        const successMessage: AppAlertMessage = {
-          alertType: "error",
-          alertMessage: textResourses.userConfirmFailureMessage,
-        };
-        dispatch(showMessage(successMessage));
-      }
+    // api call service
+    const result = await putUserService(updatedUser);
+    // if api call was successful, show the confirmation
+    // update users list 
+    if (result) {
+      dataUpdate()
+      closeUserDetails()
     }
   };
 
   const updateUserServiceCall = async (updatedUser: UserDocument) => {
-    const result = await putUser(updatedUser);
-    // to process user updated result
-    if (Array.isArray(result)) {
-      if (result[0].message === "user is successfully updated") {
-        dataUpdate()
-        closeUserDetails();
-        const successMessage: AppAlertMessage = {
-          alertType: "success",
-          alertMessage: textResourses.userUpdateSuccessMessage,
-        };
-        dispatch(showMessage(successMessage));
-      } else {
-        const successMessage: AppAlertMessage = {
-          alertType: "error",
-          alertMessage: textResourses.userUpdateFailureMessage,
-        };
-        dispatch(showMessage(successMessage));
-      }
+    // api call service
+    const result = await putUserService(updatedUser);
+    // if api call was successful, show the confirmation
+    // update users list
+    if (result) {
+      dataUpdate();
+      closeUserDetails();
     }
   };
 
   const deleteUserServiceCall = async (userId: string) => {
+    // api call service
     const result = await deleteUser(userId);
-    // to process user delete result
-    if (Array.isArray(result)) {
-      if (result[0].message === "user is successfully deleted") {
-        dataUpdate()
-        closeUserDetails();
-        const successMessage: AppAlertMessage = {
-          alertType: "success",
-          alertMessage: textResourses.userDeleteSuccessMessage,
-        };
-        dispatch(showMessage(successMessage));
-      } else {
-        const successMessage: AppAlertMessage = {
-          alertType: "error",
-          alertMessage: textResourses.userDeleteFailureMessage,
-        };
-        dispatch(showMessage(successMessage));
-      }
+    // if api call was successful, show the confirmation
+    // update users list
+    if (result) {
+      dataUpdate();
+      closeUserDetails();
     }
   };
 
   // click handlers
   const refreshDataClickHandler = () => {
-    dataUpdate()
-  }
+    dataUpdate();
+  };
 
   return (
     <Box sx={styles.fragmentFrame}>
       <Toolbar sx={styles.toolbox}>
-        <IconButton aria-label="delete" size="large" onClick={refreshDataClickHandler}>
+        <IconButton
+          aria-label="delete"
+          size="large"
+          onClick={refreshDataClickHandler}
+        >
           <CachedIcon fontSize="inherit" />
         </IconButton>
         <TextField
@@ -361,36 +325,36 @@ const AdminPanelUserListFragment: React.FunctionComponent<
         />
       </Toolbar>
       <Box sx={styles.databox}>
-          <Grid
-            container
-            rowSpacing={1}
-            columnSpacing={1}
-            sx={styles.gridBox}
-            alignItems="center"
-            columns={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}
-          >
-            {userItemsToShow?.map((user) => (
-              <Grid
-                item
-                key={user._id}
-                sx={styles.gridItem}
-                xs={12}
-                sm={8}
-                md={6}
-                lg={4}
-                xl={3}
-              >
-                <AdminPanelUserCard
-                  user={user}
-                  dataUpdate={dataUpdate}
-                  openUserDetails={openUserDetails}
-                  openConfirmationDialog={openConfirmationDialog}
-                  confirmUserServiceCall={confirmUserServiceCall}
-                  deleteUserServiceCall={deleteUserServiceCall}
-                />
-              </Grid>
-            ))}
-          </Grid>
+        <Grid
+          container
+          rowSpacing={1}
+          columnSpacing={1}
+          sx={styles.gridBox}
+          alignItems="center"
+          columns={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}
+        >
+          {userItemsToShow?.map((user) => (
+            <Grid
+              item
+              key={user._id}
+              sx={styles.gridItem}
+              xs={12}
+              sm={8}
+              md={6}
+              lg={4}
+              xl={3}
+            >
+              <AdminPanelUserCard
+                user={user}
+                dataUpdate={dataUpdate}
+                openUserDetails={openUserDetails}
+                openConfirmationDialog={openConfirmationDialog}
+                confirmUserServiceCall={confirmUserServiceCall}
+                deleteUserServiceCall={deleteUserServiceCall}
+              />
+            </Grid>
+          ))}
+        </Grid>
       </Box>
       <AdminPanelUserDetailsDialog
         openStatus={openUserDetailsStatus}

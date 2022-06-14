@@ -1,6 +1,6 @@
 // the important this to keep in mind i sthat the majority of this code was copied
-// from AdminPanelUserDetailsDialog component. I was looking for the way to 
-// refactor the code to avoid simlar code and functions in different files, 
+// from AdminPanelUserDetailsDialog component. I was looking for the way to
+// refactor the code to avoid simlar code and functions in different files,
 // but so far have not found any good way to reorganize / refactor it
 
 import React, { useState, useEffect, useMemo } from "react";
@@ -34,7 +34,7 @@ import {
   OpenConfimationStatus,
   openConfimationInitialState,
 } from "./reusableComponents/ConfirmationDialog";
-import { deleteUser, putUser } from "../../app/services/userServices";
+import { deleteUser, putUserService } from "../../app/services/userServices";
 import { logoutService } from "../../app/services/logoutService";
 
 interface UserDocumentForm extends UserDocument {
@@ -437,7 +437,7 @@ const ProfileFragment: React.FunctionComponent = () => {
 
   // functions to call proper services and api calls
   const updateUserServiceCall = async (updatedUser: UserDocument) => {
-    const result = await putUser(updatedUser);
+    const result = await putUserService(updatedUser);
     // to process user updated result
     if (Array.isArray(result)) {
       if (result[0].message === "user is successfully updated") {

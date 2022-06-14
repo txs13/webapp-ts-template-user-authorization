@@ -9,7 +9,7 @@ import {
   Button,
   TextField,
 } from "@mui/material";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 
 import { LocalizedTextResources } from "../../../res/textResourcesFunction";
 import getTextResources from "../../../res/textResourcesFunction";
@@ -26,13 +26,18 @@ import {
   roleSchema,
 } from "../../../schemas/InputValidationSchemas";
 import { validateResourceAsync } from "../../../utils/validateResource";
-import { createRoleService } from "../../../app/services/roleServices";
+import {
+  createRoleService,
+  deleteRoleService,
+  putRoleService,
+} from "../../../app/services/roleServices";
 
 interface AdminPanelRoleDetailDialogPropsTypes {
   openStatus: OpenRoleDetailsStatus;
   roles: RoleDocument[] | undefined;
   users: UserDocument[] | undefined;
   closeRoleDetails: Function;
+  openConfirmationDialog: Function;
 }
 
 interface RoleDocumentForm extends RoleDocument {
@@ -58,8 +63,13 @@ const initialRoleValue: RoleDocumentForm = {
 
 const AdminPanelRoleDetailsDialog: React.FunctionComponent<
   AdminPanelRoleDetailDialogPropsTypes
-> = ({ openStatus, roles, users, closeRoleDetails }) => {
-  const dispatch = useDispatch();
+> = ({
+  openStatus,
+  roles,
+  users,
+  closeRoleDetails,
+  openConfirmationDialog,
+}) => {
   // get data from app settings store and get text resouses in proper language
   const appSettings = useSelector(
     (state: RootState) => state.appSettings.value
@@ -154,12 +164,44 @@ const AdminPanelRoleDetailsDialog: React.FunctionComponent<
     }
   };
 
+  // api service calls
+  const deleteApiServiceCall = async () => {
+    const result = await deleteRoleService(
+      openStatus.currentRole?._id as string
+    );
+    if (result) {
+      closeRoleDetails();
+    }
+  };
+  const putApiServiceCall = async () => {
+    let updatedRole: RoleDocument = {
+      _id: currentRole._id,
+      __v: currentRole.__v,
+      role: currentRole.role,
+      createdAt: currentRole.createdAt,
+      updatedAt: currentRole.updatedAt,
+    };
+    if (currentRole.description !== "") {
+      updatedRole.description = currentRole.description;
+    }
+    const result = await putRoleService(updatedRole);
+    if (result) {
+      closeRoleDetails();
+    }
+  };
+
   // click handlers
   const closeDialogClickHandler = () => {
     closeRoleDetails();
   };
-  const saveClickHandler = () => {
-    // TODO: initiate put api call
+  const saveClickHandler = async () => {
+    // validating inputs
+    const inputsAreOk = await validateInputs("submit");
+    if (inputsAreOk) {
+      openConfirmationDialog(textResourses.saveRoleUpdatesMessage, () =>
+        putApiServiceCall()
+      );
+    }
   };
   const editClickHandler = () => {
     setCardState("edit");
@@ -169,7 +211,10 @@ const AdminPanelRoleDetailsDialog: React.FunctionComponent<
     setCurrentRole({ ...initialRoleValue, ...openStatus.currentRole });
   };
   const deleteClickHandler = () => {
-    // TODO: initiate delete api call
+    openConfirmationDialog(
+      `${textResourses.deleteRoleCardMessage} ${openStatus.currentRole?.role}`,
+      () => deleteApiServiceCall()
+    );
   };
   const createClickHandler = async () => {
     // validating inputs

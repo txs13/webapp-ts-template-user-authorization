@@ -1,11 +1,13 @@
 import express from "express";
-import { validateResource } from "../middleware/validateResource";
+import { validateResource, validateResourceAsync } from "../middleware/validateResource";
 import {
   createRoleHandler,
   getPublicRolesHandler,
   getAllRolesHandler,
+  putRoleHandler,
+  deleteRoleHandler,
 } from "../controllers/role.controller";
-import { createRoleSchema } from "../schemas/role.schema";
+import { createRoleSchema, putRoleSchema } from "../schemas/role.schema";
 import authorizedAccess from "../middleware/authorizedAccess";
 import adminAccess from "../middleware/adminAccess";
 
@@ -19,9 +21,21 @@ roleRouter.post(
   createRoleHandler
 );
 
+// put / update role
+roleRouter.put(
+  "/",
+  validateResourceAsync(putRoleSchema),
+  authorizedAccess,
+  adminAccess,
+  putRoleHandler
+);
+
+//delete role
+roleRouter.delete("/:roleid", authorizedAccess, adminAccess, deleteRoleHandler);
+
 // the idea is to return all the roles without word "admin"
 roleRouter.get("/", getPublicRolesHandler);
 
-roleRouter.get("/allroles", authorizedAccess, adminAccess, getAllRolesHandler)
+roleRouter.get("/allroles", authorizedAccess, adminAccess, getAllRolesHandler);
 
 export default roleRouter;

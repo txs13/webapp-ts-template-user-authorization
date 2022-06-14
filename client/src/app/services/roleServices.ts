@@ -3,6 +3,8 @@ import {
   fetchAllRolesApiCall,
   APICallInterface,
   createRoleApiCall,
+  putRoleApiCall,
+  deleteRoleApiCall
 } from "../../api/api";
 import { updatePublicRoles } from "../features/role.slice";
 import store from "../store";
@@ -75,7 +77,9 @@ export const fetchAllRoles = async () => {
   }
 };
 
-export const createRoleService = async (roleInput: RoleInput): Promise<boolean> => {
+export const createRoleService = async (
+  roleInput: RoleInput
+): Promise<boolean> => {
   // get actual store state
   const storeState = store.getState();
   // api call
@@ -93,14 +97,19 @@ export const createRoleService = async (roleInput: RoleInput): Promise<boolean> 
     // store update
     const allRoles = await fetchAllRoles();
     store.dispatch(updatePublicRoles(allRoles));
-    const { successCreateRoleMessage } = getTextResources(storeState.appSettings.value.language)
+    // show cinfirmation message
+    const { successCreateRoleMessage } = getTextResources(
+      storeState.appSettings.value.language
+    );
     const alertMessage: AppAlertMessage = {
       alertType: "success",
       alertMessage: successCreateRoleMessage,
     };
     store.dispatch(showMessage(alertMessage));
+    // return api call result
     return true;
   } else {
+    // show cinfirmation message
     const { errorCreateRoleMessage } = getTextResources(
       storeState.appSettings.value.language
     );
@@ -109,6 +118,95 @@ export const createRoleService = async (roleInput: RoleInput): Promise<boolean> 
       alertMessage: errorCreateRoleMessage,
     };
     store.dispatch(showMessage(alertMessage));
+    // return api call result
     return false;
   }
 };
+
+export const putRoleService = async (
+  updatedRole: RoleDocument
+): Promise<boolean> => {
+  // get actual store state
+  const storeState = store.getState();
+  // api call
+  const response = (await putRoleApiCall(
+    storeState.user.value.tokens?.accessToken as string,
+    storeState.user.value.tokens?.refreshToken as string,
+    false,
+    updatedRole
+  )) as APICallInterface;
+  if (response.success) {
+    // update the store with new access tocken if we got one
+    if (response.updatedAccessToken) {
+      store.dispatch(accessTockenUpdate(response.updatedAccessToken));
+    }
+    // store update
+    const allRoles = await fetchAllRoles();
+    store.dispatch(updatePublicRoles(allRoles));
+    // show confirmation message
+    const { roleUpdateSuccessMessage } = getTextResources(
+      storeState.appSettings.value.language
+    );
+    const successMessage: AppAlertMessage = {
+      alertType: "success",
+      alertMessage: roleUpdateSuccessMessage,
+    };
+    store.dispatch(showMessage(successMessage));
+
+    return true;
+  } else {
+    // show the error message
+    const { roleUpdateFailureMessage } = getTextResources(
+      storeState.appSettings.value.language
+    );
+    const errorMessage: AppAlertMessage = {
+      alertType: "error",
+      alertMessage: roleUpdateFailureMessage,
+    };
+    store.dispatch(showMessage(errorMessage));
+    return false;
+  }
+};
+
+export const deleteRoleService = async(roleId: string): Promise<boolean> => {
+    // get actual store state
+  const storeState = store.getState();
+  // api call
+  const response = (await deleteRoleApiCall(
+    storeState.user.value.tokens?.accessToken as string,
+    storeState.user.value.tokens?.refreshToken as string,
+    false,
+    roleId
+  )) as APICallInterface;
+  if (response.success) {
+    // update the store with new access tocken if we got one
+    if (response.updatedAccessToken) {
+      store.dispatch(accessTockenUpdate(response.updatedAccessToken));
+    }
+    // store update
+    const allRoles = await fetchAllRoles();
+    store.dispatch(updatePublicRoles(allRoles));
+    // show confirmation message
+    const { roleDeleteSuccessMessage } = getTextResources(
+      storeState.appSettings.value.language
+    );
+    const successMessage: AppAlertMessage = {
+      alertType: "success",
+      alertMessage: roleDeleteSuccessMessage,
+    };
+    store.dispatch(showMessage(successMessage));
+    return true;
+  } else {
+    // show the error message
+    const { roleDeleteFailureMessage } = getTextResources(
+      storeState.appSettings.value.language
+    );
+    const errorMessage: AppAlertMessage = {
+      alertType: "error",
+      alertMessage: roleDeleteFailureMessage,
+    };
+    store.dispatch(showMessage(errorMessage));
+    return false;
+  }
+
+}

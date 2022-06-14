@@ -25,7 +25,7 @@ export const createUserHandler = async (
     const user = await createUser(userInput);
     return res.status(201).send(omit(user.toJSON(), "password", "isConfirmed"));
   } catch (e: any) {
-    log.error(e);
+    log.error(e.message);
     return res.status(409).send(e.message);
   }
 };
@@ -41,7 +41,7 @@ export const getAllUsersHandler = async (req: Request, res: Response) => {
     await session.save();
     return res.status(200).send(userListToSend);
   } catch (e: any) {
-    log.error(e);
+    log.error(e.message);
     const session: SessionDocument = res.locals.session;
     session.addUserAction(req.originalUrl, req.method, false);
     await session.save();
@@ -87,7 +87,7 @@ export const patchUserHandler = async (
       }
     }
   } catch (e: any) {
-    log.error(e);
+    log.error(e.message);
     const session: SessionDocument = res.locals.session;
     session.addUserAction(req.originalUrl, req.method, false);
     await session.save();
@@ -138,7 +138,7 @@ export const deleteUserHandler = async (req: Request, res: Response) => {
       }
     }
   } catch (e: any) {
-    log.error(e);
+    log.error(e.message);
     const session: SessionDocument = res.locals.session;
     session.addUserAction(req.originalUrl, req.method, false);
     await session.save();
