@@ -13,6 +13,7 @@ import {
   AppAlertMessage,
   showMessage,
 } from "../features/appAlertMessage.slice";
+import { logoutService } from "./logoutService";
 
 const currentState = store.getState();
 

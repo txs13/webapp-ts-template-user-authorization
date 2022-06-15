@@ -1,5 +1,11 @@
-import React from "react";
-import { Routes, Route, generatePath } from "react-router-dom";
+import React, { useEffect } from "react";
+import {
+  Routes,
+  Route,
+  generatePath,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import { RootState } from "../app/store";
 import { useSelector } from "react-redux";
 
@@ -22,7 +28,29 @@ interface RouterFramePropTypes {
 const RouterFrame: React.FunctionComponent<RouterFramePropTypes> = ({
   startUpActionsAreDone,
 }) => {
+  // getting current path and current user in order to redirect
+  // the request website path after a silent logoff
+  // this approach has a side effect that "not found" fragment is
+  // not goging to be reached ever
+  // it declaration is a kind of "just in case"
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const user = useSelector((state: RootState) => state.user.value);
+
+  useEffect(() => {
+    if (
+      !user.user &&
+      // basically here should be listed all the not protected routes
+      location.pathname !== "/login" &&
+      location.pathname !== "/register" &&
+      location.pathname !== "/about" &&
+      location.pathname !== "/"
+    ) {
+      navigate("/")
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location, user.user]);
 
   const defaultProtectedRouteProps: Omit<ProtectedRouteProps, "outlet"> = {
     isAuthenticated: user.user ? true : false,
@@ -31,8 +59,8 @@ const RouterFrame: React.FunctionComponent<RouterFramePropTypes> = ({
 
   const defaultAdminProtectedRouteProps: Omit<ProtectedRouteProps, "outlet"> = {
     isAuthenticated: user.user && user.tokens?.isAdmin === true ? true : false,
-    authenticationPath: "/"
-  }
+    authenticationPath: "/",
+  };
 
   return !startUpActionsAreDone ? (
     <StartUpFragment startUpActionsAreDone={startUpActionsAreDone} />
@@ -67,7 +95,9 @@ const RouterFrame: React.FunctionComponent<RouterFramePropTypes> = ({
         }
       />
       <Route
-        path={`${generatePath("/:id/adminpanel", { id: emailToPath(user.user) })}/*`}
+        path={`${generatePath("/:id/adminpanel", {
+          id: emailToPath(user.user),
+        })}/*`}
         element={
           <ProtectedRoute
             {...defaultAdminProtectedRouteProps}

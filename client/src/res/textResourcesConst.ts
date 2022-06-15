@@ -375,6 +375,9 @@ export const textResourcesMultilang: TextResources = {
   refreshRolesBtnLabel: {
     EN: "refresh",
   },
+  onlyPublicSwitchLabel: {
+    EN: "public only"
+  },
   // role details dialog labels
   roleEditDetailsDialogHeader: {
     EN: "role details",

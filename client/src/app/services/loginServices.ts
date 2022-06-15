@@ -23,8 +23,11 @@ export const loginService = async (loginInput: LoginInput) => {
 
   if (response.success) {
     // get all roles is user is admin
-    if (response.payload?.tokens?.isAdmin) {
-      await fetchAllRolesService();
+    if (response.payload?.isAdmin) {
+      await fetchAllRolesService(
+        response.payload?.accessToken,
+        response.payload?.refreshToken
+      );
     }
     // dispatching successful login
     return store.dispatch(successfulLoginUser(response.payload));

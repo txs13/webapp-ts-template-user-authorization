@@ -1,6 +1,13 @@
 import axios from "axios";
-import { LoginInput, RoleDocument, RoleInput, UserDocument, UserInput } from "../interfaces/inputInterfaces";
+import {
+  LoginInput,
+  RoleDocument,
+  RoleInput,
+  UserDocument,
+  UserInput,
+} from "../interfaces/inputInterfaces";
 import getConfig from "../config/config";
+import { localLogoutService } from "../app/services/logoutService";
 
 interface ObjectLiteral {
   [key: string]: any;
@@ -11,6 +18,7 @@ export interface APICallInterface {
   errorMessage?: String;
   payload?: ObjectLiteral;
   updatedAccessToken?: String;
+  expiredToken?: Boolean;
 }
 
 const { baseApiUrl, userApi, roleApi, reqOptions, reqOptionsToken } =
@@ -48,7 +56,7 @@ export const loginApiCall = async (
 
 export const refreshTokenApiCall = async (
   refreshToken: string
-): Promise<APICallInterface> => {
+): Promise<APICallInterface | void> => {
   let response;
   try {
     response = await client.post(
@@ -67,6 +75,7 @@ export const refreshTokenApiCall = async (
 
   if (response.status === 401) {
     // wrong login credentional provided
+    localLogoutService();
     return { success: false, errorMessage: response.data[0].message };
   }
 
@@ -146,8 +155,9 @@ export const logoutApiCall = async (
       return { success: false, errorMessage: response?.errorMessage };
     }
   }
-  // normally this should never happen - this status can happen if wrong token is submitted
+
   if (response.status === 409) {
+    // normally this should never happen - this status can happen if wrong token is submitted
     return { success: false, errorMessage: response.data[0].message };
   }
 };
@@ -190,7 +200,11 @@ export const fetchAllUsersApiCall = async (
       return await fetchAllUsersApiCall(newAccessToken, refreshToken, true);
     } else {
       // in case we do not get new access token, we have to clean up and exit
-      return { success: false, errorMessage: response?.errorMessage };
+      if (response?.errorMessage === "wrong token"){
+        return { success: false, errorMessage: response?.errorMessage, expiredToken: true };
+      } else {
+        return { success: false, errorMessage: response?.errorMessage };
+      }
     }
   }
   // normally this should never happen - this status can happen if wrong token is submitted
@@ -282,7 +296,12 @@ export const putUserApiCall = async (
       // in case we have it, we call the same function to call the api once again
       // function is supposed to get done after the second api call returns status 200
       const newAccessToken = response.payload?.accessToken;
-      return await putUserApiCall(newAccessToken, refreshToken, true, updatedUser);
+      return await putUserApiCall(
+        newAccessToken,
+        refreshToken,
+        true,
+        updatedUser
+      );
     } else {
       // in case we do not get new access token, we have to clean up and exit
       return { success: false, errorMessage: response?.errorMessage };
@@ -330,7 +349,12 @@ export const deleteUserApiCall = async (
       // in case we have it, we call the same function to call the api once again
       // function is supposed to get done after the second api call returns status 200
       const newAccessToken = response.payload?.accessToken;
-      return await deleteUserApiCall(newAccessToken, refreshToken, true, userId);
+      return await deleteUserApiCall(
+        newAccessToken,
+        refreshToken,
+        true,
+        userId
+      );
     } else {
       // in case we do not get new access token, we have to clean up and exit
       return { success: false, errorMessage: response?.errorMessage };

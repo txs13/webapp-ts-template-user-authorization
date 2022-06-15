@@ -7,8 +7,9 @@ import {
   MenuItem,
   Grid,
   Typography,
+  Switch,
+  FormControlLabel,
 } from "@mui/material";
-import CachedIcon from "@mui/icons-material/Cached";
 import AddIcon from "@mui/icons-material/Add";
 import { useSelector } from "react-redux";
 import { useTheme, useMediaQuery } from "@mui/material";
@@ -61,7 +62,7 @@ interface FilterMenuItem {
 interface UserFilters {
   field: MenuValue;
   filterValue: string;
-  showNotConfirmed: boolean;
+  showPublic: boolean;
 }
 
 const AdminPanelRoleListFragment: React.FunctionComponent<
@@ -123,7 +124,7 @@ const AdminPanelRoleListFragment: React.FunctionComponent<
   const [filters, setFilters] = useState<UserFilters>({
     field: "role",
     filterValue: "",
-    showNotConfirmed: true,
+    showPublic: false,
   });
   const filtersChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     switch (e.target.name) {
@@ -132,6 +133,9 @@ const AdminPanelRoleListFragment: React.FunctionComponent<
         break;
       case "filterValue":
         setFilters({ ...filters, filterValue: e.target.value });
+        break;
+      case "showPublic":
+        setFilters({ ...filters, showPublic: !filters.showPublic });
         break;
     }
   };
@@ -159,6 +163,16 @@ const AdminPanelRoleListFragment: React.FunctionComponent<
       }
       return false;
     });
+
+    // public only filter handler
+    // currently it is organized the way that if role name contains
+    // the word "admin" - this is NOT a public role
+    // this is organized the same way on server side
+    if (filters.showPublic) {
+      filteredItems = filteredItems?.filter(
+        (it) => !it.role.toLowerCase().includes("admin")
+      );
+    }
 
     setRoleItemsToShow(filteredItems);
   }, [filters, roleItems]);
@@ -206,9 +220,6 @@ const AdminPanelRoleListFragment: React.FunctionComponent<
   };
 
   // click handlers
-  const refreshDataClickHandler = () => {
-    dataUpdate();
-  };
 
   const addRoleClickHandler = () => {
     openRoleDetails();
@@ -221,16 +232,6 @@ const AdminPanelRoleListFragment: React.FunctionComponent<
   return (
     <Box sx={styles.fragmentFrame}>
       <Toolbar sx={styles.toolbox}>
-        <IconButton
-          aria-label="delete"
-          size="large"
-          onClick={refreshDataClickHandler}
-        >
-          <CachedIcon fontSize="inherit" />
-          {isSmallScreen ? null : (
-            <Typography>{textResourses.refreshRolesBtnLabel}</Typography>
-          )}
-        </IconButton>
         <TextField
           select
           name="field"
@@ -253,6 +254,19 @@ const AdminPanelRoleListFragment: React.FunctionComponent<
           sx={styles.searchWhatlabel}
           label={textResourses.searchWhatlabel}
           variant="standard"
+        />
+        <FormControlLabel
+          sx={{ marginLeft: "5px" }}
+          control={
+            <Switch
+              name="showPublic"
+              onChange={filtersChangeHandler}
+              value={filters.showPublic}
+              size="small"
+              defaultChecked={false}
+            />
+          }
+          label={textResourses.onlyPublicSwitchLabel}
         />
         <IconButton
           aria-label="delete"

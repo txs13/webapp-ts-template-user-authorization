@@ -7,8 +7,8 @@ export const logoutService = async () => {
   const currentState = store.getState();
   // call loagout api
   const response = await logoutApiCall(
-    currentState.user.value.tokens?.accessToken as string,
-    currentState.user.value.tokens?.refreshToken as string
+    currentState?.user.value.tokens?.accessToken as string,
+    currentState?.user.value.tokens?.refreshToken as string
   );
   // after logout API is called, for the client is not important
   // whether call was successfule or not successful
@@ -23,3 +23,10 @@ export const logoutService = async () => {
     console.log("Logout API call does not work properly");
   }
 };
+
+export const localLogoutService = () => {
+  // dispatch "empty" store state
+  store.dispatch(backToInitialState());
+  // remove token record from the local storage
+  localStorage.removeItem("refreshinfo");
+}

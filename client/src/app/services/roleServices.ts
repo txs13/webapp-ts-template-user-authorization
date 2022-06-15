@@ -84,8 +84,8 @@ export const createRoleService = async (
   const storeState = store.getState();
   // api call
   const response = (await createRoleApiCall(
-    storeState.user.value.tokens?.accessToken as string,
-    storeState.user.value.tokens?.refreshToken as string,
+    storeState?.user.value.tokens?.accessToken as string,
+    storeState?.user.value.tokens?.refreshToken as string,
     false,
     roleInput
   )) as APICallInterface;
@@ -206,6 +206,10 @@ export const deleteRoleService = async(roleId: string): Promise<boolean> => {
       alertMessage: roleDeleteFailureMessage,
     };
     store.dispatch(showMessage(errorMessage));
+
+    // run logout procedure if token is expired or wrong
+    
+
     return false;
   }
 
