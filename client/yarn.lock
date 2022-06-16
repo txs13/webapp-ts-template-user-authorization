@@ -2132,9 +2132,9 @@
   integrity sha512-YATxVxgRqNH6nHEIsvg6k2Boc1JHI9ZbH5iWFFv/MTkchz3b1ieGDa5T0a9RznNdI0KhVbdbWSN+KWWrQZRxTw==
 
 "@types/node@*", "@types/node@^17.0.43":
-  version "17.0.43"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-17.0.43.tgz#7f16898cdd791c9d64069000ad448b47b3ca8353"
-  integrity sha512-jnUpgw8fL9kP2iszfIDyBQtw5Mf4/XSqy0Loc1J9pI14ejL83XcCEvSf50Gs/4ET0I9VCCDoOfufQysj0S66xA==
+  version "17.0.44"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-17.0.44.tgz#16dd0bb5338f016d8ca10631789f0d0612fe5d5b"
+  integrity sha512-gWYiOlu6Y4oyLYBvsJAPlwHbC8H4tX+tLsHy6Ee976wedwwZKrG2hFl3Y/HiH6bIyLTbDWQexQF/ohwKkOpUCg==
 
 "@types/parse-json@^4.0.0":
   version "4.0.0"
@@ -3984,9 +3984,9 @@ ejs@^3.1.6:
     jake "^10.8.5"
 
 electron-to-chromium@^1.4.147:
-  version "1.4.155"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.155.tgz#9c7190bf5e8608c5a5e4953b1ccf0facf3d1b49d"
-  integrity sha512-niPzKBSYPG06gxLKO0c2kEmgdRMTtIbNrBlvD31Ld8Q57b/K0218U4j8u/OOt25XE1eFOn47FcmQVdx9R1qqxA==
+  version "1.4.156"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.156.tgz#fc398e1bfbe586135351ebfaf198473a82923af5"
+  integrity sha512-/Wj5NC7E0wHaMCdqxWz9B0lv7CcycDTiHyXCtbbu3pXM9TV2AOp8BtMqkVuqvJNdEvltBG6LxT2Q+BxY4LUCIA==
 
 emittery@^0.10.2:
   version "0.10.2"

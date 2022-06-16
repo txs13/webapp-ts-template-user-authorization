@@ -109,6 +109,22 @@ const AdminPanelRoleDetailsDialog: React.FunctionComponent<
     }
   }, [openStatus.currentRole]);
 
+  // variable to store edits / changes status
+  const [edits, setEdits] = useState(false);
+  useEffect(() => {
+    if (
+      (currentRole.role === openStatus.currentRole?.role) &&
+      ((currentRole.description === openStatus.currentRole?.description ||
+        (!openStatus.currentRole?.description &&
+          currentRole.description === "")))
+    ) {
+      setEdits(false);
+    } else {
+      setEdits(true);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentRole]);
+
   // input validation
   const validateInputs = async (
     callType: "fill" | "submit"
@@ -357,6 +373,7 @@ const AdminPanelRoleDetailsDialog: React.FunctionComponent<
               display:
                 !openStatus.currentRole || cardState === "view" ? "none" : "",
             }}
+            disabled={!edits}
             variant="contained"
             color="success"
             onClick={saveClickHandler}

@@ -15,7 +15,10 @@ import { useSelector, useDispatch } from "react-redux";
 import { LocalizedTextResources } from "../../../res/textResourcesFunction";
 import getTextResources from "../../../res/textResourcesFunction";
 import { RootState } from "../../../app/store";
-import { OpenUserDetailsStatus } from "./AdminPanelUserListFragment";
+import {
+  OpenUserDetailsStatus,
+  OpenNewPasswordStatus,
+} from "./AdminPanelUserListFragment";
 import {
   RoleDocument,
   UserDocument,
@@ -39,6 +42,9 @@ export interface AdminPanelUserDetailsDialogPropsTypes {
   openConfirmationDialog: Function;
   updateUserServiceCall: Function;
   deleteUserServiceCall: Function;
+  openNewPasswordDialogStatus: OpenNewPasswordStatus;
+  openNewPasswordDialog: Function;
+  resetNewPasswordDialog: Function;
 }
 
 interface UserDocumentForm extends UserDocument {
@@ -110,6 +116,9 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
   openConfirmationDialog,
   updateUserServiceCall,
   deleteUserServiceCall,
+  openNewPasswordDialog,
+  openNewPasswordDialogStatus,
+  resetNewPasswordDialog,
 }) => {
   const dispatch = useDispatch();
   // get data from app settings store and get text resouses in proper language
@@ -142,6 +151,23 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
       { id: "1", label: textResourses.userNStatusLabel, value: "false" },
     ]);
   }, [textResourses]);
+
+  // MUI does not allow dialog windows nesting, so we watch the result of
+  // new password dialog window here
+  useEffect(() => {
+    if (
+      openNewPasswordDialogStatus.open === false &&
+      openNewPasswordDialogStatus.user &&
+      openNewPasswordDialogStatus.password
+    ) {
+      setCurrentUser({
+        ...currentUser,
+        password: openNewPasswordDialogStatus.password,
+      });
+      resetNewPasswordDialog();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [openNewPasswordDialogStatus]);
 
   // variable to store user changes
   const [currentUser, setCurrentUser] =
@@ -260,6 +286,9 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
     if (currentUser.phone !== "") {
       user = { ...user, phone: currentUser.phone };
     }
+    if (currentUser?.password) {
+      user = { ...user, password: currentUser.password };
+    }
     if (type === "PutUserInput") {
       return user;
     } else {
@@ -347,25 +376,38 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
     updatedParam: string | Boolean | undefined
   ): boolean => {
     if (!initialParam && updatedParam === "") {
-      return true
+      return true;
     }
     if (initialParam === updatedParam) {
-      return true
+      return true;
     }
-    return false
+    return false;
   };
   const compareSavedData = (): boolean => {
     const noEdits =
       fieldsAreEqual(openStatus.currentUser?.name, currentUser?.name) &&
-      fieldsAreEqual(openStatus.currentUser?.familyname, currentUser?.familyname) &&
+      fieldsAreEqual(
+        openStatus.currentUser?.familyname,
+        currentUser?.familyname
+      ) &&
       fieldsAreEqual(openStatus.currentUser?.email, currentUser?.email) &&
       fieldsAreEqual(openStatus.currentUser?.phone, currentUser?.phone) &&
       fieldsAreEqual(openStatus.currentUser?.company, currentUser?.company) &&
       fieldsAreEqual(openStatus.currentUser?.position, currentUser?.position) &&
       fieldsAreEqual(openStatus.currentUser?.address, currentUser?.address) &&
-      fieldsAreEqual(openStatus.currentUser?.description, currentUser?.description) &&
-      fieldsAreEqual(openStatus.currentUser?.isConfirmed, currentUser?.isConfirmed) &&
-      fieldsAreEqual(openStatus.currentUser?.userrole_id, currentUser?.userrole_id);
+      fieldsAreEqual(
+        openStatus.currentUser?.description,
+        currentUser?.description
+      ) &&
+      fieldsAreEqual(
+        openStatus.currentUser?.isConfirmed,
+        currentUser?.isConfirmed
+      ) &&
+      fieldsAreEqual(
+        openStatus.currentUser?.userrole_id,
+        currentUser?.userrole_id
+      ) &&
+      fieldsAreEqual(openStatus.currentUser?.password, currentUser?.password);
     return !noEdits;
   };
   const [edits, setEdits] = useState<boolean>(false);
@@ -447,6 +489,10 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
   };
   const closeClickHandler = () => {
     closeDialog();
+  };
+
+  const passwordClickHandler = () => {
+    openNewPasswordDialog(openStatus.currentUser);
   };
 
   return (
@@ -632,6 +678,19 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
 
         <TextField
           fullWidth
+          disabled={true}
+          name="password"
+          type="password"
+          label={textResourses.passwordInputLabel}
+          sx={{
+            ...styles.inputField,
+            display: currentUser?.password ? "" : "none",
+          }}
+          value={currentUser?.password}
+        />
+
+        <TextField
+          fullWidth
           sx={styles.inputField}
           disabled={true}
           variant="outlined"
@@ -684,6 +743,13 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
             onClick={editClickHandler}
           >
             {textResourses.editBtnDialogBoxLabel}
+          </Button>
+          <Button
+            sx={{ display: cardState === "edit" ? "" : "none" }}
+            variant="contained"
+            onClick={passwordClickHandler}
+          >
+            {textResourses.passwordBtnDialogBoxLabel}
           </Button>
           <Button
             sx={{ display: cardState === "view" ? "none" : "" }}

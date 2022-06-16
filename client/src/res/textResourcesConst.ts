@@ -336,6 +336,9 @@ export const textResourcesMultilang: TextResources = {
   closeBtnDialogBoxLabel: {
     EN: "close",
   },
+  passwordBtnDialogBoxLabel: {
+    EN: "password",
+  },
   // confirmation dialog box labels
   headerConfimationDialogLabel: {
     EN: "please confirm",
@@ -376,7 +379,7 @@ export const textResourcesMultilang: TextResources = {
     EN: "refresh",
   },
   onlyPublicSwitchLabel: {
-    EN: "public only"
+    EN: "public only",
   },
   // role details dialog labels
   roleEditDetailsDialogHeader: {
@@ -466,5 +469,20 @@ export const textResourcesMultilang: TextResources = {
   deleteRoleCardMessage: {
     EN: "You are going to delete the role",
   },
-
+  // new password dialog labels
+  newPasswordDialogHeader: {
+    EN: "set new password"
+  },
+  newPasswordDialogText: {
+    EN: "please enter new password for the user"
+  },
+  cancelNewPasswordDialogBtnLabel: {
+    EN: "calcel"
+  },
+  setNewPasswordDialogBtnLabel: {
+    EN: "set password"
+  },
+  generateNewPasswordDialogBtnLabel: {
+    EN: "generate"
+  }
 };

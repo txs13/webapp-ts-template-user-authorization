@@ -41,6 +41,7 @@ const RouterFrame: React.FunctionComponent<RouterFramePropTypes> = ({
   useEffect(() => {
     if (
       !user.user &&
+      startUpActionsAreDone &&
       // basically here should be listed all the not protected routes
       location.pathname !== "/login" &&
       location.pathname !== "/register" &&

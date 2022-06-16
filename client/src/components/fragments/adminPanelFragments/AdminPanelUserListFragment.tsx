@@ -28,6 +28,19 @@ import {
   OpenConfimationStatus,
   openConfimationInitialState,
 } from "../reusableComponents/ConfirmationDialog";
+import AdminPanelNewPasswordDialog from "./AdminPanelNewPasswordDialog";
+
+export interface OpenNewPasswordStatus {
+  open: boolean;
+  user: UserDocument | undefined;
+  password: string | undefined;
+}
+
+const initialNewPasswordStatus: OpenNewPasswordStatus = {
+  open: false,
+  user: undefined,
+  password: undefined,
+};
 
 export interface OpenUserDetailsStatus {
   open: boolean;
@@ -198,6 +211,29 @@ const AdminPanelUserListFragment: React.FunctionComponent<
     setUserItemsToShow(filteredItems);
   }, [filters, userItems]);
 
+  // this variable is needed in order to open new passsword dialog window
+  // according to my current investigation, MUI Dialog does not allow to
+  // nest dialog windows - so this is the reason to handle it exactly this way
+  // part of the related code - useEffect and password reset are organized in
+  // userdetails dialog fragment
+  const [openNewPasswordStatus, setOpenNewPasswordStatus] =
+    useState<OpenNewPasswordStatus>(initialNewPasswordStatus);
+  // this function is used to open new password dialog and should be
+  // passed to the user details dialog
+    const openNewPasswordDialog = (user: UserDocument) => {
+      setOpenNewPasswordStatus({ ...openNewPasswordStatus, user: user, open: true });
+    };
+  // this function is needed to set new password and should be passed to
+  // the new password dialog only
+  const setNewPassword = (password: string) => {
+    setOpenNewPasswordStatus({ ...openNewPasswordStatus, password: password, open: false });
+  }
+  // this function is needed for both cancelling the new password dialog and
+  // resetting the dialog state after the new password for is read  
+  const resetNewPasswordDialog = () => {
+    setOpenNewPasswordStatus(initialNewPasswordStatus);
+  }
+
   // this variable is needed to open dialog screen with user details
   const [openUserDetailsStatus, setOpenUserDetailsStatus] =
     useState<OpenUserDetailsStatus>({ open: false, currentUser: undefined });
@@ -244,10 +280,10 @@ const AdminPanelUserListFragment: React.FunctionComponent<
     // api call service
     const result = await putUserService(updatedUser);
     // if api call was successful, show the confirmation
-    // update users list 
+    // update users list
     if (result) {
-      dataUpdate()
-      closeUserDetails()
+      dataUpdate();
+      closeUserDetails();
     }
   };
 
@@ -364,10 +400,18 @@ const AdminPanelUserListFragment: React.FunctionComponent<
         openConfirmationDialog={openConfirmationDialog}
         updateUserServiceCall={updateUserServiceCall}
         deleteUserServiceCall={deleteUserServiceCall}
+        openNewPasswordDialogStatus={openNewPasswordStatus}
+        openNewPasswordDialog={openNewPasswordDialog}
+        resetNewPasswordDialog={resetNewPasswordDialog}
       />
       <AdminPanelUserListConfirmationDialog
         openStatus={openConfirmationStatus}
         submitConfirmationDecision={submitConfirmationDecision}
+      />
+      <AdminPanelNewPasswordDialog
+        openStatus={openNewPasswordStatus}
+        setNewPassword={setNewPassword}
+        closeDialog={resetNewPasswordDialog}
       />
     </Box>
   );

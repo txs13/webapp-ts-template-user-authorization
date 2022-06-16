@@ -13,7 +13,6 @@ import {
   AppAlertMessage,
   showMessage,
 } from "../features/appAlertMessage.slice";
-import { logoutService } from "./logoutService";
 
 const currentState = store.getState();
 
@@ -49,21 +48,17 @@ export const fetchAllUsers = async () => {
     // return array of user records
     return response.payload as UserDocument[];
   } else {
-    // logout precedure to be started
+    // TODO: show error message
   }
 };
 
 export const putUserService = async (
-  updatedUser: UserDocument,
-  newPassword?: string
+  updatedUser: UserDocument
 ): Promise<boolean> => {
   // get actual store state
   const storeState = store.getState();
   // add new password to the object if any
-  let user: UserDocument = {...updatedUser}
-  if (newPassword) {
-    user.password = newPassword
-  }
+  let user: UserDocument = { ...updatedUser };
   // api call
   const response = (await putUserApiCall(
     storeState.user.value.tokens?.accessToken as string,
