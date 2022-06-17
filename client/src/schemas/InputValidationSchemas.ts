@@ -49,18 +49,19 @@ const {
   roleNameWrongFormatMessage,
   roleDescMin6CharsMessage,
   roleDescWrongFormatMessage,
+  oldAndNewPasswordsMatchMessage,
 } = getTextResources(storeState.appSettings.value.language);
 
 // schema for checking login data
 export const loginDataSchema = object({
-    email: string({ required_error: "email is required" }).min(
-      1,
-      `${minOneCharEmailMessage}`
-    ),
-    password: string({ required_error: "password is required" }).min(
-      1,
-      `${minOneCharPasswordMessage}`
-    ),
+  email: string({ required_error: "email is required" }).min(
+    1,
+    `${minOneCharEmailMessage}`
+  ),
+  password: string({ required_error: "password is required" }).min(
+    1,
+    `${minOneCharPasswordMessage}`
+  ),
 });
 export type LoginDataInput = TypeOf<typeof loginDataSchema>;
 
@@ -110,7 +111,7 @@ export const createUserSchema = object({
   ),
   userrole_id: string({ required_error: `${roleIsRequiredMessage}` }).refine(
     (id) => {
-      const latestStore = store.getState()
+      const latestStore = store.getState();
       if (
         latestStore.role.value.filter((role) => role._id === id.toString())
           .length === 0
@@ -223,3 +224,69 @@ export const roleSchema = object({
 });
 
 export type RoleInputSchemaType = TypeOf<typeof roleSchema>;
+
+export const passwordCheckSchema = object({
+  oldPassword: optional(string()),
+  password: optional(string().min(6, `${passwordMin6CharsMessage}`)),
+  confirmPassword: optional(string().min(6, `${passwordMin6CharsMessage}`)),
+})
+  .refine(
+    (it) => {
+      if (it.password !== it.confirmPassword) {
+        return false;
+      } else {
+        return true;
+      }
+    },
+    { message: `${passwordsDoNotMatchMessage}` }
+  )
+  .refine(
+    (it) => {
+      if (it.oldPassword && it.oldPassword === it.password) {
+        return false;
+      } else {
+        return true;
+      }
+    },
+    {
+      message: `${oldAndNewPasswordsMatchMessage}`,
+    }
+  );
+
+export type PasswordCheckInputType = TypeOf<typeof passwordCheckSchema>;
+
+export const passwordSubmitSchema = object({
+  oldPassword: optional(string()),
+  password: string({ required_error: passwordIsRequiredMessage }).min(
+    6,
+    `${passwordMin6CharsMessage}`
+  ),
+  confirmPassword: string({ required_error: passwordIsRequiredMessage }).min(
+    6,
+    `${passwordMin6CharsMessage}`
+  ),
+})
+  .refine(
+    (it) => {
+      if (it.password !== it.confirmPassword) {
+        return false;
+      } else {
+        return true;
+      }
+    },
+    { message: `${passwordsDoNotMatchMessage}` }
+  )
+  .refine(
+    (it) => {
+      if (it.oldPassword && it.oldPassword === it.password) {
+        return false;
+      } else {
+        return true;
+      }
+    },
+    {
+      message: `${oldAndNewPasswordsMatchMessage}`,
+    }
+  );
+
+export type PasswordSubmitInputType = TypeOf<typeof passwordSubmitSchema>;

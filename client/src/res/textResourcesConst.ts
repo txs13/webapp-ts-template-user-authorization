@@ -175,6 +175,9 @@ export const textResourcesMultilang: TextResources = {
   isConfirmedIsRequiredMessage: {
     EN: "missing user confirmation",
   },
+  oldAndNewPasswordsMatchMessage: {
+    EN: "new password cannot be the same as new one"
+  }, 
   // register form alert messages
   successfulRegisterSubmissionMessage: {
     EN: "please wait, user credentials were successfully submitted...",
@@ -477,7 +480,7 @@ export const textResourcesMultilang: TextResources = {
     EN: "please enter new password for the user"
   },
   cancelNewPasswordDialogBtnLabel: {
-    EN: "calcel"
+    EN: "cancel"
   },
   setNewPasswordDialogBtnLabel: {
     EN: "set password"

@@ -9,6 +9,8 @@ import {
   Grid,
   MenuItem,
   IconButton,
+  useTheme,
+  useMediaQuery
 } from "@mui/material";
 import CachedIcon from "@mui/icons-material/Cached";
 
@@ -90,6 +92,10 @@ const AdminPanelUserListFragment: React.FunctionComponent<
   useEffect(() => {
     setTextResourses(getTextResources(appSettings.language));
   }, [appSettings]);
+
+  // handle screen size change
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   // variables to store list of users, roles, shortened list to be mapped and shown
   const [userItems, setUserItems] = useState<UserItem[]>();
@@ -220,19 +226,27 @@ const AdminPanelUserListFragment: React.FunctionComponent<
     useState<OpenNewPasswordStatus>(initialNewPasswordStatus);
   // this function is used to open new password dialog and should be
   // passed to the user details dialog
-    const openNewPasswordDialog = (user: UserDocument) => {
-      setOpenNewPasswordStatus({ ...openNewPasswordStatus, user: user, open: true });
-    };
+  const openNewPasswordDialog = (user: UserDocument) => {
+    setOpenNewPasswordStatus({
+      ...openNewPasswordStatus,
+      user: user,
+      open: true,
+    });
+  };
   // this function is needed to set new password and should be passed to
   // the new password dialog only
   const setNewPassword = (password: string) => {
-    setOpenNewPasswordStatus({ ...openNewPasswordStatus, password: password, open: false });
-  }
+    setOpenNewPasswordStatus({
+      ...openNewPasswordStatus,
+      password: password,
+      open: false,
+    });
+  };
   // this function is needed for both cancelling the new password dialog and
-  // resetting the dialog state after the new password for is read  
+  // resetting the dialog state after the new password for is read
   const resetNewPasswordDialog = () => {
     setOpenNewPasswordStatus(initialNewPasswordStatus);
-  }
+  };
 
   // this variable is needed to open dialog screen with user details
   const [openUserDetailsStatus, setOpenUserDetailsStatus] =
@@ -403,6 +417,7 @@ const AdminPanelUserListFragment: React.FunctionComponent<
         openNewPasswordDialogStatus={openNewPasswordStatus}
         openNewPasswordDialog={openNewPasswordDialog}
         resetNewPasswordDialog={resetNewPasswordDialog}
+        isSmallScreen={isSmallScreen}
       />
       <AdminPanelUserListConfirmationDialog
         openStatus={openConfirmationStatus}
@@ -412,6 +427,7 @@ const AdminPanelUserListFragment: React.FunctionComponent<
         openStatus={openNewPasswordStatus}
         setNewPassword={setNewPassword}
         closeDialog={resetNewPasswordDialog}
+        isSmallScreen={isSmallScreen}
       />
     </Box>
   );

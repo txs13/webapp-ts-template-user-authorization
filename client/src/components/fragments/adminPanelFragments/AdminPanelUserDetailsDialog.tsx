@@ -45,6 +45,7 @@ export interface AdminPanelUserDetailsDialogPropsTypes {
   openNewPasswordDialogStatus: OpenNewPasswordStatus;
   openNewPasswordDialog: Function;
   resetNewPasswordDialog: Function;
+  isSmallScreen: boolean;
 }
 
 interface UserDocumentForm extends UserDocument {
@@ -106,6 +107,10 @@ const initialUserValue: UserDocumentForm = {
   __v: 0,
 };
 
+const shortName = (name: string): string => {
+  return name.slice(0, 4) + "...";
+};
+
 const AdminPanelUserDetailsDialog: React.FunctionComponent<
   AdminPanelUserDetailsDialogPropsTypes
 > = ({
@@ -119,6 +124,7 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
   openNewPasswordDialog,
   openNewPasswordDialogStatus,
   resetNewPasswordDialog,
+  isSmallScreen,
 }) => {
   const dispatch = useDispatch();
   // get data from app settings store and get text resouses in proper language
@@ -717,7 +723,11 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
             variant="contained"
             onClick={clipboardClickHandler}
           >
-            {textResourses.clipboardBtnDialogBoxLabel}
+            {cardState === "edit" &&
+            isSmallScreen &&
+            textResourses.clipboardBtnDialogBoxLabel
+              ? shortName(textResourses.clipboardBtnDialogBoxLabel)
+              : textResourses.clipboardBtnDialogBoxLabel}
           </Button>
           <Button
             color="error"
@@ -749,7 +759,9 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
             variant="contained"
             onClick={passwordClickHandler}
           >
-            {textResourses.passwordBtnDialogBoxLabel}
+            {isSmallScreen && textResourses.passwordBtnDialogBoxLabel
+              ? shortName(textResourses.passwordBtnDialogBoxLabel)
+              : textResourses.passwordBtnDialogBoxLabel}
           </Button>
           <Button
             sx={{ display: cardState === "view" ? "none" : "" }}
