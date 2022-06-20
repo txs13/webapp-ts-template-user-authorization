@@ -23,6 +23,7 @@ import {
   passwordSubmitSchema,
 } from "../../../schemas/InputValidationSchemas";
 import { validateResourceAsync } from "../../../utils/validateResource";
+import generatePassword from "../../../utils/generatePassword"
 
 interface AdminPanelNewPasswordDialogTypesProps {
   openStatus: OpenNewPasswordStatus;
@@ -162,8 +163,13 @@ const AdminPanelNewPasswordDialog: React.FunctionComponent<
     }
   };
   const generatePasswordClickHandler = () => {
-    // TODO: generate and set new passsword
-    // TODO: copy new password to teh clipboard
+    const password = generatePassword()
+    setFormState({
+      password: password,
+      confirmPassword: password,
+      passwordError: "",
+      confirmPasswordError: ""
+    })
   };
 
   return (
