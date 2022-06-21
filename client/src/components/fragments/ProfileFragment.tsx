@@ -11,6 +11,8 @@ import {
   Button,
   Typography,
   MenuItem,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -36,6 +38,7 @@ import {
 } from "./reusableComponents/ConfirmationDialog";
 import { deleteUser, putUserService } from "../../app/services/userServices";
 import { logoutService } from "../../app/services/logoutService";
+import ProfileNewPasswordDialog from "./profileFragments/ProfileNewPasswordDialog";
 
 interface UserDocumentForm extends UserDocument {
   nameError: string;
@@ -90,6 +93,10 @@ const initialUserValue: UserDocumentForm = {
   __v: 0,
 };
 
+const shortName = (name: string): string => {
+  return name.slice(0, 4) + "...";
+};
+
 const ProfileFragment: React.FunctionComponent = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -108,8 +115,32 @@ const ProfileFragment: React.FunctionComponent = () => {
     setTextResourses(getTextResources(appSettings.language));
   }, [appSettings]);
 
+  // handle screen size change
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
+
   // user card state variable
   const [cardState, setCardState] = useState<"view" | "edit">("view");
+
+  // this variable is needed in order to open new passsword dialog window
+  const [openNewPasswordStatus, setOpenNewPasswordStatus] =
+    useState<boolean>(false);
+  // this function is used to open new password dialog and should be
+  // passed to the user details dialog
+  const openNewPasswordDialog = () => {
+    setOpenNewPasswordStatus(true);
+  };
+  // this function is needed to set new password and should be passed to
+  // the new password dialog only
+  const setNewPassword = (password: string) => {
+    setCurrentUser({ ...currentUser, password: password });
+    setOpenNewPasswordStatus(false);
+  };
+  // this function is needed for both cancelling the new password dialog and
+  // resetting the dialog state after the new password for is read
+  const closeNewPasswordDialog = () => {
+    setOpenNewPasswordStatus(false);
+  };
 
   // variable to store user changes
   const [currentUser, setCurrentUser] =
@@ -411,6 +442,9 @@ const ProfileFragment: React.FunctionComponent = () => {
       );
     }
   };
+  const passwordClickHandler = () => {
+    openNewPasswordDialog()
+  }
 
   // this block is needed for the universal model / confimation window
   const [openConfirmationStatus, setOpenConfirmationStatus] =
@@ -672,7 +706,10 @@ const ProfileFragment: React.FunctionComponent = () => {
             variant="contained"
             onClick={clipboardClickHandler}
           >
-            {textResourses.clipboardBtnDialogBoxLabel}
+            {isSmallScreen &&
+            textResourses.clipboardBtnDialogBoxLabel
+              ? shortName(textResourses.clipboardBtnDialogBoxLabel)
+              : textResourses.clipboardBtnDialogBoxLabel}
           </Button>
           <Button
             color="error"
@@ -700,6 +737,15 @@ const ProfileFragment: React.FunctionComponent = () => {
             {textResourses.editBtnDialogBoxLabel}
           </Button>
           <Button
+            sx={{ display: cardState === "edit" ? "" : "none" }}
+            variant="contained"
+            onClick={passwordClickHandler}
+          >
+            {isSmallScreen && textResourses.passwordBtnDialogBoxLabel
+              ? shortName(textResourses.passwordBtnDialogBoxLabel)
+              : textResourses.passwordBtnDialogBoxLabel}
+          </Button>
+          <Button
             sx={{ display: cardState === "view" ? "none" : "" }}
             onClick={calcelClickHandler}
           >
@@ -710,6 +756,12 @@ const ProfileFragment: React.FunctionComponent = () => {
       <ConfirmationDialog
         openStatus={openConfirmationStatus}
         submitConfirmationDecision={submitConfirmationDecision}
+      />
+      <ProfileNewPasswordDialog
+        openStatus={openNewPasswordStatus}
+        closeDialog={closeNewPasswordDialog}
+        setNewPassword={setNewPassword}
+        isSmallScreen={isSmallScreen}
       />
     </Box>
   );

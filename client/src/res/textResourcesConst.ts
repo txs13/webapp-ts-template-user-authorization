@@ -176,8 +176,8 @@ export const textResourcesMultilang: TextResources = {
     EN: "missing user confirmation",
   },
   oldAndNewPasswordsMatchMessage: {
-    EN: "new password cannot be the same as new one"
-  }, 
+    EN: "new password cannot be the same as new one",
+  },
   // register form alert messages
   successfulRegisterSubmissionMessage: {
     EN: "please wait, user credentials were successfully submitted...",
@@ -474,18 +474,24 @@ export const textResourcesMultilang: TextResources = {
   },
   // new password dialog labels
   newPasswordDialogHeader: {
-    EN: "set new password"
+    EN: "set new password",
   },
   newPasswordDialogText: {
-    EN: "please enter new password for the user"
+    EN: "please enter new password for the user",
+  },
+  newPasswordProfileDialogText: {
+    EN: "please enter your new password",
+  },
+  oldPasswordInputLabel: {
+    EN: "old password"
   },
   cancelNewPasswordDialogBtnLabel: {
-    EN: "cancel"
+    EN: "cancel",
   },
   setNewPasswordDialogBtnLabel: {
-    EN: "set password"
+    EN: "set password",
   },
   generateNewPasswordDialogBtnLabel: {
-    EN: "generate"
-  }
+    EN: "generate",
+  },
 };
