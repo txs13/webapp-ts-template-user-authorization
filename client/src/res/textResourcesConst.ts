@@ -483,7 +483,7 @@ export const textResourcesMultilang: TextResources = {
     EN: "please enter your new password",
   },
   oldPasswordInputLabel: {
-    EN: "old password"
+    EN: "old password",
   },
   cancelNewPasswordDialogBtnLabel: {
     EN: "cancel",
@@ -493,5 +493,11 @@ export const textResourcesMultilang: TextResources = {
   },
   generateNewPasswordDialogBtnLabel: {
     EN: "generate",
+  },
+  passwordCheckFailureMessage: {
+    EN: "password check has failed - please contact administrator",
+  },
+  wrongPasswordValidationMessage: {
+    EN: "wrong password",
   },
 };

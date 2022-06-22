@@ -1,12 +1,19 @@
-import { loginApiCall, refreshTokenApiCall } from "../../api/api";
+import {
+  loginApiCall,
+  refreshTokenApiCall,
+  checkPasswordApiCall,
+} from "../../api/api";
 import store from "../store";
 import {
   successfulLoginUser,
   notSuccessfulLoginUser,
 } from "../features/user.slice";
+import { APICallInterface } from "../../api/api";
 import getTextResources from "../../res/textResourcesFunction";
 import { LoginInput } from "../../interfaces/inputInterfaces";
 import { fetchAllRolesService } from "./roleServices";
+import { accessTockenUpdate } from "../features/user.slice";
+import { AppAlertMessage, showMessage } from "../features/appAlertMessage.slice";
 
 const currentState = store.getState();
 
@@ -78,4 +85,42 @@ export const loginWithRefreshTokenService = async (
     // dispatching not successfule login
     return store.dispatch(notSuccessfulLoginUser(wrongStoredTokenMessage));
   }
+};
+
+export const checkPasswordService = async (
+  passwordToCheck: string
+): Promise<boolean> => {
+  // get actual store state
+  const storeState = store.getState();
+  // api call
+  const response = (await checkPasswordApiCall(
+    storeState.user.value.tokens?.accessToken as string,
+    storeState.user.value.tokens?.refreshToken as string,
+    false,
+    passwordToCheck
+  )) as APICallInterface;
+  if (response.success) {
+    // update the store with new access tocken if we got one
+    if (response.updatedAccessToken) {
+      store.dispatch(accessTockenUpdate(response.updatedAccessToken));
+    }
+    // return array of user records
+    if (response.payload?.message === "password is NOT OK") {
+      return false;
+    }
+
+    if (response.payload?.message === "password is OK") {
+      return true;
+    }
+  } 
+  // show error
+  const { passwordCheckFailureMessage } = getTextResources(
+    storeState.appSettings.value.language
+  );
+  const errorMessage: AppAlertMessage = {
+    alertType: "error",
+    alertMessage: passwordCheckFailureMessage,
+  };
+  store.dispatch(showMessage(errorMessage));
+  return false;
 };

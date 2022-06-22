@@ -1,6 +1,6 @@
 import { get } from "lodash";
 import { Request, Response } from "express";
-import { LoginDataInput } from "../schemas/login.schema";
+import { LoginDataInput, PasswordCheckInput } from "../schemas/login.schema";
 import { validatePasswordAndGetUser } from "../services/user.service";
 import log from "../utils/logger";
 import { decodeJwt, signJwt } from "../utils/jwt.utils";
@@ -8,6 +8,7 @@ import SessionModel, { SessionDocument } from "../models/session.model";
 import getEnvVars from "../config/config";
 import { omit } from "lodash";
 import { checkAdminByUserId } from "../services/admin.service";
+import { UserDocument } from "../models/user.model";
 
 const { accessTokenTtl, refreshTokenTtl } = getEnvVars();
 
@@ -32,10 +33,12 @@ export const loginUserHandler = async (
         .status(401)
         .send([{ message: "Wrong network settings. Please contact admin" }]);
     }
-    
+
     // if admin has not yet approved th new user, login should be rejected
     if (!user.isConfirmed) {
-      return res.status(401).send([{ message: "Your accout is not confirmed yet" }]);
+      return res
+        .status(401)
+        .send([{ message: "Your accout is not confirmed yet" }]);
     }
 
     // TODO?: to check that user has opened sessions
@@ -115,4 +118,34 @@ export const refreshTokenHandler = async (req: Request, res: Response) => {
   }
 
   return res.status(200).send(refreshJson);
+};
+
+export const checkPasswordHandler = async (
+  req: Request<{}, {}, PasswordCheckInput["body"]>,
+  res: Response
+) => {
+  try {
+    // getting password to check
+    const passwordToCheck: string = req.body.password;
+    // getting currently logged user according to the token content
+    const user: UserDocument = res.locals.user;
+    // checking that password is valid
+    const isValid = await user.comparePassword(passwordToCheck);
+    const session: SessionDocument = res.locals.session;
+    session.addUserAction(req.originalUrl, req.method, true);
+    await session.save();
+    // for this check is does not matter whether enetered password is OK or NOT
+    // this is just a check that the guy who is loggen is changing the password
+    if (isValid) {
+      res.status(200).send({ message: "password is OK" });
+    } else {
+      res.status(200).send({ message: "password is NOT OK" });
+    }
+  } catch (e: any) {
+    log.error(e);
+    const session: SessionDocument = res.locals.session;
+    session.addUserAction(req.originalUrl, req.method, true);
+    await session.save();
+    return res.status(409).send(e.message);
+  }
 };

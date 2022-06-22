@@ -3,6 +3,7 @@ import {
   loginUserHandler,
   logoutUserHandler,
   refreshTokenHandler,
+  checkPasswordHandler,
 } from "../controllers/session.controller";
 import {
   createUserHandler,
@@ -13,7 +14,7 @@ import {
 import authorizedAccess from "../middleware/authorizedAccess";
 import adminAccess from "../middleware/adminAccess";
 import { validateResourceAsync } from "../middleware/validateResource";
-import { loginDataSchema } from "../schemas/login.schema";
+import { loginDataSchema, passwordCheckSchema } from "../schemas/login.schema";
 import { createUserSchema, putUserSchema } from "../schemas/user.schema";
 
 const userRouter = express.Router();
@@ -33,6 +34,13 @@ userRouter.post(
 userRouter.post("/logout", authorizedAccess, logoutUserHandler);
 
 userRouter.post("/refresh", authorizedAccess, refreshTokenHandler);
+
+userRouter.post(
+  "/checkpassword",
+  validateResourceAsync(passwordCheckSchema),
+  authorizedAccess,
+  checkPasswordHandler
+);
 
 userRouter.get("/allusers", authorizedAccess, adminAccess, getAllUsersHandler);
 

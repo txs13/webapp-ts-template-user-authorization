@@ -23,6 +23,7 @@ import {
 } from "../../../schemas/InputValidationSchemas";
 import { validateResourceAsync } from "../../../utils/validateResource";
 import generatePassword from "../../../utils/generatePassword";
+import { checkPasswordService } from "../../../app/services/loginServices";
 
 interface ProfileNewPasswordDialogTypesProps {
   openStatus: boolean;
@@ -95,10 +96,25 @@ const ProfileNewPasswordDialog: React.FunctionComponent<
       passwordsInput
     );
     if (!errors) {
-      let errorsToShow: ValidationErrors = {
-        passwordError: "",
-        confirmPasswordError: "",
-      };
+      // only if therre are no other validation errors, as a final step we run
+      // api call to check the old password
+      const oldPasswordIsValid = await checkPasswordService(
+        formState.oldPassword
+      );
+      let errorsToShow: ValidationErrors;
+      if (oldPasswordIsValid) {
+        errorsToShow = {
+          oldPasswordError: "",
+          passwordError: "",
+          confirmPasswordError: "",
+        };
+      } else {
+        errorsToShow = {
+          oldPasswordError: textResourses.wrongPasswordValidationMessage,
+          passwordError: "",
+          confirmPasswordError: "",
+        };
+      }
       setFormState({ ...formState, ...errorsToShow });
       return true;
     } else {
@@ -118,7 +134,7 @@ const ProfileNewPasswordDialog: React.FunctionComponent<
           case "oldPassword":
             if (!errorsToShow.oldPasswordError) {
               errorsToShow.oldPasswordError = it.message;
-            }
+            } 
             break;
         }
       });
