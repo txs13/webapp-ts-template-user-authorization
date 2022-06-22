@@ -259,6 +259,9 @@ const ProfileFragment: React.FunctionComponent = () => {
     if (currentUser.phone !== "") {
       user = { ...user, phone: currentUser.phone };
     }
+    if (currentUser.password && currentUser.password !== "") {
+      user = {...user, password: currentUser.password}
+    }
     if (type === "PutUserInput") {
       return user;
     } else {
@@ -363,7 +366,9 @@ const ProfileFragment: React.FunctionComponent = () => {
       fieldsAreEqual(storeUser?.user?.position, currentUser?.position) &&
       fieldsAreEqual(storeUser?.user?.address, currentUser?.address) &&
       fieldsAreEqual(storeUser?.user?.description, currentUser?.description) &&
-      fieldsAreEqual(storeUser?.user?.userrole_id, currentUser?.userrole_id);
+      fieldsAreEqual(storeUser?.user?.userrole_id, currentUser?.userrole_id) &&
+      fieldsAreEqual(storeUser?.user?.password, currentUser?.password);
+      console.log(storeUser?.user?.password, currentUser?.password);
     return !noEdits;
   };
   const [edits, setEdits] = useState<boolean>(false);
@@ -679,6 +684,19 @@ const ProfileFragment: React.FunctionComponent = () => {
             </MenuItem>
           ))}
         </TextField>
+        
+        <TextField
+          fullWidth
+          disabled={true}
+          name="password"
+          type="password"
+          label={textResourses.passwordInputLabel}
+          sx={{
+            ...styles.inputField,
+            display: currentUser?.password ? "" : "none",
+          }}
+          value={currentUser?.password}
+        />
 
         <TextField
           fullWidth
@@ -706,8 +724,7 @@ const ProfileFragment: React.FunctionComponent = () => {
             variant="contained"
             onClick={clipboardClickHandler}
           >
-            {isSmallScreen &&
-            textResourses.clipboardBtnDialogBoxLabel
+            {isSmallScreen && textResourses.clipboardBtnDialogBoxLabel
               ? shortName(textResourses.clipboardBtnDialogBoxLabel)
               : textResourses.clipboardBtnDialogBoxLabel}
           </Button>

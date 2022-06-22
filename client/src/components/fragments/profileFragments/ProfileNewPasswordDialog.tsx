@@ -88,7 +88,7 @@ const ProfileNewPasswordDialog: React.FunctionComponent<
           ? undefined
           : formState.confirmPassword,
       oldPassword:
-        formState.oldPassword === "" ? undefined : formState.oldPasswordError,
+        formState.oldPassword === "" ? undefined : formState.oldPassword,
     };
     // test imputs
     const errors: any[] = await validateResourceAsync(
@@ -114,6 +114,8 @@ const ProfileNewPasswordDialog: React.FunctionComponent<
           passwordError: "",
           confirmPasswordError: "",
         };
+        setFormState({ ...formState, ...errorsToShow });
+        return false;  
       }
       setFormState({ ...formState, ...errorsToShow });
       return true;
@@ -150,7 +152,7 @@ const ProfileNewPasswordDialog: React.FunctionComponent<
         errorsToShow = {
           passwordError: errors[0].message,
           confirmPasswordError: errors[0].message,
-          oldPasswordError: errors[0].message,
+          oldPasswordError: "",
         };
       }
       setFormState({ ...formState, ...errorsToShow });
