@@ -98,6 +98,7 @@ const initialUserValue: UserDocumentForm = {
   positionError: "",
   description: "",
   descriptionError: "",
+  password: "",
   isConfirmed: false,
   isConfirmedError: "",
   userrole_id: "",
@@ -292,7 +293,7 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
     if (currentUser.phone !== "") {
       user = { ...user, phone: currentUser.phone };
     }
-    if (currentUser?.password) {
+    if (currentUser?.password !== "") {
       user = { ...user, password: currentUser.password };
     }
     if (type === "PutUserInput") {
@@ -690,7 +691,7 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
           label={textResourses.passwordInputLabel}
           sx={{
             ...styles.inputField,
-            display: currentUser?.password ? "" : "none",
+            display: currentUser?.password !== "" ? "" : "none",
           }}
           value={currentUser?.password}
         />

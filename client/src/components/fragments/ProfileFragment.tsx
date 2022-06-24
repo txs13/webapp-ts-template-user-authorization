@@ -88,6 +88,7 @@ const initialUserValue: UserDocumentForm = {
   isConfirmedError: "",
   userrole_id: "",
   userroleError: "",
+  password: "",
   createdAt: new Date(),
   updatedAt: new Date(),
   __v: 0,
@@ -259,7 +260,7 @@ const ProfileFragment: React.FunctionComponent = () => {
     if (currentUser.phone !== "") {
       user = { ...user, phone: currentUser.phone };
     }
-    if (currentUser.password && currentUser.password !== "") {
+    if (currentUser.password !== "") {
       user = {...user, password: currentUser.password}
     }
     if (type === "PutUserInput") {
@@ -368,7 +369,6 @@ const ProfileFragment: React.FunctionComponent = () => {
       fieldsAreEqual(storeUser?.user?.description, currentUser?.description) &&
       fieldsAreEqual(storeUser?.user?.userrole_id, currentUser?.userrole_id) &&
       fieldsAreEqual(storeUser?.user?.password, currentUser?.password);
-      console.log(storeUser?.user?.password, currentUser?.password);
     return !noEdits;
   };
   const [edits, setEdits] = useState<boolean>(false);
@@ -693,7 +693,7 @@ const ProfileFragment: React.FunctionComponent = () => {
           label={textResourses.passwordInputLabel}
           sx={{
             ...styles.inputField,
-            display: currentUser?.password ? "" : "none",
+            display: currentUser?.password !== "" ? "" : "none",
           }}
           value={currentUser?.password}
         />
