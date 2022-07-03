@@ -5,9 +5,10 @@ import {
   APICallInterface,
   putUserApiCall,
   deleteUserApiCall,
+  getUserApiCall
 } from "../../api/api";
 import store from "../store";
-import { accessTockenUpdate } from "../features/user.slice";
+import { accessTockenUpdate, userDataUpdate } from "../features/user.slice";
 import getTextResources from "../../res/textResourcesFunction";
 import {
   AppAlertMessage,
@@ -130,6 +131,29 @@ export const deleteUser = async (userId: string): Promise<boolean> => {
       alertMessage: userDeleteFailureMessage,
     };
     store.dispatch(showMessage(errorMessage));
+    return false;
+  }
+};
+
+export const updateStoreUser = async (): Promise<boolean> => {
+  // get actual store state
+  const storeState = store.getState();
+  // api call
+  const response = (await getUserApiCall(
+    storeState.user.value.tokens?.accessToken as string,
+    storeState.user.value.tokens?.refreshToken as string,
+    false,
+    storeState.user.value.user?._id as string
+  )) as APICallInterface;
+  if (response.success) {
+    // update the store with new access tocken if we got one
+    if (response.updatedAccessToken) {
+      store.dispatch(accessTockenUpdate(response.updatedAccessToken));
+    }
+    const updatedUser = response.payload as UserDocument
+    store.dispatch(userDataUpdate(updatedUser))
+    return true;
+  } else {
     return false;
   }
 };

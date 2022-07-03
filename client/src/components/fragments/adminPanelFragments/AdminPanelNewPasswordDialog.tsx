@@ -9,7 +9,11 @@ import {
   TextField,
   ButtonGroup,
   Button,
+  InputAdornment,
+  IconButton
 } from "@mui/material";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
 import { OpenNewPasswordStatus } from "./AdminPanelUserListFragment";
 import { LocalizedTextResources } from "../../../res/textResourcesFunction";
@@ -35,8 +39,10 @@ interface AdminPanelNewPasswordDialogTypesProps {
 interface FormState {
   password: string;
   passwordError: string;
+  showPassword: boolean;
   confirmPassword: string;
   confirmPasswordError: string;
+  showConfirmPassword: boolean;
 }
 
 interface ValidationErrors {
@@ -47,8 +53,10 @@ interface ValidationErrors {
 const initialFormState: FormState = {
   password: "",
   passwordError: "",
+  showPassword: false,
   confirmPassword: "",
   confirmPasswordError: "",
+  showConfirmPassword: false
 };
 
 const shortName = (name: string): string => {
@@ -164,13 +172,26 @@ const AdminPanelNewPasswordDialog: React.FunctionComponent<
   };
   const generatePasswordClickHandler = () => {
     const password = generatePassword()
-    setFormState({
+    setFormState({...formState,
       password: password,
       confirmPassword: password,
       passwordError: "",
       confirmPasswordError: ""
     })
   };
+  const showPasswordClickHandler = () => {
+    setFormState({ ...formState, showPassword: true });
+  };
+  const hidePasswordClickHandler = () => {
+    setFormState({ ...formState, showPassword: false });
+  };
+  const showConfirmPasswordClickHandler = () => {
+    setFormState({ ...formState, showConfirmPassword: true });
+  };
+  const hideConfirmPasswordClickHandler = () => {
+    setFormState({ ...formState, showConfirmPassword: false });
+  };
+
 
   return (
     <Dialog open={openStatus.open}>
@@ -186,13 +207,31 @@ const AdminPanelNewPasswordDialog: React.FunctionComponent<
           variant="outlined"
           label={textResourses.passwordInputLabel}
           name="password"
-          type="password"
+          type={formState.showPassword ? "text" : "password"}
           value={formState.password}
           onChange={changeHandler}
           helperText={formState.passwordError}
           FormHelperTextProps={{ error: true }}
           error={formState.passwordError === "" ? false : true}
           onBlur={() => validateInputs("fill")}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton
+                  sx={{ display: formState.showPassword ? "none" : "" }}
+                  onClick={showPasswordClickHandler}
+                >
+                  <Visibility />
+                </IconButton>
+                <IconButton
+                  sx={{ display: !formState.showPassword ? "none" : "" }}
+                  onClick={hidePasswordClickHandler}
+                >
+                  <VisibilityOff />
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
         />
         <TextField
           sx={styles.inputField}
@@ -201,13 +240,31 @@ const AdminPanelNewPasswordDialog: React.FunctionComponent<
           variant="outlined"
           label={textResourses.confirmPasswordInputLabel}
           name="confirmPassword"
-          type="password"
+          type={formState.showConfirmPassword ? "text" : "password"}
           value={formState.confirmPassword}
           onChange={changeHandler}
           helperText={formState.confirmPasswordError}
           FormHelperTextProps={{ error: true }}
           error={formState.confirmPasswordError === "" ? false : true}
           onBlur={() => validateInputs("fill")}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton
+                  sx={{ display: formState.showConfirmPassword ? "none" : "" }}
+                  onClick={showConfirmPasswordClickHandler}
+                >
+                  <Visibility />
+                </IconButton>
+                <IconButton
+                  sx={{ display: !formState.showConfirmPassword ? "none" : "" }}
+                  onClick={hideConfirmPasswordClickHandler}
+                >
+                  <VisibilityOff />
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
         />
       </DialogContent>
       <DialogActions>

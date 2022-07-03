@@ -9,7 +9,11 @@ import {
   ButtonGroup,
   Button,
   TextField,
+  InputAdornment,
+  IconButton,
 } from "@mui/material";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
 import { LocalizedTextResources } from "../../../res/textResourcesFunction";
 import getTextResources from "../../../res/textResourcesFunction";
@@ -35,10 +39,13 @@ interface ProfileNewPasswordDialogTypesProps {
 interface FormState {
   oldPassword: string;
   oldPasswordError: string;
+  showOldPassword: boolean;
   password: string;
   passwordError: string;
+  showPassword: boolean;
   confirmPassword: string;
   confirmPasswordError: string;
+  showConfirmPassword: boolean;
 }
 
 interface ValidationErrors {
@@ -50,10 +57,13 @@ interface ValidationErrors {
 const initialFormState: FormState = {
   oldPassword: "",
   oldPasswordError: "",
+  showOldPassword: false,
   password: "",
   passwordError: "",
+  showPassword: false,
   confirmPassword: "",
   confirmPasswordError: "",
+  showConfirmPassword: false,
 };
 
 const shortName = (name: string): string => {
@@ -115,7 +125,7 @@ const ProfileNewPasswordDialog: React.FunctionComponent<
           confirmPasswordError: "",
         };
         setFormState({ ...formState, ...errorsToShow });
-        return false;  
+        return false;
       }
       setFormState({ ...formState, ...errorsToShow });
       return true;
@@ -136,7 +146,7 @@ const ProfileNewPasswordDialog: React.FunctionComponent<
           case "oldPassword":
             if (!errorsToShow.oldPasswordError) {
               errorsToShow.oldPasswordError = it.message;
-            } 
+            }
             break;
         }
       });
@@ -213,6 +223,25 @@ const ProfileNewPasswordDialog: React.FunctionComponent<
       confirmPasswordError: "",
     });
   };
+  const showPasswordClickHandler = () => {
+    setFormState({ ...formState, showPassword: true });
+  };
+  const hidePasswordClickHandler = () => {
+    setFormState({ ...formState, showPassword: false });
+  };
+  const showOldPasswordClickHandler = () => {
+    setFormState({ ...formState, showOldPassword: true });
+  };
+  const hideOldPasswordClickHandler = () => {
+    setFormState({ ...formState, showOldPassword: false });
+  };
+    const showConfirmPasswordClickHandler = () => {
+      setFormState({ ...formState, showConfirmPassword: true });
+    };
+    const hideConfirmPasswordClickHandler = () => {
+      setFormState({ ...formState, showConfirmPassword: false });
+    };
+
   return (
     <Dialog open={openStatus}>
       <DialogTitle>
@@ -227,13 +256,31 @@ const ProfileNewPasswordDialog: React.FunctionComponent<
           variant="outlined"
           label={textResourses.oldPasswordInputLabel}
           name="oldPassword"
-          type="password"
+          type={formState.showOldPassword ? "text" : "password"}
           value={formState.oldPassword}
           onChange={changeHandler}
           helperText={formState.oldPasswordError}
           FormHelperTextProps={{ error: true }}
           error={formState.oldPasswordError === "" ? false : true}
           onBlur={() => validateInputs("fill")}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton
+                  sx={{ display: formState.showOldPassword ? "none" : "" }}
+                  onClick={showOldPasswordClickHandler}
+                >
+                  <Visibility />
+                </IconButton>
+                <IconButton
+                  sx={{ display: !formState.showOldPassword ? "none" : "" }}
+                  onClick={hideOldPasswordClickHandler}
+                >
+                  <VisibilityOff />
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
         />
         <TextField
           sx={styles.inputField}
@@ -242,13 +289,31 @@ const ProfileNewPasswordDialog: React.FunctionComponent<
           variant="outlined"
           label={textResourses.passwordInputLabel}
           name="password"
-          type="password"
+          type={formState.showPassword ? "text" : "password"}
           value={formState.password}
           onChange={changeHandler}
           helperText={formState.passwordError}
           FormHelperTextProps={{ error: true }}
           error={formState.passwordError === "" ? false : true}
           onBlur={() => validateInputs("fill")}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton
+                  sx={{ display: formState.showPassword ? "none" : "" }}
+                  onClick={showPasswordClickHandler}
+                >
+                  <Visibility />
+                </IconButton>
+                <IconButton
+                  sx={{ display: !formState.showPassword ? "none" : "" }}
+                  onClick={hidePasswordClickHandler}
+                >
+                  <VisibilityOff />
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
         />
         <TextField
           sx={styles.inputField}
@@ -257,13 +322,31 @@ const ProfileNewPasswordDialog: React.FunctionComponent<
           variant="outlined"
           label={textResourses.confirmPasswordInputLabel}
           name="confirmPassword"
-          type="password"
+          type={formState.showConfirmPassword ? "text" : "password"}
           value={formState.confirmPassword}
           onChange={changeHandler}
           helperText={formState.confirmPasswordError}
           FormHelperTextProps={{ error: true }}
           error={formState.confirmPasswordError === "" ? false : true}
           onBlur={() => validateInputs("fill")}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton
+                  sx={{ display: formState.showConfirmPassword ? "none" : "" }}
+                  onClick={showConfirmPasswordClickHandler}
+                >
+                  <Visibility />
+                </IconButton>
+                <IconButton
+                  sx={{ display: !formState.showConfirmPassword ? "none" : "" }}
+                  onClick={hideConfirmPasswordClickHandler}
+                >
+                  <VisibilityOff />
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
         />
       </DialogContent>
       <DialogActions>

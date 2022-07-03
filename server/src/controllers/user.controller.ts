@@ -8,6 +8,7 @@ import {
   getAllusers,
   deleteUser,
   putUser,
+  getUserById,
 } from "../services/user.service";
 import log from "../utils/logger";
 import { SessionDocument } from "../models/session.model";
@@ -143,6 +144,52 @@ export const deleteUserHandler = async (req: Request, res: Response) => {
     session.addUserAction(req.originalUrl, req.method, false);
     await session.save();
 
+    return res.status(409).send(e.message);
+  }
+};
+
+export const getUserHandler = async (req: Request, res: Response) => {
+  try {
+    // first to get user deciphered after auth middlware and check its admin status
+    const user: UserDocument = res.locals.user;
+    const isAdmin = await checkAdminByUserId(user._id);
+    const userIdToGet: string = req.params.userid;
+    if (isAdmin) {
+      // if current user is admin we simply call the get user service
+      const dbUser = await getUserById(userIdToGet);
+      if (dbUser) {
+        const session: SessionDocument = res.locals.session;
+        session.addUserAction(req.originalUrl, req.method, true);
+        await session.save();
+        return res.status(200).send(omit(dbUser.toJSON(), "password"));
+      } else {
+        const session: SessionDocument = res.locals.session;
+        session.addUserAction(req.originalUrl, req.method, false);
+        await session.save();
+        return res.status(409).send("wrong user id");
+      }
+    } else {
+      // if user is not admin, we have to check if user is trying to delete him(her)self
+      if (user._id.toString() === userIdToGet) {
+        const dbUser = await getUserById(userIdToGet);
+        if (dbUser) {
+          const session: SessionDocument = res.locals.session;
+          session.addUserAction(req.originalUrl, req.method, true);
+          await session.save();
+          return res.status(200).send(omit(dbUser.toJSON(), "password"));
+        } else {
+          const session: SessionDocument = res.locals.session;
+          session.addUserAction(req.originalUrl, req.method, false);
+          await session.save();
+          return res.status(401).send("access denied");
+        }
+      }
+    }
+  } catch (e: any) {
+    log.error(e.message);
+    const session: SessionDocument = res.locals.session;
+    session.addUserAction(req.originalUrl, req.method, false);
+    await session.save();
     return res.status(409).send(e.message);
   }
 };

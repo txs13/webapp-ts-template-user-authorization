@@ -10,6 +10,7 @@ import {
   getAllUsersHandler,
   patchUserHandler,
   deleteUserHandler,
+  getUserHandler
 } from "../controllers/user.controller";
 import authorizedAccess from "../middleware/authorizedAccess";
 import adminAccess from "../middleware/adminAccess";
@@ -50,6 +51,8 @@ userRouter.put(
   authorizedAccess,
   patchUserHandler
 );
+
+userRouter.get("/getuser/:userid", authorizedAccess, getUserHandler);
 
 userRouter.delete("/deleteuser/:userid", authorizedAccess, deleteUserHandler);
 

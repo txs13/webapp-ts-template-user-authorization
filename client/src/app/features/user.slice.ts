@@ -50,6 +50,9 @@ export const userSlice = createSlice({
         tokens: { ...state.value.tokens, accessToken: action.payload },
       } as UserValue;
     },
+    userDataUpdate: (state, action) => {
+      state.value = {...state.value, user: action.payload}
+    }
   },
 });
 
@@ -57,7 +60,8 @@ export const {
   successfulLoginUser,
   notSuccessfulLoginUser,
   backToInitialState,
-  accessTockenUpdate
+  accessTockenUpdate,
+  userDataUpdate 
 } = userSlice.actions;
 
 export default userSlice.reducer;

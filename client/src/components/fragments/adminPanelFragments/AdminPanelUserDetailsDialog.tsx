@@ -9,8 +9,14 @@ import {
   Button,
   Typography,
   MenuItem,
+  InputAdornment,
+  IconButton
 } from "@mui/material";
 import { useSelector, useDispatch } from "react-redux";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import DoneIcon from "@mui/icons-material/Done";
 
 import { LocalizedTextResources } from "../../../res/textResourcesFunction";
 import getTextResources from "../../../res/textResourcesFunction";
@@ -59,6 +65,8 @@ interface UserDocumentForm extends UserDocument {
   descriptionError: string;
   isConfirmedError: string;
   userroleError: string;
+  showPassword: boolean;
+  showCopyBtn: boolean;
 }
 
 interface ValidationErrors {
@@ -99,6 +107,8 @@ const initialUserValue: UserDocumentForm = {
   description: "",
   descriptionError: "",
   password: "",
+  showPassword: false,
+  showCopyBtn: true,
   isConfirmed: false,
   isConfirmedError: "",
   userrole_id: "",
@@ -502,6 +512,34 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
     openNewPasswordDialog(openStatus.currentUser);
   };
 
+  const showPasswordClickHandler = () => {
+    setCurrentUser({ ...currentUser, showPassword: true });
+  };
+  const hidePasswordClickHandler = () => {
+    setCurrentUser({ ...currentUser, showPassword: false });
+  };
+  const copyPasswordBtnClickHandler = () => {
+    let data = [
+      new window.ClipboardItem({
+        "text/plain": new Blob([currentUser.password as string], {
+          type: "text/plain",
+        }),
+      }),
+    ];
+    navigator.clipboard
+      .write(data)
+      .then(() => {
+        setCurrentUser({ ...currentUser, showCopyBtn: false });
+        setTimeout(() => {
+          setCurrentUser({ ...currentUser, showCopyBtn: true });
+        }, 3000);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+
   return (
     <Dialog open={openStatus.open} onClose={handleClose} sx={styles.mainFrame}>
       <DialogTitle>
@@ -687,13 +725,43 @@ const AdminPanelUserDetailsDialog: React.FunctionComponent<
           fullWidth
           disabled={true}
           name="password"
-          type="password"
+          type={currentUser.showPassword ? "text" : "password"}
           label={textResourses.passwordInputLabel}
           sx={{
             ...styles.inputField,
             display: currentUser?.password !== "" ? "" : "none",
           }}
           value={currentUser?.password}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton
+                  sx={{ display: currentUser.showCopyBtn ? "" : "none" }}
+                  onClick={copyPasswordBtnClickHandler}
+                >
+                  <ContentCopyIcon />
+                </IconButton>
+                <IconButton
+                  sx={{ display: currentUser.showCopyBtn ? "none" : "" }}
+                >
+                  <DoneIcon />
+                </IconButton>
+
+                <IconButton
+                  sx={{ display: currentUser.showPassword ? "none" : "" }}
+                  onClick={showPasswordClickHandler}
+                >
+                  <Visibility />
+                </IconButton>
+                <IconButton
+                  sx={{ display: !currentUser.showPassword ? "none" : "" }}
+                  onClick={hidePasswordClickHandler}
+                >
+                  <VisibilityOff />
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
         />
 
         <TextField

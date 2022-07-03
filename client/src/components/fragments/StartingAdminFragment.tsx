@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Box } from "@mui/material";
 import { Routes, Route } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux"
+import { useSelector } from "react-redux"
 
 import AdminPanelNavigationFragment from "./adminPanelFragments/AdminPanelNavigationFragment";
 import AdminPanelUserListFragment from "./adminPanelFragments/AdminPanelUserListFragment";
@@ -9,13 +9,12 @@ import AdminPanelRoleListFragment from "./adminPanelFragments/AdminPanelRoleList
 import AdminPanelStartingPageFragment from "./adminPanelFragments/AdminPanelStartingPageFragment";
 import startingAdminFragmentStyles from "../styles/startingAdminFragmentStyles";
 import { fetchAllUsers } from "../../app/services/userServices";
-import { RoleDocument, UserDocument } from "../../interfaces/inputInterfaces";
+import { UserDocument } from "../../interfaces/inputInterfaces";
 import { RootState } from "../../app/store";
 
 type DataRefreshState = "userupdate" | "waiting";
 
 const StartingAdminFragment: React.FunctionComponent = () => {
-  const dispatch = useDispatch()
   // variables to store list of users, roles, shortened list to be mapped and shown
   const [users, setUsers] = useState<UserDocument[]>();
   //const [roles, setRoles] = useState<RoleDocument[]>();

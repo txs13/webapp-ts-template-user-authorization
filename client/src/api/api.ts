@@ -585,3 +585,56 @@ export const checkPasswordApiCall = async (
     return { success: false, errorMessage: response.data[0].message };
   }
 };
+
+export const getUserApiCall = async (
+  accessToken: string,
+  refreshToken: string,
+  secondCall: Boolean = false,
+  userId: string
+): Promise<APICallInterface | void> => {
+  let response;
+  // first we try to perform logout with the access token we have
+  try {
+    response = await client.get(`${userApi}/getuser/${userId}`, {
+      ...reqOptionsToken(accessToken),
+    });
+  } catch (e: any) {
+    response = e.response;
+  }
+  // if logout api call was successful, we return proper message
+  if (response.status === 200) {
+    if (secondCall) {
+      return {
+        success: true,
+        payload: response.data,
+        updatedAccessToken: accessToken,
+      };
+    } else {
+      return { success: true, payload: response.data };
+    }
+  }
+  // if access token is not valid, it could be because it is expired and we can try to
+  // refresh it once - for this we have a function argument "secondCall"
+  if (response.status === 401 && !secondCall) {
+    // trying to get new access token
+    response = await refreshTokenApiCall(refreshToken);
+    if (response?.success) {
+      // in case we have it, we call the same function to call the api once again
+      // function is supposed to get done after the second api call returns status 200
+      const newAccessToken = response.payload?.accessToken;
+      return await getUserApiCall(
+        newAccessToken,
+        refreshToken,
+        true,
+        userId
+      );
+    } else {
+      // in case we do not get new access token, we have to clean up and exit
+      return { success: false, errorMessage: response?.errorMessage };
+    }
+  }
+  // normally this should never happen - this status can happen if wrong token is submitted
+  if (response.status === 409) {
+    return { success: false, errorMessage: response.data[0].message };
+  }
+};

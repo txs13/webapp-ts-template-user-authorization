@@ -13,7 +13,14 @@ import {
   MenuItem,
   useTheme,
   useMediaQuery,
+  InputAdornment,
+  IconButton,
 } from "@mui/material";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import DoneIcon from "@mui/icons-material/Done";
+
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
@@ -36,7 +43,11 @@ import {
   OpenConfimationStatus,
   openConfimationInitialState,
 } from "./reusableComponents/ConfirmationDialog";
-import { deleteUser, putUserService } from "../../app/services/userServices";
+import {
+  deleteUser,
+  putUserService,
+  updateStoreUser,
+} from "../../app/services/userServices";
 import { logoutService } from "../../app/services/logoutService";
 import ProfileNewPasswordDialog from "./profileFragments/ProfileNewPasswordDialog";
 
@@ -51,6 +62,8 @@ interface UserDocumentForm extends UserDocument {
   descriptionError: string;
   isConfirmedError: string;
   userroleError: string;
+  showPassword: boolean;
+  showCopyBtn: boolean;
 }
 
 interface ValidationErrors {
@@ -89,6 +102,8 @@ const initialUserValue: UserDocumentForm = {
   userrole_id: "",
   userroleError: "",
   password: "",
+  showPassword: false,
+  showCopyBtn: true,
   createdAt: new Date(),
   updatedAt: new Date(),
   __v: 0,
@@ -261,7 +276,7 @@ const ProfileFragment: React.FunctionComponent = () => {
       user = { ...user, phone: currentUser.phone };
     }
     if (currentUser.password !== "") {
-      user = {...user, password: currentUser.password}
+      user = { ...user, password: currentUser.password };
     }
     if (type === "PutUserInput") {
       return user;
@@ -448,8 +463,32 @@ const ProfileFragment: React.FunctionComponent = () => {
     }
   };
   const passwordClickHandler = () => {
-    openNewPasswordDialog()
-  }
+    openNewPasswordDialog();
+  };
+  const showPasswordClickHandler = () => {
+    setCurrentUser({ ...currentUser, showPassword: true });
+  };
+  const hidePasswordClickHandler = () => {
+    setCurrentUser({ ...currentUser, showPassword: false });
+  };
+  const copyPasswordBtnClickHandler = () => {
+    let data = [
+      new window.ClipboardItem({
+        "text/plain": new Blob([currentUser.password as string], { type: "text/plain" }),
+      }),
+    ];
+    navigator.clipboard
+      .write(data)
+      .then(() => {
+        setCurrentUser({ ...currentUser, showCopyBtn: false });
+        setTimeout(() => {
+          setCurrentUser({ ...currentUser, showCopyBtn: true });
+        }, 3000);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
   // this block is needed for the universal model / confimation window
   const [openConfirmationStatus, setOpenConfirmationStatus] =
@@ -478,51 +517,24 @@ const ProfileFragment: React.FunctionComponent = () => {
   const updateUserServiceCall = async (updatedUser: UserDocument) => {
     const result = await putUserService(updatedUser);
     // to process user updated result
-    if (Array.isArray(result)) {
-      if (result[0].message === "user is successfully updated") {
-        // TODO: to initiate store update
-        const successMessage: AppAlertMessage = {
-          alertType: "success",
-          alertMessage: textResourses.userUpdateSuccessMessage,
-        };
-        dispatch(showMessage(successMessage));
-      } else {
-        const successMessage: AppAlertMessage = {
-          alertType: "error",
-          alertMessage: textResourses.userUpdateFailureMessage,
-        };
-        dispatch(showMessage(successMessage));
-      }
+    if (result) {
+      //initiate store update
+      await updateStoreUser();
     }
   };
 
   const deleteUserServiceCall = async (userId: string) => {
     const result = await deleteUser(userId);
     // to process user delete result
-    if (Array.isArray(result)) {
-      if (result[0].message === "user is successfully deleted") {
-        // show confirmation message
-        const successMessage: AppAlertMessage = {
-          alertType: "success",
-          alertMessage: textResourses.userDeleteSuccessMessage,
-        };
-        dispatch(showMessage(successMessage));
-
-        // delete email from cookies if it is there
-        const oldSettings = localStorage.getItem("rememberEmail");
-        if (oldSettings) {
-          localStorage.removeItem("rememberEmail");
-        }
-        // call logout service to clean up the store
-        await logoutService();
-        navigate("/");
-      } else {
-        const successMessage: AppAlertMessage = {
-          alertType: "error",
-          alertMessage: textResourses.userDeleteFailureMessage,
-        };
-        dispatch(showMessage(successMessage));
+    if (result) {
+      // delete email from cookies if it is there
+      const oldSettings = localStorage.getItem("rememberEmail");
+      if (oldSettings) {
+        localStorage.removeItem("rememberEmail");
       }
+      // call logout service to clean up the store
+      await logoutService();
+      navigate("/");
     }
   };
 
@@ -684,18 +696,47 @@ const ProfileFragment: React.FunctionComponent = () => {
             </MenuItem>
           ))}
         </TextField>
-        
+
         <TextField
           fullWidth
           disabled={true}
           name="password"
-          type="password"
+          type={currentUser.showPassword ? "text" : "password"}
           label={textResourses.passwordInputLabel}
           sx={{
             ...styles.inputField,
             display: currentUser?.password !== "" ? "" : "none",
           }}
           value={currentUser?.password}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton
+                  sx={{ display: currentUser.showCopyBtn ? "" : "none" }}
+                  onClick={copyPasswordBtnClickHandler}
+                >
+                  <ContentCopyIcon />
+                </IconButton>
+                <IconButton
+                  sx={{ display: currentUser.showCopyBtn ? "none" : "" }}
+                >
+                  <DoneIcon />
+                </IconButton>
+                <IconButton
+                  sx={{ display: currentUser.showPassword ? "none" : "" }}
+                  onClick={showPasswordClickHandler}
+                >
+                  <Visibility />
+                </IconButton>
+                <IconButton
+                  sx={{ display: !currentUser.showPassword ? "none" : "" }}
+                  onClick={hidePasswordClickHandler}
+                >
+                  <VisibilityOff />
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
         />
 
         <TextField
