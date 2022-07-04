@@ -15,9 +15,11 @@ export const envDefaultContent =
   "\n" +
   "DB_URI_DEV=mongodb://localhost:27017" +
   "\n" +
-  "DB_URI_PROD=" +
+  "DB_URI_PROD=mongodb://localhost:27017" +
   "\n" +
   "DB_URI_DOCKER=mongodb://mongo:27017" +
+  "\n" +
+  "DB_URI_DOCKER_PROD=mongodb://mongo:27017" +
   "\n" +
   "DB_NAME_DEV=webapp-ts-template" +
   "\n" +

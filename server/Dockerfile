@@ -12,4 +12,6 @@ COPY . .
 
 RUN yarn tsc
 
+EXPOSE 1337
+
 CMD ["node", "./build"]

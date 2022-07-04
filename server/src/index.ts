@@ -13,7 +13,12 @@ const systemStart = async () => {
   dbConnect();
 
   // getting environmental variables
-  const { host, port } = getEnvVars();
+  const { host, port, prodMode } = getEnvVars();
+
+  // console info if production mode
+  if(prodMode) {
+    log.info("Production Mode is ON")
+  }
 
   // starting api listener
   app.listen(port, host, () => {

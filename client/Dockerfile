@@ -8,10 +8,14 @@ RUN yarn install
 
 COPY . .
 
+ENV REACT_APP_DOCKER_MODE DOCKER_PROD
+
 RUN yarn build
 
 FROM nginx:stable
 
 COPY --from=build /webapp-ts-template-client/build /usr/share/nginx/html
+
+EXPOSE 80
 
 CMD ["nginx", "-g", "daemon off;"]

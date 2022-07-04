@@ -14,12 +14,16 @@ const getEnvVars = (): {
   refreshTokenTtl: number;
   privKey: string;
   pubKey: string;
+  prodMode: boolean
 } => {
   // TODO 01: implement environmental vars read depending on the app startup mode,
   // error handler reading param
   // temporarily only dev vars are read
   const devHost = process.env.DEV_HOST as string;
   const devPort = Number(process.env.DEV_PORT);
+  const prodHost = process.env.PROD_HOST as string;
+  const prodPort = Number(process.env.PROD_PORT);
+  const nodeProdMode = process.env.APP_MODE as string;
   let dbUri = process.env.DB_URI_DEV as string;
   const dbName = process.env.DB_NAME_DEV as string;
   const testDbName = process.env.DB_NAME_TESTS as string;
@@ -36,23 +40,43 @@ const getEnvVars = (): {
     "utf8"
   ) as string;
 
-  const dockerEnvironment = process.env.NODE_ENV
-  if (dockerEnvironment === "docker") {
+  const dockerEnvironment = process.env.NODE_ENV;
+  const dockerProdEnvironment = process.env.MODE_ENV;
+  if (
+    dockerEnvironment === "docker" &&
+    dockerProdEnvironment !== "docker_prod"
+  ) {
     dbUri = process.env.DB_URI_DOCKER as string;
   }
-    
-  return {
-    host: devHost,
-    port: devPort,
-    dbUri: dbUri,
-    dbName: dbName,
-    testDbName: testDbName,
-    saltWorkFactor: saltWorkFactor,
-    accessTokenTtl: accessTokenTtl,
-    refreshTokenTtl: refreshTokenTtl,
-    privKey: privKey,
-    pubKey: pubKey,
-  };
+  if (
+    dockerEnvironment === "docker" &&
+    dockerProdEnvironment == "docker_prod"
+  ) {
+    dbUri = process.env.DB_URI_DOCKER_PROD as string;
+  }
+
+  let host = devHost
+  let port = devPort
+
+  if (dockerProdEnvironment === "docker_prod" || nodeProdMode === "PROD") {
+    host = prodHost;
+    port = prodPort;
+  }
+
+    return {
+      host: host,
+      port: port,
+      dbUri: dbUri,
+      dbName: dbName,
+      testDbName: testDbName,
+      saltWorkFactor: saltWorkFactor,
+      accessTokenTtl: accessTokenTtl,
+      refreshTokenTtl: refreshTokenTtl,
+      privKey: privKey,
+      pubKey: pubKey,
+      prodMode:
+        dockerProdEnvironment === "docker_prod" || nodeProdMode === "PROD",
+    };
 };
 
 export default getEnvVars;

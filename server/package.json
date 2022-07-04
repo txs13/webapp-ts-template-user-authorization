@@ -9,7 +9,7 @@
     "dev": "ts-node-dev --respawn --transpile-only --exit-child src/index.ts",
     "build": "tsc && rm -r -d frontend-build || true && cd ../client && yarn build && mv build ../server/frontend-build",
     "test": "jest --runInBand",
-    "prod": "tsc && node ./build"
+    "prod": "tsc && APP_MODE=PROD node ./build"
   },
   "dependencies": {
     "bcrypt": "^5.0.1",
