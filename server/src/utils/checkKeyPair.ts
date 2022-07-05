@@ -5,11 +5,11 @@ import log from "./logger";
 import genKeyPair from "./generateKeys";
 
 export const envDefaultContent =
-  "DEV_HOST=localhost" +
+  "DEV_HOST=0.0.0.0" +
   "\n" +
   "DEV_PORT=1337" +
   "\n" +
-  "PROD_HOST=localhost" +
+  "PROD_HOST=0.0.0.0" +
   "\n" +
   "PROD_PORT=1337" +
   "\n" +

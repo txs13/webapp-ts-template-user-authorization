@@ -1,23 +1,25 @@
 version: '3.9'
 services:
-  webapp-ts-tempalte-client:
+  web-client:
     build:
       context: ./client
       dockerfile: Dockerfile
+    image: web-client
     depends_on:
-      - webapp-ts-template-api
+      -  api-server
     stdin_open: true
     tty: true
     environment:
       - REACT_APP_DOCKER_MODE=DOCKER_PROD
-    ports:
-      - "127.0.0.1:80:80"
     networks:
-      - webapp-ts-template-frontend-network      
-  webapp-ts-template-api:
+      - webapp-ts-template-network
+    ports:
+      - "80:80"
+  api-server:
     build:
       context: ./server
       dockerfile: Dockerfile
+    image: api-server
     environment:
       - NODE_ENV=docker
       - MODE_ENV=docker_prod
@@ -25,11 +27,10 @@ services:
       - mongo
     stdin_open: true
     tty: true
-    ports:
-      - "127.0.0.1:1337:1337"
     networks:
-      - webapp-ts-template-backend-network
-      - webapp-ts-template-frontend-network      
+      - webapp-ts-template-network
+    ports:
+      - "1337:1337"          
   mongo:
     image: mongo:latest
     stdin_open: true
@@ -37,12 +38,12 @@ services:
     ports:
       - "27017:27017"
     networks:
-      - webapp-ts-template-backend-network      
+      - webapp-ts-template-network      
     volumes:
       - mongo-data:/data/webapp-ts-template
 networks:
-  webapp-ts-template-frontend-network:
-  webapp-ts-template-backend-network:
+  webapp-ts-template-network:
+    driver: bridge
 volumes:
   mongo-data:
     driver: local  
