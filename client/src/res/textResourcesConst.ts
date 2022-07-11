@@ -500,4 +500,17 @@ export const textResourcesMultilang: TextResources = {
   wrongPasswordValidationMessage: {
     EN: "wrong password",
   },
+  // admin panel starting page labels and descriptions
+  aboutRolesDesc: {
+    EN: "App roles are customizable - you can create as many roles as you want. Currently, the app works the way that any role, which contains the word 'admin' is going to be NOT public. Any existing role can be edited, but you can delete the role only if there are no users using it. At the page 'roles' you can find out how many users are set to the tole and which are, also you can edit user and reassign the role if needed."
+  },
+  aboutAdminsDesc: {
+    EN: "Currently the role with the word 'admin' has no impact on the app functionality. In this version of the app there is no possibility to assign real admin rights - it can be done only manually by adding user id to the document in the monoDb. The reason to do so is to have the two types of role - those which can be chosen during registration process and those which can be assigned by 'real admin' only."
+  },
+  aboutUsersDesc: {
+    EN: "Users page contains pretty standard functionality, it allows admin to search, list, edit users, including password reset when needed. Current app logic is that after user submits registration form, he/she is still not enabled to access the app before app admin confirms the new user. This 'confirmation' functionality is also available at 'users' page either through direct user editing or quick button at user's card."
+  },
+  aboutAdminPanelStatistics: {
+    EN: "Please fine below some summarized stats regarding app users:"
+  }
 };
