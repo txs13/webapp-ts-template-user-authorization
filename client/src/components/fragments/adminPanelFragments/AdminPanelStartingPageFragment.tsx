@@ -26,48 +26,63 @@ const AdminPanelStartingPageFragment: React.FunctionComponent<
   const appSettings = useSelector(
     (state: RootState) => state.appSettings.value
   );
-  const [textResourses, setTextResourses] = useState<LocalizedTextResources>(
+  const [textResources, setTextResources] = useState<LocalizedTextResources>(
     {}
   );
   useEffect(() => {
-    setTextResourses(getTextResources(appSettings.language));
+    setTextResources(getTextResources(appSettings.language));
   }, [appSettings]);
 
+  // the intention is diagrams size to fit grid width
+  // due to the thing that rechart object requires exact width value,
+  // it is needed to calculate it "manually"
   // charts ref variables in order to handle box sizes
-  const rolesPieChartBox = useRef<HTMLElement>();
+  const rolesPieChartBox = useRef<HTMLDivElement>(null);
   const [chartSize, setChartSize] = useState<number>(300);
+  // function which changes chart box size depending on the grid cell size
+  const updateDimensions = () => {
+    if (rolesPieChartBox) {
+      setChartSize(
+        Math.floor((rolesPieChartBox.current?.clientWidth || 300) * 0.9)
+      );
+    }
+  };
+  // rendering the form for the first time, listener is added in order
+  // to update the chart size depending on the grid item size
   useEffect(() => {
-    console.log(rolesPieChartBox);
-    setChartSize(Math.floor(rolesPieChartBox.current?.offsetWidth || 300 * 0.9))
-  }, [rolesPieChartBox]);
+    window.addEventListener("resize", updateDimensions);
+    setChartSize(
+      Math.floor((rolesPieChartBox.current?.clientWidth || 300) * 0.9)
+    );
+    return () => {
+      window.removeEventListener("resize", updateDimensions);
+    };
+  }, []);
+
 
   return (
     <Box sx={styles.fragmentFrame}>
       <Container maxWidth="lg" sx={styles.container}>
         <Typography sx={styles.textParagraph}>
-          {textResourses.aboutRolesDesc}
+          {textResources.aboutRolesDesc}
         </Typography>
         <Typography sx={styles.textParagraph}>
-          {textResourses.aboutAdminsDesc}
+          {textResources.aboutAdminsDesc}
         </Typography>
         <Typography sx={styles.textParagraph}>
-          {textResourses.aboutUsersDesc}
+          {textResources.aboutUsersDesc}
         </Typography>
         <Typography sx={styles.textParagraph}>
-          {textResourses.aboutAdminPanelStatistics}
+          {textResources.aboutAdminPanelStatistics}
         </Typography>
         <Grid
           container
-          rowSpacing={1}
-          columnSpacing={1}
-          alignItems="center"
+          spacing={1}
+          sx={styles.gridFrame}
           columns={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}
         >
-          <Grid item sx={styles.gridItem}>
-            <Box
-              sx={{ ...styles.chartBox, width: chartSize, height: chartSize }}
-              ref={rolesPieChartBox}
-            >
+          <Grid xs={12} sm={8} md={6} lg={4} item sx={styles.gridItem}>
+            <Box sx={styles.chartBox} ref={rolesPieChartBox}>
               <PieChart width={chartSize} height={chartSize}>
                 <Pie
                   data={[
@@ -78,18 +93,19 @@ const AdminPanelStartingPageFragment: React.FunctionComponent<
                   nameKey="name"
                   cx="50%"
                   cy="50%"
-                  outerRadius={100}
+                  outerRadius={Math.floor(chartSize * 0.4)}
+                  innerRadius={Math.floor(chartSize * 0.25)}
                   fill="#8884d8"
                 />
               </PieChart>
             </Box>
           </Grid>
-          <Grid item>
+          <Grid xs={12} sm={8} md={6} lg={4} item sx={styles.gridItem}>
             <Box sx={styles.chartBox}>
               <AreaChart width={chartSize} height={chartSize}></AreaChart>
             </Box>
           </Grid>
-          <Grid item>
+          <Grid xs={12} sm={8} md={6} lg={4} item sx={styles.gridItem}>
             <Box sx={styles.chartBox}>
               <AreaChart width={chartSize} height={chartSize}></AreaChart>
             </Box>

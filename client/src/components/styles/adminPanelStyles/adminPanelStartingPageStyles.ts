@@ -7,17 +7,25 @@ const adminPanelStartingPageFragmentStyles: ComponentStylesDatatype = {
   },
   container: {
     backgroundColor: "white",
+    height: "100%"
+  },
+  gridFrame: {
+    width: "100%",
   },
   textParagraph: {
     paddingTop: "1em",
     paddingBottom: "1em",
   },
   gridItem: {
-    width: "auto"
   },
   chartBox: {
-
-    backgroundColor: "yellow"
+    width: "100%",
+    height: "auto",
+    display: "grid",
+    gridTemplateRows: "auto",
+    gridTemplateColumns: "auto",
+    alignItems: "center",
+    justifyItems: "center"
   },
 };
 
