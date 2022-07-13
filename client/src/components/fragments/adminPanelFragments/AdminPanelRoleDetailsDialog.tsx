@@ -70,15 +70,15 @@ const AdminPanelRoleDetailsDialog: React.FunctionComponent<
   closeRoleDetails,
   openConfirmationDialog,
 }) => {
-  // get data from app settings store and get text resouses in proper language
+  // get data from app settings store and get text resources in proper language
   const appSettings = useSelector(
     (state: RootState) => state.appSettings.value
   );
-  const [textResourses, setTextResourses] = useState<LocalizedTextResources>(
+  const [textResources, setTextResources] = useState<LocalizedTextResources>(
     {}
   );
   useEffect(() => {
-    setTextResourses(getTextResources(appSettings.language));
+    setTextResources(getTextResources(appSettings.language));
   }, [appSettings]);
 
   // user card state variable
@@ -108,6 +108,12 @@ const AdminPanelRoleDetailsDialog: React.FunctionComponent<
       setCardState("edit");
     }
   }, [openStatus.currentRole]);
+  // this function clears the form input after dialog window is closed
+  // the reason to do so is because setup function above would not work for the case when
+  // user creates several roles in a row
+  const clearForm = () => {
+    setCurrentRole(initialRoleValue)
+  }
 
   // variable to store edits / changes status
   const [edits, setEdits] = useState(false);
@@ -208,13 +214,14 @@ const AdminPanelRoleDetailsDialog: React.FunctionComponent<
 
   // click handlers
   const closeDialogClickHandler = () => {
+    clearForm();
     closeRoleDetails();
   };
   const saveClickHandler = async () => {
     // validating inputs
     const inputsAreOk = await validateInputs("submit");
     if (inputsAreOk) {
-      openConfirmationDialog(textResourses.saveRoleUpdatesMessage, () =>
+      openConfirmationDialog(textResources.saveRoleUpdatesMessage, () =>
         putApiServiceCall()
       );
     }
@@ -228,7 +235,7 @@ const AdminPanelRoleDetailsDialog: React.FunctionComponent<
   };
   const deleteClickHandler = () => {
     openConfirmationDialog(
-      `${textResourses.deleteRoleCardMessage} ${openStatus.currentRole?.role}`,
+      `${textResources.deleteRoleCardMessage} ${openStatus.currentRole?.role}`,
       () => deleteApiServiceCall()
     );
   };
@@ -247,6 +254,7 @@ const AdminPanelRoleDetailsDialog: React.FunctionComponent<
       const result = await createRoleService(roleInput);
       // if role is created - close the dialog window
       if (result) {
+        clearForm()
         closeRoleDetails();
       }
     }
@@ -259,12 +267,12 @@ const AdminPanelRoleDetailsDialog: React.FunctionComponent<
       <DialogTitle>
         <Typography>
           {openStatus.currentRole
-            ? textResourses.roleEditDetailsDialogHeader
-            : textResourses.roleCreateDetailsDialogHeader}
+            ? textResources.roleEditDetailsDialogHeader
+            : textResources.roleCreateDetailsDialogHeader}
         </Typography>
         {openStatus.currentRole ? (
           <Typography>
-            {`${usersNum} ` + textResourses.roleDetailsUsersWithRoleHeader}
+            {`${usersNum} ` + textResources.roleDetailsUsersWithRoleHeader}
           </Typography>
         ) : null}
       </DialogTitle>
@@ -277,7 +285,7 @@ const AdminPanelRoleDetailsDialog: React.FunctionComponent<
             display: openStatus.currentRole ? "" : "none",
           }}
           variant="outlined"
-          label={textResourses.roleIdInputLabel}
+          label={textResources.roleIdInputLabel}
           name="id"
           value={currentRole._id}
         />
@@ -289,7 +297,7 @@ const AdminPanelRoleDetailsDialog: React.FunctionComponent<
           variant="outlined"
           name="role"
           type="text"
-          label={textResourses.roleNameInputLabel}
+          label={textResources.roleNameInputLabel}
           value={currentRole.role}
           onChange={changeHandler}
           helperText={currentRole.roleError}
@@ -304,7 +312,7 @@ const AdminPanelRoleDetailsDialog: React.FunctionComponent<
           variant="outlined"
           name="description"
           type="text"
-          label={textResourses.roleDescriptionLabel}
+          label={textResources.roleDescriptionLabel}
           value={currentRole.description}
           onChange={changeHandler}
           helperText={currentRole.descriptionError}
@@ -320,7 +328,7 @@ const AdminPanelRoleDetailsDialog: React.FunctionComponent<
             display: openStatus.currentRole ? "" : "none",
           }}
           variant="outlined"
-          label={textResourses.createdAtInputLabel}
+          label={textResources.createdAtInputLabel}
           name="createdAt"
           value={currentRole.createdAt}
         />
@@ -332,7 +340,7 @@ const AdminPanelRoleDetailsDialog: React.FunctionComponent<
             display: openStatus.currentRole ? "" : "none",
           }}
           variant="outlined"
-          label={textResourses.updatedAtInputLabel}
+          label={textResources.updatedAtInputLabel}
           name="updatedAt"
           value={currentRole.updatedAt}
         />
@@ -343,7 +351,7 @@ const AdminPanelRoleDetailsDialog: React.FunctionComponent<
             sx={{ display: openStatus.currentRole ? "" : "none" }}
             onClick={showUsersClickHandler}
           >
-            {textResourses.roleDetailsShowUsersLabel}
+            {textResources.roleDetailsShowUsersLabel}
           </Button>
           <Button
             sx={{
@@ -354,7 +362,7 @@ const AdminPanelRoleDetailsDialog: React.FunctionComponent<
             color="success"
             onClick={createClickHandler}
           >
-            {textResourses.roleDetailsCreateBtnLabel}
+            {textResources.roleDetailsCreateBtnLabel}
           </Button>
           <Button
             sx={{
@@ -366,7 +374,7 @@ const AdminPanelRoleDetailsDialog: React.FunctionComponent<
             color="error"
             onClick={deleteClickHandler}
           >
-            {textResourses.roleDetailsDeleteBtnLabel}
+            {textResources.roleDetailsDeleteBtnLabel}
           </Button>
           <Button
             sx={{
@@ -378,13 +386,13 @@ const AdminPanelRoleDetailsDialog: React.FunctionComponent<
             color="success"
             onClick={saveClickHandler}
           >
-            {textResourses.roleDetailsSaveBtnLabel}
+            {textResources.roleDetailsSaveBtnLabel}
           </Button>
           <Button
             sx={{ display: cardState === "view" ? "" : "none" }}
             onClick={editClickHandler}
           >
-            {textResourses.roleDetailsEditBtnLabel}
+            {textResources.roleDetailsEditBtnLabel}
           </Button>
           <Button
             sx={{
@@ -393,10 +401,10 @@ const AdminPanelRoleDetailsDialog: React.FunctionComponent<
             }}
             onClick={cancelClickHandler}
           >
-            {textResourses.roleDetailsCancelBtnLabel}
+            {textResources.roleDetailsCancelBtnLabel}
           </Button>
           <Button onClick={closeDialogClickHandler}>
-            {textResourses.roleDetailsCloseBtnLabel}
+            {textResources.roleDetailsCloseBtnLabel}
           </Button>
         </ButtonGroup>
       </DialogActions>

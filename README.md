@@ -69,5 +69,6 @@
 </ul>
 <hr/>
 <h2 id="screenshots">Screenshots</h2>
+<img src="./screenshot3.png" width="auto"/>
 <img src="./screenshot1.png" width="auto"/>
 <img src="./screenshot2.png" width="auto"/>
