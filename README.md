@@ -31,7 +31,9 @@
 <p>"About app", "starting app page", "starting admin panel page" are currently empty and are supposed to be added / adjusted later according to the forked app needs.</p>
 <hr/>
 <h2 id="design-approach">General design approach</h2>
-<p>Backend app architecture is based on service - controller approach with heavy usage of middleware (for user authorization, admin access, input validation, etc.). Frontend is based on Model-View-Controller strategy. Later I am going to publish here diagrams with complete api scheme, authorization strategy, frontend architecture, which I use as a handy cheat-sheet if get lost in own code.</p>
+<p>Backend app architecture is based on service - controller approach with heavy usage of middleware (for user authorization, admin access, input validation, etc.). Frontend is based on Model-View-Controller strategy. Later I am going to publish here diagrams with authorization strategy, frontend architecture, which I use as a handy cheat-sheet if get lost in own code.</p>
+<h3>API architecture scheme</h3>
+<img src="./webapp-ts-template-uer-authorization-API-scheme.png"/>
 <p>App backend is based on the following technologies: express for api handling, zod for input validation, mongoose and mongo db for database handling.</p>
 <p>Frontend is based on react, redux, react-router technologies, mui components. User input validation is based also on zod library, but the functionality is different, so if you change it in one place, do not forget to disable / edit in on the other side. All the text resources are gathered in one big file in "res" folder, app has already the engine to switch interface languages. The button itself is not implemented mainly because the translation into other languages is yet to be done. In general, I already have a some ideas regarding code refactoring, but I am going to tackle this after all the automatic tests implemented.</p>
 <hr/>
@@ -63,8 +65,8 @@
 <h2 id="to-be-done">To be done / added in further releases</h2>
 <p>The app itself is manually tested, all the functionality is checked, and we already use this as a starting point for the side app development, but the following features are going to be added:</p>
 <ul>
-    <li>Admin panel starting page is going to be added with some general descriptions, dashboards with app summary, etc.</li>
     <li>Automated testing for the whole server package, whole client package and e2e.</li>
+    <li>Server part is going to be slightly refactored - there are some direct Mongo model calls bypassing services layer, etc. This is going to be done only after proper automated tests are implemented.</li>
     <li>Client part is going to be refactored, especially client api calls part. This is going to be done only after proper automated tests are implemented.</li>
 </ul>
 <hr/>
