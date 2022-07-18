@@ -464,4 +464,45 @@ describe("user api tests", () => {
     await RoleModel.deleteOne({ _id: dbRole?._id });
     await AdminModel.deleteOne({_id: adminRecord?._id});
   });
+
+  test("check password - correct password attached", async () => {
+    // TODO: correct password attached case
+  });
+
+  test("check password - not correct password attached", async () => {
+    // TODO: NOT correct password attached case
+  });
+
+  test("check password - no password attached", async () => {
+    // TODO: NO password attached case 
+  });
+
+  test("get user - admin user correct userID", async () => {
+    // TODO: admin user correct ID case
+  });
+
+  test ("get user - admin user NOT correct userID", async () => {
+    // TODO: get user - admin user NOT correct userID case
+  });
+
+  test ("get user - admin user NO userIDe", async () => {
+    // TODO: get user - admin user NO userID case
+  });
+
+  test ("get user - standard user NO userID case", async () => {
+    // TODO: get user - standard user NO userID
+  });
+
+  test("get user - standard user correct own userID", async () => {
+    // TODO: get user - standard user correct own userID case
+  });
+
+  test("get user - standard user correct other user's userID", async () => {
+    // TODO: get user - standard user correct other user's userID case
+  });
+
+  test("get user - standard user wrong userID", async () => {
+    // TODO: get user - standard user wrong userID case
+  });
+
 });

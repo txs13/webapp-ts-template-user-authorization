@@ -39,14 +39,14 @@ export const loginService = async (loginInput: LoginInput) => {
     // dispatching successful login
     return store.dispatch(successfulLoginUser(response.payload));
   } else {
-    // dispatching not successfule login
+    // dispatching not successful login
     if (response.errorMessage === "Invalid email or password") {
       // normal server response with wrong password
       return store.dispatch(
         notSuccessfulLoginUser(wrongUserNamePasswordMessage)
       );
     }
-    if (response.errorMessage === "Your accout is not confirmed yet") {
+    if (response.errorMessage === "Your account is not confirmed yet") {
       // normal server response with wrong password
       return store.dispatch(
         notSuccessfulLoginUser(accountIsNotConfirmedMessage)

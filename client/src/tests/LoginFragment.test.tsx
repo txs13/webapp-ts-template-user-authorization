@@ -234,7 +234,7 @@ describe("login form tests", () => {
     const loginBtn = await screen.findByTestId("loginBtn");
 
     await userEvent.click(emailInput);
-    await userEvent.type(emailInput, "fake email");
+    await userEvent.type(emailInput, "fake@email.com");
     await userEvent.click(passwordInput);
     await userEvent.type(passwordInput, "fake password");
     await userEvent.click(loginBtn);
@@ -246,7 +246,7 @@ describe("login form tests", () => {
     expect(alert).toBeVisible();
     await waitFor(() => {
       expect(mockAdapter.history.post[0].data).toBe(
-        JSON.stringify({ email: "fake email", password: "fake password" })
+        JSON.stringify({ email: "fake@email.com", password: "fake password" })
       );
     });
     // wrong email password alarm banner appeared with proper text

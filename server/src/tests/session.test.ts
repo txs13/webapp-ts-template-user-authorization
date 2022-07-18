@@ -330,14 +330,14 @@ describe("login / logout tests", () => {
   });
 
   test("login with not confirmed user", async () => {
-    // check if there is somethig left after prefious not successfull test and cleaning DB
+    // check if there is something left after previous not successful test and cleaning DB
     let user = await UserModel.findOne({ email: notConfirmedUserEmail });
     let dbSessions = await SessionModel.find({ userId: user?._id });
     if (dbSessions.length > 0) {
       await SessionModel.deleteMany({ userId: user?._id });
     }
 
-    // implies that login procedure works in the scope of the preceeding test
+    // implies that login procedure works in the scope of the preceding test
     // performing pure login through the api call
     const loginResult = await request(app)
       .post("/api/v1/user/login")
@@ -351,7 +351,7 @@ describe("login / logout tests", () => {
     expect(loginResult.statusCode).toBe(401);
     expect(loginResult.body.length).toBe(1);
     expect(loginResult.body[0].message).toBe(
-      "Your accout is not confirmed yet"
+      "Your account is not confirmed yet"
     );
     // check that no new session was added
     const dbSession = await SessionModel.find({ userId: user?._id });

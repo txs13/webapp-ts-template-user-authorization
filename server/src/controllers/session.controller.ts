@@ -38,7 +38,7 @@ export const loginUserHandler = async (
     if (!user.isConfirmed) {
       return res
         .status(401)
-        .send([{ message: "Your accout is not confirmed yet" }]);
+        .send([{ message: "Your account is not confirmed yet" }]);
     }
 
     // TODO?: to check that user has opened sessions
@@ -53,7 +53,7 @@ export const loginUserHandler = async (
     // generate tokens
     const accessToken = signJwt(user._id, session._id, "accessKey");
     const refreshToken = signJwt(user._id, session._id, "refreshKey");
-    // add access token infor to the session
+    // add access token info to the session
     session.addToken("loginAccessToken", accessTokenTtl);
     await session.save();
 
@@ -67,7 +67,7 @@ export const loginUserHandler = async (
       accessToken: `Bearer ${accessToken}`,
       refreshToken: `Bearer ${refreshToken}`,
     };
-    // add isAdmin status frontend to show admin resourses
+    // add isAdmin status frontend to show admin resources
     if (isAdmin) {
       confirmationJson = { ...confirmationJson, isAdmin: true };
     }
@@ -112,7 +112,7 @@ export const refreshTokenHandler = async (req: Request, res: Response) => {
     user: userData,
     accessToken: `Bearer ${newAccessToken}`,
   };
-  // add isAdmin status frontend to show admin resourses
+  // add isAdmin status frontend to show admin resources
   if (isAdmin) {
     refreshJson = { ...refreshJson, isAdmin: true };
   }
@@ -134,8 +134,8 @@ export const checkPasswordHandler = async (
     const session: SessionDocument = res.locals.session;
     session.addUserAction(req.originalUrl, req.method, true);
     await session.save();
-    // for this check is does not matter whether enetered password is OK or NOT
-    // this is just a check that the guy who is loggen is changing the password
+    // for this check is does not matter whether entered password is OK or NOT
+    // this is just a check that the guy who is logged is changing the password
     if (isValid) {
       res.status(200).send({ message: "password is OK" });
     } else {
