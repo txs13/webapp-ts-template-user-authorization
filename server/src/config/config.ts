@@ -16,9 +16,7 @@ const getEnvVars = (): {
   pubKey: string;
   prodMode: boolean
 } => {
-  // TODO 01: implement environmental vars read depending on the app startup mode,
-  // error handler reading param
-  // temporarily only dev vars are read
+  // .env parameters are read
   const devHost = process.env.DEV_HOST as string;
   const devPort = Number(process.env.DEV_PORT);
   const prodHost = process.env.PROD_HOST as string;
@@ -40,7 +38,10 @@ const getEnvVars = (): {
     "utf8"
   ) as string;
 
+  // check if app is started from docker
   const dockerEnvironment = process.env.NODE_ENV;
+  // check if app is started in dev container or "normal" one
+  // proper parameters are preset in project docker files
   const dockerProdEnvironment = process.env.MODE_ENV;
   if (
     dockerEnvironment === "docker" &&
@@ -57,7 +58,7 @@ const getEnvVars = (): {
 
   let host = devHost
   let port = devPort
-
+  // take prod host & port if in production mode
   if (dockerProdEnvironment === "docker_prod" || nodeProdMode === "PROD") {
     host = prodHost;
     port = prodPort;
