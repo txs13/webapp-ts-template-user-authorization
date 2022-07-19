@@ -33,9 +33,9 @@
 <h2 id="design-approach">General design approach</h2>
 <p>Backend app architecture is based on service - controller approach with heavy usage of middleware (for user authorization, admin access, input validation, etc.). Frontend is based on Model-View-Controller strategy. Please find below diagrams with authorization strategy, JWT tokens strategy, which I use as a handy cheat-sheet if get lost in own code.</p>
 <h3>API architecture scheme</h3>
-<img src="./webapp-ts-template-uer-authorization-API-scheme.png" alt="API scheme" width="auto"/>
+<img src="./API-scheme.png" alt="API scheme" width="auto"/>
 <h3>JWT tokens based authorization strategy</h3>
-<img src="./webapp-ts-template-uer-authorization-JWT-strategy.png" alt="jwt tokens strategy" width="auto"/>
+<img src="./JWT-strategy.png" alt="jwt tokens strategy" width="auto"/>
 <p>Frontend architecture diagram is yet to be added here later.</p>
 <p>App backend is based on the following technologies: express for api handling, zod for input validation, mongoose and mongo db for database handling.</p>
 <p>Frontend is based on react, redux, react-router technologies, mui components. User input validation is based also on zod library, but the functionality is different, so if you change it in one place, do not forget to disable / edit in on the other side. All the text resources are gathered in one big file in "res" folder, app has already the engine to switch interface languages. The button itself is not implemented mainly because the translation into other languages is yet to be done. In general, I already have a some ideas regarding code refactoring, but I am going to tackle this after all the automatic tests implemented.</p>
