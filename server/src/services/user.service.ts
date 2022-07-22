@@ -1,4 +1,4 @@
-import { FilterQuery } from "mongoose";
+import { FilterQuery, isValidObjectId } from "mongoose";
 import UserModel, { UserDocument, UserInput } from "../models/user.model";
 import { LoginInput } from "../models/login.model";
 import { PutUserInput } from "../schemas/user.schema";
@@ -51,13 +51,16 @@ export const validatePasswordAndGetUser = async ({
 };
 
 // get user by Id
-export const getUserById = async (userId: string): Promise<UserDocument> => {
+export const getUserById = async (userId: string): Promise<UserDocument | undefined> => {
   try {
-    const dbUser = await UserModel.findById(userId);
+    if (!isValidObjectId(userId)) {
+      return undefined
+    }
+    const dbUser = await UserModel.findOne({ _id: userId });
     if (dbUser) {
       return dbUser;
     } else {
-      throw new Error("wrong user id");
+      return undefined;
     }
   } catch (e: any) {
     throw new Error(e);

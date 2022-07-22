@@ -182,7 +182,7 @@ export const putUserSchema = object({
       // user email is not the same - then we have to check that this email is available
       async (user) => {
         const dbUser = await getUserById(user._id);
-        if (dbUser.email === user.email) {
+        if (dbUser?.email === user.email) {
           return true;
         }
         if (await checkUserByEmail(user.email)) {

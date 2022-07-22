@@ -166,7 +166,7 @@ export const getUserHandler = async (req: Request, res: Response) => {
         const session: SessionDocument = res.locals.session;
         session.addUserAction(req.originalUrl, req.method, false);
         await session.save();
-        return res.status(409).send("wrong user id");
+        return res.status(409).send({message: "wrong user id"});
       }
     } else {
       // if user is not admin, we have to check if user is trying to delete him(her)self
@@ -181,8 +181,13 @@ export const getUserHandler = async (req: Request, res: Response) => {
           const session: SessionDocument = res.locals.session;
           session.addUserAction(req.originalUrl, req.method, false);
           await session.save();
-          return res.status(401).send("access denied");
+          return res.status(409).send({ message: "wrong user id" });
         }
+      } else {
+        const session: SessionDocument = res.locals.session;
+        session.addUserAction(req.originalUrl, req.method, false);
+        await session.save();
+        return res.status(401).send({ message: "access denied" });
       }
     }
   } catch (e: any) {

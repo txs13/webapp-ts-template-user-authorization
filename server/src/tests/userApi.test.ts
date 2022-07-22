@@ -10,7 +10,6 @@ import getEnvVars from "../config/config";
 const { dbUri, testDbName } = getEnvVars();
 const userAgentContent = "user agent content";
 
-
 describe("user api tests", () => {
   beforeAll(async () => {
     await mongoose.connect(dbUri, { dbName: testDbName });
@@ -30,8 +29,8 @@ describe("user api tests", () => {
     const roleInput = {
       role: "test case role 00001",
     };
-    let  dbRole = await RoleModel.create(roleInput);
-    
+    let dbRole = await RoleModel.create(roleInput);
+
     // user dataset which is supposed to be accepted by api
     const userInput = {
       email: "test@example.com",
@@ -45,7 +44,7 @@ describe("user api tests", () => {
       description: "very important test case user",
       userrole_id: dbRole._id.toString(),
     };
-    
+
     // pure api call
     const result = await request(app)
       .post("/api/v1/user/register")
@@ -104,7 +103,7 @@ describe("user api tests", () => {
       role: "test case role 00001",
     };
     let dbRole = await RoleModel.create(roleInput);
-    
+
     // user dataset which is supposed to be accepted by api
     const userInput = {
       email: "test@example.com",
@@ -165,7 +164,7 @@ describe("user api tests", () => {
       role: "test case role 00001",
     };
     let dbRole = await RoleModel.create(roleInput);
-    
+
     // user dataset which is supposed to be accepted by api
     const userInput = {
       email: "test@example.com",
@@ -202,7 +201,7 @@ describe("user api tests", () => {
       role: "test case role 00001",
     };
     let dbRole = await RoleModel.create(roleInput);
-    
+
     // user dataset which is supposed to be accepted by api
     const userInput = {
       email: "testexample.com",
@@ -216,7 +215,7 @@ describe("user api tests", () => {
       description: "very*important test case user",
       userrole_id: "6238f2d5b9686c6607323abf",
     };
-    
+
     // pure api call
     const result = await request(app)
       .post("/api/v1/user/register")
@@ -283,7 +282,7 @@ describe("user api tests", () => {
       role: "test case role 00001",
     };
     let dbRole = await RoleModel.create(roleInput);
-    
+
     // user dataset which is supposed to be accepted by api
     const userInput: UserInput = {
       email: "test@example.com",
@@ -299,7 +298,7 @@ describe("user api tests", () => {
     };
     // create "existing" user record in the database
     let dbUser = await UserModel.create(userInput);
-    
+
     // pure api call
     const result = await request(app)
       .post("/api/v1/user/register")
@@ -339,13 +338,15 @@ describe("user api tests", () => {
       .post("/api/v1/user/register")
       .send(userInput);
     // check api call status
-    expect(result.status).toBe(400)
-    expect(result.body.length).toBe(1)
-    expect(result.body[0].message).toBe("you are submitting to many parameters");
+    expect(result.status).toBe(400);
+    expect(result.body.length).toBe(1);
+    expect(result.body[0].message).toBe(
+      "you are submitting to many parameters"
+    );
 
     //clean up database
     await RoleModel.deleteOne({ _id: dbRole?._id });
-  })
+  });
 
   test("get all users without authorization", async () => {
     // pure api call
@@ -355,7 +356,7 @@ describe("user api tests", () => {
     // no user data provided
     expect(result.status).toBe(401);
     expect(result.body.length).toBe(1);
-    expect(result.body[0].message).toBe("token is required");  
+    expect(result.body[0].message).toBe("token is required");
   });
 
   test("get all users without admin rights", async () => {
@@ -434,9 +435,9 @@ describe("user api tests", () => {
 
     let adminInput: AdminInput = {
       userId: dbUser._id,
-      description: "test case admin user record"
-    }
-    let adminRecord = await AdminModel.create(adminInput)
+      description: "test case admin user record",
+    };
+    let adminRecord = await AdminModel.create(adminInput);
 
     // perform login in order to get access token
     const loginResult = await request(app)
@@ -462,47 +463,433 @@ describe("user api tests", () => {
     //clean up database
     await UserModel.deleteOne({ _id: dbUser?._id });
     await RoleModel.deleteOne({ _id: dbRole?._id });
-    await AdminModel.deleteOne({_id: adminRecord?._id});
+    await AdminModel.deleteOne({ _id: adminRecord?._id });
   });
 
   test("check password - correct password attached", async () => {
-    // TODO: correct password attached case
+    // check and create role - because it is needed for the user registration
+    const roleInput = {
+      role: "test case role 00001",
+    };
+    let dbRole = await RoleModel.create(roleInput);
+
+    // user dataset which is supposed to be accepted by api
+    const userInput = {
+      email: "test@example.com",
+      password: "qwerty12345",
+      name: "Vasyliy",
+      familyname: "Pupkin",
+      phone: "+1 254 456 23 45",
+      address: "USA, Philadelphia, Linkoln Str. 25",
+      company: "Roga i Kopyta Ltd.",
+      position: "anykey tester",
+      description: "very important test case user",
+      isConfirmed: true,
+      userrole_id: dbRole._id.toString(),
+    };
+    // create "existing" user record in the database
+    let dbUser = await UserModel.create(userInput);
+
+    // perform login in order to get access token
+    const loginResult = await request(app)
+      .post("/api/v1/user/login")
+      .send({ email: userInput.email, password: userInput.password })
+      .set("User-agent", userAgentContent);
+
+    expect(loginResult.status).toBe(200);
+    expect(loginResult.body.accessToken).toBeTruthy();
+
+    const accessToken = loginResult.body.accessToken;
+
+    // perform api request
+    const result = await request(app)
+      .post("/api/v1/user/checkpassword")
+      .send({ password: userInput.password })
+      .set("User-agent", userAgentContent)
+      .set("Authorization", accessToken);
+
+    // checking correctness of the response
+    expect(result.status).toBe(200);
+    expect(result.body.message).toBe("password is OK");
+
+    //clean up database
+    await UserModel.deleteOne({ _id: dbUser?._id });
+    await RoleModel.deleteOne({ _id: dbRole?._id });
   });
 
   test("check password - not correct password attached", async () => {
-    // TODO: NOT correct password attached case
+    // check and create role - because it is needed for the user registration
+    const roleInput = {
+      role: "test case role 00001",
+    };
+    let dbRole = await RoleModel.create(roleInput);
+
+    // user dataset which is supposed to be accepted by api
+    const userInput = {
+      email: "test@example.com",
+      password: "qwerty12345",
+      name: "Vasyliy",
+      familyname: "Pupkin",
+      phone: "+1 254 456 23 45",
+      address: "USA, Philadelphia, Linkoln Str. 25",
+      company: "Roga i Kopyta Ltd.",
+      position: "anykey tester",
+      description: "very important test case user",
+      isConfirmed: true,
+      userrole_id: dbRole._id.toString(),
+    };
+    // create "existing" user record in the database
+    let dbUser = await UserModel.create(userInput);
+
+    // perform login in order to get access token
+    const loginResult = await request(app)
+      .post("/api/v1/user/login")
+      .send({ email: userInput.email, password: userInput.password })
+      .set("User-agent", userAgentContent);
+
+    expect(loginResult.status).toBe(200);
+    expect(loginResult.body.accessToken).toBeTruthy();
+
+    const accessToken = loginResult.body.accessToken;
+
+    // perform api request
+    const result = await request(app)
+      .post("/api/v1/user/checkpassword")
+      .send({ password: "wrong password" })
+      .set("User-agent", userAgentContent)
+      .set("Authorization", accessToken);
+
+    // checking correctness of the response
+    expect(result.status).toBe(200);
+    expect(result.body.message).toBe("password is NOT OK");
+
+    //clean up database
+    await UserModel.deleteOne({ _id: dbUser?._id });
+    await RoleModel.deleteOne({ _id: dbRole?._id });
   });
 
   test("check password - no password attached", async () => {
-    // TODO: NO password attached case 
+    // check and create role - because it is needed for the user registration
+    const roleInput = {
+      role: "test case role 00001",
+    };
+    let dbRole = await RoleModel.create(roleInput);
+
+    // user dataset which is supposed to be accepted by api
+    const userInput = {
+      email: "test@example.com",
+      password: "qwerty12345",
+      name: "Vasyliy",
+      familyname: "Pupkin",
+      phone: "+1 254 456 23 45",
+      address: "USA, Philadelphia, Linkoln Str. 25",
+      company: "Roga i Kopyta Ltd.",
+      position: "anykey tester",
+      description: "very important test case user",
+      isConfirmed: true,
+      userrole_id: dbRole._id.toString(),
+    };
+    // create "existing" user record in the database
+    let dbUser = await UserModel.create(userInput);
+
+    // perform login in order to get access token
+    const loginResult = await request(app)
+      .post("/api/v1/user/login")
+      .send({ email: userInput.email, password: userInput.password })
+      .set("User-agent", userAgentContent);
+
+    expect(loginResult.status).toBe(200);
+    expect(loginResult.body.accessToken).toBeTruthy();
+
+    const accessToken = loginResult.body.accessToken;
+
+    // perform api request
+    const result = await request(app)
+      .post("/api/v1/user/checkpassword")
+      .send()
+      .set("User-agent", userAgentContent)
+      .set("Authorization", accessToken);
+
+    // checking correctness of the response
+    expect(result.status).toBe(400);
+    expect(result.body[0].message).toBe("password is required");
+
+    //clean up database
+    await UserModel.deleteOne({ _id: dbUser?._id });
+    await RoleModel.deleteOne({ _id: dbRole?._id });
   });
 
-  test("get user - admin user correct userID", async () => {
-    // TODO: admin user correct ID case
+  test("get user - admin user reads his record and other user's one with correct userIDs", async () => {
+    // check and create role - because it is needed for the user registration
+    const roleInput = {
+      role: "test case role 00001",
+    };
+    let dbRole = await RoleModel.create(roleInput);
+
+    // user dataset which is supposed to be accepted by api
+    const userInput = {
+      email: "test@example.com",
+      password: "qwerty12345",
+      name: "Vasyliy",
+      familyname: "Pupkin",
+      phone: "+1 254 456 23 45",
+      address: "USA, Philadelphia, Linkoln Str. 25",
+      company: "Roga i Kopyta Ltd.",
+      position: "anykey tester",
+      description: "very important test case user",
+      isConfirmed: true,
+      userrole_id: dbRole._id.toString(),
+    };
+    const secondUserInput = {
+      email: "testCaseEmail@example.com",
+      password: "qwerty12345",
+      name: "Ignat",
+      familyname: "Bubkin",
+      phone: "+1 254 456 23 41",
+      address: "USA, Philadelphia, Linkoln Str. 26",
+      company: "Roga i Kopyta Corp.",
+      position: "test case role",
+      description: "test case second user",
+      isConfirmed: false,
+      userrole_id: dbRole._id.toString(),
+    };
+
+    // create "existing" user record in the database
+    let dbUser = await UserModel.create(userInput);
+    let dbSecondUser = await UserModel.create(secondUserInput);
+
+    let adminInput: AdminInput = {
+      userId: dbUser._id,
+      description: "test case admin user record",
+    };
+    let adminRecord = await AdminModel.create(adminInput);
+
+    // perform login in order to get access token
+    const loginResult = await request(app)
+      .post("/api/v1/user/login")
+      .send({ email: userInput.email, password: userInput.password })
+      .set("User-agent", userAgentContent);
+
+    expect(loginResult.status).toBe(200);
+    expect(loginResult.body.accessToken).toBeTruthy();
+
+    const accessToken = loginResult.body.accessToken;
+
+    // get himself
+    let result = await request(app)
+      .get(`/api/v1/user/getuser/${dbUser._id.toString()}`)
+      .set("Authorization", accessToken)
+      .set("User-agent", userAgentContent);
+
+    expect(result.status).toBe(200);
+    let userRecord: any = result.body;
+    expect(userRecord.email).toBe(userInput.email);
+    expect(userRecord.password).toBeFalsy();
+    expect(userRecord.name).toBe(userInput.name);
+    expect(userRecord.familyname).toBe(userInput.familyname);
+    expect(userRecord.phone).toBe(userInput.phone);
+    expect(userRecord.address).toBe(userInput.address);
+    expect(userRecord.company).toBe(userInput.company);
+    expect(userRecord.position).toBe(userInput.position);
+    expect(userRecord.description).toBe(userInput.description);
+    expect(userRecord.isConfirmed).toBeTruthy();
+    expect(userRecord.userrole_id).toBe(dbRole._id.toString());
+
+    // get other user details
+    result = await request(app)
+      .get(`/api/v1/user/getuser/${dbSecondUser._id.toString()}`)
+      .set("Authorization", accessToken)
+      .set("User-agent", userAgentContent);
+
+    expect(result.status).toBe(200);
+    userRecord = result.body;
+    expect(userRecord.email).toBe(dbSecondUser.email);
+    expect(userRecord.password).toBeFalsy();
+    expect(userRecord.name).toBe(dbSecondUser.name);
+    expect(userRecord.familyname).toBe(dbSecondUser.familyname);
+    expect(userRecord.phone).toBe(dbSecondUser.phone);
+    expect(userRecord.address).toBe(dbSecondUser.address);
+    expect(userRecord.company).toBe(dbSecondUser.company);
+    expect(userRecord.position).toBe(dbSecondUser.position);
+    expect(userRecord.description).toBe(dbSecondUser.description);
+    expect(userRecord.isConfirmed).toBeFalsy();
+    expect(userRecord.userrole_id).toBe(dbRole._id.toString());
+
+    //clean up database
+    await UserModel.deleteOne({ _id: dbUser?._id });
+    await UserModel.deleteOne({ _id: dbSecondUser?._id });
+    await RoleModel.deleteOne({ _id: dbRole?._id });
+    await AdminModel.deleteOne({ _id: adminRecord?._id });
   });
 
-  test ("get user - admin user NOT correct userID", async () => {
+  test("get user - admin user NOT correct userID", async () => {
     // TODO: get user - admin user NOT correct userID case
+    // check and create role - because it is needed for the user registration
+    const roleInput = {
+      role: "test case role 00001",
+    };
+    let dbRole = await RoleModel.create(roleInput);
+
+    // user dataset which is supposed to be accepted by api
+    const userInput = {
+      email: "test@example.com",
+      password: "qwerty12345",
+      name: "Vasyliy",
+      familyname: "Pupkin",
+      phone: "+1 254 456 23 45",
+      address: "USA, Philadelphia, Linkoln Str. 25",
+      company: "Roga i Kopyta Ltd.",
+      position: "anykey tester",
+      description: "very important test case user",
+      isConfirmed: true,
+      userrole_id: dbRole._id.toString(),
+    };
+    const secondUserInput = {
+      email: "testCaseEmail@example.com",
+      password: "qwerty12345",
+      name: "Ignat",
+      familyname: "Bubkin",
+      phone: "+1 254 456 23 41",
+      address: "USA, Philadelphia, Linkoln Str. 26",
+      company: "Roga i Kopyta Corp.",
+      position: "test case role",
+      description: "test case second user",
+      isConfirmed: false,
+      userrole_id: dbRole._id.toString(),
+    };
+
+    // create "existing" user record in the database
+    let dbUser = await UserModel.create(userInput);
+    let dbSecondUser = await UserModel.create(secondUserInput);
+
+    let adminInput: AdminInput = {
+      userId: dbUser._id,
+      description: "test case admin user record",
+    };
+    let adminRecord = await AdminModel.create(adminInput);
+
+    // perform login in order to get access token
+    const loginResult = await request(app)
+      .post("/api/v1/user/login")
+      .send({ email: userInput.email, password: userInput.password })
+      .set("User-agent", userAgentContent);
+
+    expect(loginResult.status).toBe(200);
+    expect(loginResult.body.accessToken).toBeTruthy();
+
+    const accessToken = loginResult.body.accessToken;
+
+    // trying to get wrong userID
+    let result = await request(app)
+      .get(`/api/v1/user/getuser/628b94fdd44228x40566450`)
+      .set("Authorization", accessToken)
+      .set("User-agent", userAgentContent);
+    expect(result.status).toBe(409);
+    expect(result.body.message).toBe("wrong user id");
+
+    //clean up database
+    await UserModel.deleteOne({ _id: dbUser?._id });
+    await UserModel.deleteOne({ _id: dbSecondUser?._id });
+    await RoleModel.deleteOne({ _id: dbRole?._id });
+    await AdminModel.deleteOne({ _id: adminRecord?._id });
   });
 
-  test ("get user - admin user NO userIDe", async () => {
-    // TODO: get user - admin user NO userID case
-  });
+  test("get user - standard user correct own, other user's userID", async () => {
+    // check and create role - because it is needed for the user registration
+    const roleInput = {
+      role: "test case role 00001",
+    };
+    let dbRole = await RoleModel.create(roleInput);
 
-  test ("get user - standard user NO userID case", async () => {
-    // TODO: get user - standard user NO userID
-  });
+    // user dataset which is supposed to be accepted by api
+    const userInput = {
+      email: "test@example.com",
+      password: "qwerty12345",
+      name: "Vasyliy",
+      familyname: "Pupkin",
+      phone: "+1 254 456 23 45",
+      address: "USA, Philadelphia, Linkoln Str. 25",
+      company: "Roga i Kopyta Ltd.",
+      position: "anykey tester",
+      description: "very important test case user",
+      isConfirmed: true,
+      userrole_id: dbRole._id.toString(),
+    };
+    const secondUserInput = {
+      email: "testCaseEmail@example.com",
+      password: "qwerty12345",
+      name: "Ignat",
+      familyname: "Bubkin",
+      phone: "+1 254 456 23 41",
+      address: "USA, Philadelphia, Linkoln Str. 26",
+      company: "Roga i Kopyta Corp.",
+      position: "test case role",
+      description: "test case second user",
+      isConfirmed: true,
+      userrole_id: dbRole._id.toString(),
+    };
 
-  test("get user - standard user correct own userID", async () => {
-    // TODO: get user - standard user correct own userID case
-  });
+    // create "existing" user record in the database
+    let dbUser = await UserModel.create(userInput);
+    let dbSecondUser = await UserModel.create(secondUserInput);
 
-  test("get user - standard user correct other user's userID", async () => {
-    // TODO: get user - standard user correct other user's userID case
-  });
+    let adminInput: AdminInput = {
+      userId: dbUser._id,
+      description: "test case admin user record",
+    };
+    let adminRecord = await AdminModel.create(adminInput);
 
-  test("get user - standard user wrong userID", async () => {
-    // TODO: get user - standard user wrong userID case
+    // perform login in order to get access token
+    const loginResult = await request(app)
+      .post("/api/v1/user/login")
+      .send({
+        email: secondUserInput.email,
+        password: secondUserInput.password,
+      })
+      .set("User-agent", userAgentContent);
+
+    expect(loginResult.status).toBe(200);
+    expect(loginResult.body.accessToken).toBeTruthy();
+
+    const accessToken = loginResult.body.accessToken;
+
+    
+    // get himself
+    let result = await request(app)
+      .get(`/api/v1/user/getuser/${dbSecondUser._id.toString()}`)
+      .set("Authorization", accessToken)
+      .set("User-agent", userAgentContent);
+
+    expect(result.status).toBe(200);
+    let userRecord: any = result.body;
+    expect(userRecord.email).toBe(dbSecondUser.email);
+    expect(userRecord.password).toBeFalsy();
+    expect(userRecord.name).toBe(dbSecondUser.name);
+    expect(userRecord.familyname).toBe(dbSecondUser.familyname);
+    expect(userRecord.phone).toBe(dbSecondUser.phone);
+    expect(userRecord.address).toBe(dbSecondUser.address);
+    expect(userRecord.company).toBe(dbSecondUser.company);
+    expect(userRecord.position).toBe(dbSecondUser.position);
+    expect(userRecord.description).toBe(dbSecondUser.description);
+    expect(userRecord.isConfirmed).toBeTruthy();
+    expect(userRecord.userrole_id).toBe(dbRole._id.toString());
+    
+    // get other user details
+    result = await request(app)
+      .get(`/api/v1/user/getuser/${dbUser._id.toString()}`)
+      .set("Authorization", accessToken)
+      .set("User-agent", userAgentContent);
+    
+      
+    expect(result.status).toBe(401);
+    userRecord = result.body;
+    expect(result.body.message).toBe("access denied");
+
+    //clean up database
+    await UserModel.deleteOne({ _id: dbUser?._id });
+    await UserModel.deleteOne({ _id: dbSecondUser?._id });
+    await RoleModel.deleteOne({ _id: dbRole?._id });
+    await AdminModel.deleteOne({ _id: adminRecord?._id });
   });
 
 });
