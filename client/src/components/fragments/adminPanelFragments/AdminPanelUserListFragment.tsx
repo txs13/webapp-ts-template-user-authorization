@@ -82,15 +82,15 @@ interface AdminPanelUserListFragmentPropsTypes {
 const AdminPanelUserListFragment: React.FunctionComponent<
   AdminPanelUserListFragmentPropsTypes
 > = ({ users, roles, dataUpdate }) => {
-  // get data from app settings store and get text resouses in proper language
+  // get data from app settings store and get text resources in proper language
   const appSettings = useSelector(
     (state: RootState) => state.appSettings.value
   );
-  const [textResourses, setTextResourses] = useState<LocalizedTextResources>(
+  const [textResources, setTextResources] = useState<LocalizedTextResources>(
     {}
   );
   useEffect(() => {
-    setTextResourses(getTextResources(appSettings.language));
+    setTextResources(getTextResources(appSettings.language));
   }, [appSettings]);
 
   // handle screen size change
@@ -134,15 +134,15 @@ const AdminPanelUserListFragment: React.FunctionComponent<
 
   // filter block handling variables
   const menuItems: FilterMenuItem[] = [
-    { id: "1", label: textResourses.nameDialogBoxlabel, value: "name" },
+    { id: "1", label: textResources.nameDialogBoxlabel, value: "name" },
     {
       id: "2",
-      label: textResourses.familynameDialogBoxlabel,
+      label: textResources.familynameDialogBoxlabel,
       value: "familyname",
     },
-    { id: "3", label: textResourses.emailDialogBoxlabel, value: "email" },
-    { id: "4", label: textResourses.companyDialogBoxlabel, value: "company" },
-    { id: "5", label: textResourses.userRoleDialogBoxlabel, value: "userrole" },
+    { id: "3", label: textResources.emailDialogBoxlabel, value: "email" },
+    { id: "4", label: textResources.companyDialogBoxlabel, value: "company" },
+    { id: "5", label: textResources.userRoleDialogBoxlabel, value: "userrole" },
   ];
   const [filters, setFilters] = useState<UserFilters>({
     field: "familyname",
@@ -261,7 +261,7 @@ const AdminPanelUserListFragment: React.FunctionComponent<
     setOpenUserDetailsStatus({ open: false, currentUser: undefined });
   };
 
-  // this block is responsibelt for the universal model / confimation window
+  // this block is responsible for the universal model / confirmation window
   const [openConfirmationStatus, setOpenConfirmationStatus] =
     useState<OpenConfimationStatus>(openConfimationInitialState);
   const openConfirmationDialog = (
@@ -344,7 +344,7 @@ const AdminPanelUserListFragment: React.FunctionComponent<
           value={filters.field}
           onChange={filtersChangeHandler}
           sx={styles.searchFieldLabel}
-          label={textResourses.searchFieldLabel}
+          label={textResources.searchFieldLabel}
           variant="standard"
         >
           {menuItems.map((item) => (
@@ -358,7 +358,7 @@ const AdminPanelUserListFragment: React.FunctionComponent<
           onChange={filtersChangeHandler}
           value={filters.filterValue}
           sx={styles.searchWhatlabel}
-          label={textResourses.searchWhatlabel}
+          label={textResources.searchWhatlabel}
           variant="standard"
         />
         <FormControlLabel
@@ -371,7 +371,7 @@ const AdminPanelUserListFragment: React.FunctionComponent<
               defaultChecked
             />
           }
-          label={textResourses.toBeConfirmedSwitchLabel}
+          label={textResources.toBeConfirmedSwitchLabel}
         />
       </Toolbar>
       <Box sx={styles.databox}>

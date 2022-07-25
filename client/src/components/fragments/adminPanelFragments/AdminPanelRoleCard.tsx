@@ -14,6 +14,7 @@ interface RoleCardPropsTypes {
   dataUpdate: Function;
   openRoleDetails: Function;
   openConfirmationDialog: Function;
+  openRoleUsersList: Function;
 }
 
 const AdminPanelRoleCard: React.FunctionComponent<RoleCardPropsTypes> = ({
@@ -21,28 +22,32 @@ const AdminPanelRoleCard: React.FunctionComponent<RoleCardPropsTypes> = ({
   dataUpdate,
   openRoleDetails,
   openConfirmationDialog,
+  openRoleUsersList,
 }) => {
-  // get data from app settings store and get text resouses in proper language
+  // get data from app settings store and get text resources in proper language
   const appSettings = useSelector(
     (state: RootState) => state.appSettings.value
   );
-  const [textResourses, setTextResourses] = useState<LocalizedTextResources>(
+  const [textResources, setTextResources] = useState<LocalizedTextResources>(
     {}
   );
   useEffect(() => {
-    setTextResourses(getTextResources(appSettings.language));
+    setTextResources(getTextResources(appSettings.language));
   }, [appSettings]);
 
   //extended form visibility
   const [extended, setExtended] = useState(false);
-  const onCardClickHandler = () => {
-    setExtended(!extended);
+  const onCardClickHandler = (e: React.MouseEvent<HTMLElement>) => {
+    const { name } = e.target as HTMLButtonElement;
+    if (!name) {
+      setExtended(!extended);
+    }
   };
 
   // click handlers
   const deleteRoleClickHandler = async () => {
     openConfirmationDialog(
-      `${textResourses.deleteRoleCardMessage} ${roleItem.role}`,
+      `${textResources.deleteRoleCardMessage} ${roleItem.role}`,
       () => deleteRoleApiServiceCall()
     );
   };
@@ -52,10 +57,10 @@ const AdminPanelRoleCard: React.FunctionComponent<RoleCardPropsTypes> = ({
   };
 
   const openRoleListClickHandler = () => {
-    // TODO: open roles list
+    openRoleUsersList(roleItem._id);
   };
 
-  // api service call fuunctions
+  // api service call functions
   const deleteRoleApiServiceCall = async () => {
     await deleteRoleService(roleItem._id);
   };
@@ -66,7 +71,7 @@ const AdminPanelRoleCard: React.FunctionComponent<RoleCardPropsTypes> = ({
         <Grid item xs={3}>
           <Typography
             sx={styles.labelText}
-          >{`${textResourses.roleNameCardlabel}:`}</Typography>
+          >{`${textResources.roleNameCardlabel}:`}</Typography>
         </Grid>
         <Grid item xs={9}>
           <Typography fontWeight={600}>{roleItem.role}</Typography>
@@ -74,7 +79,7 @@ const AdminPanelRoleCard: React.FunctionComponent<RoleCardPropsTypes> = ({
         <Grid item xs={3}>
           <Typography
             sx={styles.labelText}
-          >{`${textResourses.roleDescriptionCardlabel}:`}</Typography>
+          >{`${textResources.roleDescriptionCardlabel}:`}</Typography>
         </Grid>
         <Grid item xs={9}>
           <Typography>{roleItem.description}</Typography>
@@ -82,7 +87,7 @@ const AdminPanelRoleCard: React.FunctionComponent<RoleCardPropsTypes> = ({
         <Grid item xs={3}>
           <Typography
             sx={styles.labelText}
-          >{`${textResourses.usersNumberWithRolelabel}:`}</Typography>
+          >{`${textResources.usersNumberWithRolelabel}:`}</Typography>
         </Grid>
         <Grid item xs={9}>
           <Typography>{roleItem.usersNumber}</Typography>
@@ -93,10 +98,11 @@ const AdminPanelRoleCard: React.FunctionComponent<RoleCardPropsTypes> = ({
           <ButtonGroup sx={styles.btnBox} variant="text">
             <Typography sx={styles.isPublic}>
               {roleItem.isPublic
-                ? textResourses.roleIsPubliclabel
-                : textResourses.roleIsNotPubliclabel}
+                ? textResources.roleIsPubliclabel
+                : textResources.roleIsNotPubliclabel}
             </Typography>
             <Button
+              name="delete"
               variant="contained"
               color="error"
               size="small"
@@ -104,25 +110,27 @@ const AdminPanelRoleCard: React.FunctionComponent<RoleCardPropsTypes> = ({
               disabled={roleItem.usersNumber === 0 ? false : true}
               onClick={() => deleteRoleClickHandler()}
             >
-              {textResourses.deleteBtnLabel}
+              {textResources.deleteBtnLabel}
             </Button>
             <Button
+              name="details"
               variant="contained"
               color="info"
               size="small"
               sx={styles.btn}
               onClick={() => openRoleDetailsClickHandler()}
             >
-              {textResourses.editBtnLabel}
+              {textResources.editBtnLabel}
             </Button>
             <Button
+              name="users"
               variant="contained"
               color="info"
               size="small"
               sx={styles.btn}
               onClick={() => openRoleListClickHandler()}
             >
-              {textResourses.usersListCardlabel}
+              {textResources.usersListCardlabel}
             </Button>
           </ButtonGroup>
         </Grid>

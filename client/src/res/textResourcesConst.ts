@@ -531,4 +531,11 @@ export const textResourcesMultilang: TextResources = {
   notConfirmedUsersChartLabel: {
     EN: "NOT confirmed"
   },
+  // role users list dialog window text labels
+  roleUsersListHeader: {
+    EN: "The following users belong to the role "
+  },
+  roleUsersListCloseBtnLabel: {
+    EN: "close"
+  },
 };
