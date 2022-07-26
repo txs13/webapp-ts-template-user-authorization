@@ -526,16 +526,28 @@ export const textResourcesMultilang: TextResources = {
     EN: "Confirmed users stats",
   },
   confirmedUsersChartLabel: {
-    EN: "confirmed"
+    EN: "confirmed",
   },
   notConfirmedUsersChartLabel: {
-    EN: "NOT confirmed"
+    EN: "NOT confirmed",
   },
   // role users list dialog window text labels
   roleUsersListHeader: {
-    EN: "The following users belong to the role "
+    EN: "The following users belong to the role ",
   },
   roleUsersListCloseBtnLabel: {
-    EN: "close"
+    EN: "close",
   },
+  noRoleUsersRecordText: {
+    EN: "No one is assigned to this role",
+  },
+  anotherNumberOfUsersBeginning: {
+    EN: "... and also another",
+  },
+  anotherNumberOfUsersEnding: {
+    EN: "users",
+  },
+  emailRecordForNoUser: {
+    EN: "..."
+  }
 };
