@@ -29,6 +29,7 @@ import {
 import AdminPanelRoleCard from "./AdminPanelRoleCard";
 import AdminPanelRoleDetailsDialog from "./AdminPanelRoleDetailsDialog";
 import ConfirmationDialog from "../reusableComponents/ConfirmationDialog";
+import AdminPanelRoleUserListDialog from "./AdminPanelRoleUserListDialog";
 
 interface AdminPanelRoleListFragmentPropsTypes {
   users: UserDocument[] | undefined;
@@ -50,6 +51,18 @@ export interface OpenRoleDetailsStatus {
   open: boolean;
   currentRole: RoleDocument | undefined;
 }
+
+export interface OpenRoleUserListStatus {
+  open: boolean;
+  currentRole: RoleDocument | undefined;
+  roleUsers: UserDocument[] | undefined;
+}
+
+const initialRoleUserListStatus: OpenRoleUserListStatus = {
+  open: false,
+  currentRole: undefined,
+  roleUsers: undefined,
+};
 
 type MenuValue = "role" | "description";
 
@@ -219,6 +232,21 @@ const AdminPanelRoleListFragment: React.FunctionComponent<
     setOpenConfirmationStatus(openConfimationInitialState);
   };
 
+  // this block is responsible for the user list window to show
+  // users belonging to a particular role
+  const [openRoleUserListStatus, setOpenRoleUserListStatus] =
+    useState<OpenRoleUserListStatus>(initialRoleUserListStatus);
+  const openRoleUsersList = (roleId: string) => {
+    setOpenRoleUserListStatus({
+      open: true,
+      currentRole: roles?.find((it) => it._id === roleId),
+      roleUsers: users?.filter((it) => it.userrole_id === roleId),
+    });
+  };
+  const closeRoleUsersList = () => {
+    setOpenRoleUserListStatus(initialRoleUserListStatus);
+  };
+
   // click handlers
 
   const addRoleClickHandler = () => {
@@ -304,6 +332,7 @@ const AdminPanelRoleListFragment: React.FunctionComponent<
                 dataUpdate={dataUpdate}
                 openRoleDetails={openRoleDetails}
                 openConfirmationDialog={openConfirmationDialog}
+                openRoleUsersList={openRoleUsersList}
               />
             </Grid>
           ))}
@@ -315,10 +344,15 @@ const AdminPanelRoleListFragment: React.FunctionComponent<
         openConfirmationDialog={openConfirmationDialog}
         roles={roles}
         users={users}
+        openRoleUsersList={openRoleUsersList}
       />
       <ConfirmationDialog
         openStatus={openConfirmationStatus}
         submitConfirmationDecision={submitConfirmationDecision}
+      />
+      <AdminPanelRoleUserListDialog
+        openStatus={openRoleUserListStatus}
+        closeDialog={closeRoleUsersList}
       />
     </Box>
   );

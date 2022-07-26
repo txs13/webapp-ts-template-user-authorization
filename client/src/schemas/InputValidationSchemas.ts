@@ -14,7 +14,7 @@ import {
 } from "../utils/regexes";
 import getTextResources from "../res/textResourcesFunction";
 
-// gett global app language settings from the store and get localized text resources
+// get global app language settings from the store and get localized text resources
 const storeState = store.getState();
 const {
   minOneCharEmailMessage,

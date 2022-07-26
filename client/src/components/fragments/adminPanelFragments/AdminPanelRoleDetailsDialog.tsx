@@ -38,6 +38,7 @@ interface AdminPanelRoleDetailDialogPropsTypes {
   users: UserDocument[] | undefined;
   closeRoleDetails: Function;
   openConfirmationDialog: Function;
+  openRoleUsersList: Function;
 }
 
 interface RoleDocumentForm extends RoleDocument {
@@ -69,6 +70,7 @@ const AdminPanelRoleDetailsDialog: React.FunctionComponent<
   users,
   closeRoleDetails,
   openConfirmationDialog,
+  openRoleUsersList,
 }) => {
   // get data from app settings store and get text resources in proper language
   const appSettings = useSelector(
@@ -112,23 +114,23 @@ const AdminPanelRoleDetailsDialog: React.FunctionComponent<
   // the reason to do so is because setup function above would not work for the case when
   // user creates several roles in a row
   const clearForm = () => {
-    setCurrentRole(initialRoleValue)
-  }
+    setCurrentRole(initialRoleValue);
+  };
 
   // variable to store edits / changes status
   const [edits, setEdits] = useState(false);
   useEffect(() => {
     if (
-      (currentRole.role === openStatus.currentRole?.role) &&
-      ((currentRole.description === openStatus.currentRole?.description ||
+      currentRole.role === openStatus.currentRole?.role &&
+      (currentRole.description === openStatus.currentRole?.description ||
         (!openStatus.currentRole?.description &&
-          currentRole.description === "")))
+          currentRole.description === ""))
     ) {
       setEdits(false);
     } else {
       setEdits(true);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentRole]);
 
   // input validation
@@ -254,13 +256,13 @@ const AdminPanelRoleDetailsDialog: React.FunctionComponent<
       const result = await createRoleService(roleInput);
       // if role is created - close the dialog window
       if (result) {
-        clearForm()
+        clearForm();
         closeRoleDetails();
       }
     }
   };
   const showUsersClickHandler = () => {
-    // TODO: show users with current role
+    openRoleUsersList(openStatus.currentRole?._id);
   };
   return (
     <Dialog open={openStatus.open} sx={styles.mainFrame}>

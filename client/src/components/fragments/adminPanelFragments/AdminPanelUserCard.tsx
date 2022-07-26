@@ -38,8 +38,11 @@ const AdminPanelUserCard: React.FunctionComponent<UserCardPropsTypes> = ({
 
   //extended form visibility
   const [extended, setExtended] = useState(false);
-  const onCardClickHandler = () => {
-    setExtended(!extended);
+  const onCardClickHandler = (e: React.MouseEvent<HTMLElement>) => {
+    const {name} = e.target as HTMLButtonElement
+    if (!name) {
+      setExtended(!extended);
+    }
   };
 
   // call confirmation dialog for the user confirmation buttton
@@ -106,6 +109,7 @@ const AdminPanelUserCard: React.FunctionComponent<UserCardPropsTypes> = ({
                   : textResourses.userNStatusLabel}
               </Typography>
               <Button
+                name="delete"
                 variant="contained"
                 color="error"
                 size="small"
@@ -115,6 +119,7 @@ const AdminPanelUserCard: React.FunctionComponent<UserCardPropsTypes> = ({
                 {textResourses.deleteBtnLabel}
               </Button>
               <Button
+                name="details"
                 variant="contained"
                 color="info"
                 size="small"
@@ -124,6 +129,7 @@ const AdminPanelUserCard: React.FunctionComponent<UserCardPropsTypes> = ({
                 {textResourses.editBtnLabel}
               </Button>
               <Button
+                name="confirm"
                 disabled={user.isConfirmed as boolean}
                 variant="contained"
                 color="success"

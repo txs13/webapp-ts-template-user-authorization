@@ -27,7 +27,7 @@ const authorizedAccess = async (
     return res.status(401).send([{ message: "wrong token" }]);
   } else {
     // get proper user and session records
-    let user: UserDocument
+    let user: UserDocument | undefined
     let session: SessionDocument
     try{
       user = await getUserById(decoded.userId);

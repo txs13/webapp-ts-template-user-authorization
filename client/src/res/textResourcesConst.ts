@@ -3,7 +3,7 @@
 import { TextResources } from "./textResourcesFunction";
 
 export const textResourcesMultilang: TextResources = {
-  // general purposes text resourses
+  // general purposes text resources
   appName: {
     EN: "Webapp template",
     DE: "Webapp Vorlage",
@@ -65,7 +65,7 @@ export const textResourcesMultilang: TextResources = {
     EN: "Wrong stored token, please log in",
   },
   accountIsNotConfirmedMessage: {
-    EN: "Your accout is not confirmed yet",
+    EN: "Your account is not confirmed yet",
   },
   wrongNetworkSettingsMessage: {
     EN: "Wrong network settings. Please contact admin",
@@ -110,7 +110,7 @@ export const textResourcesMultilang: TextResources = {
     EN: "please enter password",
   },
   passwordMin6CharsMessage: {
-    EN: "plassword should be at least 6 chars",
+    EN: "password should be at least 6 chars",
   },
   nameIsRequiredMessage: {
     EN: "please enter your name",
@@ -467,7 +467,7 @@ export const textResourcesMultilang: TextResources = {
   },
   // role related confirmation messages
   saveRoleUpdatesMessage: {
-    EN: "Please cinfirm you would like to save these changes",
+    EN: "Please confirm you would like to save these changes",
   },
   deleteRoleCardMessage: {
     EN: "You are going to delete the role",
@@ -526,9 +526,28 @@ export const textResourcesMultilang: TextResources = {
     EN: "Confirmed users stats",
   },
   confirmedUsersChartLabel: {
-    EN: "confirmed"
+    EN: "confirmed",
   },
   notConfirmedUsersChartLabel: {
-    EN: "NOT confirmed"
+    EN: "NOT confirmed",
   },
+  // role users list dialog window text labels
+  roleUsersListHeader: {
+    EN: "The following users belong to the role ",
+  },
+  roleUsersListCloseBtnLabel: {
+    EN: "close",
+  },
+  noRoleUsersRecordText: {
+    EN: "No one is assigned to this role",
+  },
+  anotherNumberOfUsersBeginning: {
+    EN: "... and also another",
+  },
+  anotherNumberOfUsersEnding: {
+    EN: "users",
+  },
+  emailRecordForNoUser: {
+    EN: "..."
+  }
 };
